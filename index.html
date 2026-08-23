@@ -219,6 +219,13 @@
         .manual-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
         .manual-grid .wide{grid-column:span 2}.manual-grid .full{grid-column:1/-1}
         .manual-master-box{background:#f8fafc;border:1px solid #cbd5e1;border-radius:9px;padding:9px 10px;font-size:.79rem;color:#475569;line-height:1.5}
+        .master-manual-panel{margin-top:14px;background:#fff;border:1px solid #f59e0b;border-radius:10px;overflow:hidden;box-shadow:0 3px 10px rgba(146,64,14,.06)}
+        .master-manual-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 12px;background:#fff7ed;border-bottom:1px solid #fed7aa;flex-wrap:wrap}
+        .master-manual-head strong{color:#9a3412;font-size:.92rem}.master-manual-head span{font-size:.76rem;color:#9a3412}
+        .master-manual-editor{padding:12px}.master-manual-table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:8px}
+        .master-manual-table{width:100%;border-collapse:collapse;min-width:940px;font-size:.79rem}.master-manual-table th{position:static;background:#f8fafc;color:#334155;padding:8px 6px;border:1px solid #e2e8f0;white-space:nowrap}.master-manual-table td{padding:6px;border:1px solid #e2e8f0;vertical-align:middle}.master-manual-table input{width:100%;min-width:100px;padding:7px 8px;border:1px solid #cbd5e1;border-radius:6px;font-size:.79rem;background:#fff}.master-manual-table input:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 2px rgba(37,99,235,.12)}
+        .master-manual-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}.master-manual-note{font-size:.76rem;color:#64748b;line-height:1.5}.master-manual-status{margin-top:8px;font-size:.8rem;font-weight:700}.master-saved-list{margin-top:12px;padding-top:10px;border-top:1px dashed #fdba74}.master-saved-item{display:grid;grid-template-columns:minmax(120px,.7fr) minmax(220px,1.5fr) minmax(90px,.55fr) minmax(130px,.8fr) minmax(180px,1fr) auto;gap:6px;align-items:center;padding:7px 8px;border:1px solid #e2e8f0;border-radius:7px;margin-top:6px;background:#f8fafc;font-size:.76rem}.master-saved-item b{color:#0f172a}.master-saved-item small{color:#64748b}.master-required-star{color:#dc2626;font-weight:900}
+        @media(max-width:800px){.master-saved-item{grid-template-columns:1fr}.master-manual-editor{padding:9px}}
         .manual-master-box b{color:#0f172a}.manual-ref{background:#f8fafc!important;color:#475569}
         .network-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;font-size:.72rem;font-weight:900;background:#e2e8f0;color:#334155}
         .network-badge.online{background:#dcfce7;color:#166534}.network-badge.offline{background:#fee2e2;color:#991b1b}.network-badge.wait{background:#fef3c7;color:#92400e}
@@ -282,25 +289,59 @@
         @media(max-width:900px){.xk-ai-top{grid-template-columns:1fr}.xk-meta-grid{grid-template-columns:1fr 1fr}.xk-meta-grid .span2{grid-column:span 2}}
         @media(max-width:600px){.xk-meta-grid{grid-template-columns:1fr}.xk-meta-grid .span2{grid-column:span 1}.xk-actions .btn{width:100%}}
 
+
+        /* ===== ĐĂNG NHẬP & BẢO MẬT ỨNG DỤNG ===== */
+        .app-login-overlay{position:fixed;inset:0;z-index:50000;background:linear-gradient(135deg,rgba(15,23,42,.96),rgba(30,64,175,.94));display:flex;align-items:center;justify-content:center;padding:18px}
+        .app-login-box{width:min(440px,96vw);background:#fff;border-radius:18px;padding:24px;box-shadow:0 30px 90px rgba(0,0,0,.38);border:1px solid rgba(255,255,255,.35)}
+        .app-login-logo{width:58px;height:58px;border-radius:16px;background:linear-gradient(135deg,#2563eb,#1e40af);color:#fff;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 10px;box-shadow:0 10px 25px rgba(37,99,235,.28)}
+        .app-login-box h2{text-align:center;color:#0f172a;margin:0 0 4px;font-size:1.25rem}
+        .app-login-box .sub{text-align:center;color:#64748b;font-size:.84rem;margin:0 0 18px;line-height:1.5}
+        .app-pass-row{display:flex;gap:7px;align-items:stretch}.app-pass-row input{margin:5px 0 10px;flex:1}.app-pass-row .btn{margin:5px 0 10px;min-width:48px}
+        .app-remember{display:flex;align-items:center;gap:8px;margin:2px 0 14px;font-size:.82rem;color:#475569;cursor:pointer}.app-remember input{width:auto;margin:0}
+        .app-login-error{display:none;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:8px;padding:9px 10px;margin-bottom:10px;font-size:.82rem;font-weight:700}
+        .app-security-note{font-size:.75rem;color:#64748b;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 10px;margin-top:12px;line-height:1.45}
+        .app-password-settings{background:#eef2ff;border:1px solid #c7d2fe;border-radius:10px;padding:12px 13px}
+        .app-password-settings h4{margin:0 0 5px;color:#3730a3}.app-password-settings p{font-size:.78rem;color:#64748b;margin:0 0 10px}
+        .header-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+        @media(max-width:700px){.app-login-box{padding:19px}.header-actions .btn{font-size:.75rem;padding:6px 8px}}
+
     </style>
 </head>
 <body>
+    <div id="app-login-overlay" class="app-login-overlay" aria-modal="true" role="dialog" aria-labelledby="app-login-title">
+        <div class="app-login-box">
+            <div class="app-login-logo">🔐</div>
+            <h2 id="app-login-title">ĐĂNG NHẬP KHO IDECO</h2>
+            <p class="sub">Nhập mật khẩu để mở ứng dụng Quản lý Kho Dược GDP.</p>
+            <label for="app-login-password">Mật khẩu đăng nhập</label>
+            <div class="app-pass-row">
+                <input id="app-login-password" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu...">
+                <button id="app-login-eye" type="button" class="btn btn-primary" title="Xem/ẩn mật khẩu">👁️</button>
+            </div>
+            <label class="app-remember"><input id="app-login-remember" type="checkbox" checked> Ghi nhớ đăng nhập trên máy này (LocalStorage)</label>
+            <div id="app-login-error" class="app-login-error">Mật khẩu không đúng. Vui lòng kiểm tra lại.</div>
+            <button id="app-login-submit" type="button" class="btn btn-primary" style="width:100%;padding:10px 14px;font-size:.92rem">🔓 ĐĂNG NHẬP</button>
+            <div class="app-security-note">Mật khẩu mặc định ban đầu do BGĐ thiết lập. Có thể đổi trong <b>⚙️ Cài đặt AI</b> sau khi mở khóa Cài đặt.</div>
+        </div>
+    </div>
+
     <datalist id="master-code-list"></datalist>
 
     <div class="container">
         <header>
             <div style="min-width:0">
-                <h1>QUẢN LÝ KHO DƯỢC GDP IDECO - PHÁT TRIỂN RIÊNG  BỞI MTRIET</h1>
+                <h1>QUẢN LÝ KHO DƯỢC GDP - IDECO ĐƯỢC PHÁT TRIỂN BỞI:MTRIET</h1>
                 <div style="margin-top:5px;display:inline-flex;align-items:center;gap:6px;background:#fef3c7;color:#92400e;border:1px solid #f59e0b;border-radius:999px;padding:4px 9px;font-size:.75rem;font-weight:800;letter-spacing:.2px">🧪 FIREBASE TEST · thunghiem-eeb1f</div>
             </div>
             <div class="header-actions">
                 <button class="btn btn-guide" type="button" onclick="openUserGuide()">📘 Hướng dẫn sử dụng</button>
                 <button class="btn btn-warning" type="button" onclick="toggleMasterSection()">📂 Dữ Liệu Gốc (Master)</button>
+                <button class="btn btn-danger" type="button" onclick="window.IDECOAppAuth&&window.IDECOAppAuth.logout()">🔒 Đăng xuất</button>
             </div>
         </header>
 
         <div class="nav-tabs">
-            <div class="nav-tab active" onclick="switchTab('tab3', this)" id="btn-tab3">1. NHẬP PHIẾU THUỐC NCC </div>
+            <div class="nav-tab active" onclick="switchTab('tab3', this)" id="btn-tab3">1. NHẬP PHIẾU NCC</div>
             <div class="nav-tab" onclick="switchTab('tab1', this)">2. NHẬP KHO & TỒN KHO</div>
             <div class="nav-tab" onclick="switchTab('tab2', this)" id="btn-tab2">3. XUẤT KHO & BÁO CÁO</div>
         </div>
@@ -319,6 +360,42 @@
                 <input type="file" id="master-upload" accept=".xlsx, .xls, .csv">
                 <div id="master-status" style="margin-top:10px; font-weight:bold; color:#059669;"></div>
                 <div id="master-files-list" style="margin-top:10px;"></div>
+
+                <div class="master-manual-panel" id="master-manual-panel">
+                    <div class="master-manual-head">
+                        <div>
+                            <strong>➕ Thêm thủ công sản phẩm vào Master</strong><br>
+                            <span>Dùng khi phát sinh sản phẩm mới hoặc cần bổ sung nhanh mà không phải upload lại toàn bộ Excel.</span>
+                        </div>
+                        <button type="button" class="btn btn-warning" onclick="toggleManualMasterEditor()">✍️ Mở nhập thủ công</button>
+                    </div>
+                    <div id="master-manual-editor" class="master-manual-editor" style="display:none">
+                        <div class="master-manual-note" style="margin-bottom:8px">
+                            Format giống Template Master. <span class="master-required-star">*</span> <b>Tên SP</b> và <b>Quy Cách</b> là dữ liệu bắt buộc để sản phẩm có thể dùng an toàn trong quy trình Nhập/Xuất kho. Mã SP, Đơn vị, Hàm lượng/Nồng độ nên khai đầy đủ nếu có hồ sơ.
+                        </div>
+                        <div class="master-manual-table-wrap">
+                            <table class="master-manual-table">
+                                <thead><tr>
+                                    <th style="width:42px">STT</th>
+                                    <th>Mã SP</th>
+                                    <th><span class="master-required-star">*</span> Tên SP</th>
+                                    <th>Đơn Vị</th>
+                                    <th>Hàm Lượng / Nồng Độ</th>
+                                    <th><span class="master-required-star">*</span> Quy Cách</th>
+                                    <th style="width:64px">Xóa</th>
+                                </tr></thead>
+                                <tbody id="master-manual-body"></tbody>
+                            </table>
+                        </div>
+                        <div class="master-manual-actions">
+                            <button type="button" class="btn btn-primary" onclick="addManualMasterRow()">➕ Thêm hàng</button>
+                            <button type="button" class="btn btn-success" onclick="saveManualMasterRows()">💾 Lưu & Đồng bộ vào Master</button>
+                            <button type="button" class="btn" style="background:#e2e8f0;color:#334155" onclick="clearManualMasterDraft()">🧹 Xóa dữ liệu đang nhập</button>
+                            <span id="master-manual-status" class="master-manual-status"></span>
+                        </div>
+                        <div id="master-manual-saved" class="master-saved-list"></div>
+                    </div>
+                </div>
             </div>
 
             <div class="grid-layout">
@@ -681,7 +758,7 @@
                     </details>
 
                     <details class="ai-settings" id="ai-settings-details">
-                        <summary id="ai-settings-summary">🔐 ⚙️ Cài đặt bởi BGĐ</summary>
+                        <summary id="ai-settings-summary">🔐 ⚙️ Cài đặt AI · yêu cầu mật khẩu</summary>
                         <div class="ai-settings-body">
                             <div><label>Gemini API Key 1</label><div style="display:flex;gap:6px"><input type="password" id="ai-key-1" autocomplete="off"><button class="btn btn-primary ai-key-eye" type="button" data-eye-target="ai-key-1" style="width:auto;padding:6px 9px">👁️</button></div></div>
                             <div><label>Gemini API Key 2</label><div style="display:flex;gap:6px"><input type="password" id="ai-key-2" autocomplete="off"><button class="btn btn-primary ai-key-eye" type="button" data-eye-target="ai-key-2" style="width:auto;padding:6px 9px">👁️</button></div></div>
@@ -698,6 +775,15 @@
                                 <button id="ai-restore-settings" class="btn btn-warning" type="button">♻️ Khôi phục cấu hình cũ</button>
                                 <button id="ai-lock-settings" class="btn btn-danger" type="button">🔒 Khóa lại</button>
                                 <span id="ai-settings-status" style="font-size:.82rem;color:#64748b"></span>
+                            </div>
+                            <div class="full app-password-settings">
+                                <h4>🔐 Bảo mật đăng nhập ứng dụng</h4>
+                                <p>Mật khẩu mở toàn bộ ứng dụng là lớp riêng với mật khẩu Cài đặt <b>minhtriet1973</b>. Mật khẩu mới được lưu dạng hash trong LocalStorage của máy này.</p>
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+                                    <div><label>Mật khẩu đăng nhập mới</label><div class="app-pass-row"><input id="app-new-password" type="password" autocomplete="new-password" placeholder="Nhập mật khẩu mới"><button id="app-new-password-eye" type="button" class="btn btn-primary">👁️</button></div></div>
+                                    <div><label>Nhập lại mật khẩu mới</label><div class="app-pass-row"><input id="app-new-password-confirm" type="password" autocomplete="new-password" placeholder="Nhập lại mật khẩu"><button id="app-new-password-confirm-eye" type="button" class="btn btn-primary">👁️</button></div></div>
+                                </div>
+                                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px"><button id="app-save-new-password" type="button" class="btn btn-success">💾 Lưu mật khẩu đăng nhập mới</button><span id="app-password-change-status" style="font-size:.8rem;color:#64748b"></span></div>
                             </div>
                             <div class="full" id="ai-test-result" style="font-size:.82rem;line-height:1.5;color:#475569"></div>
                             <div class="full" style="font-size:.78rem;color:#64748b;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:9px 10px">
@@ -764,6 +850,7 @@
                 <div class="guide-grid">
                     <div class="guide-card">
                         <h3>A. Vận hành bình thường bằng AI</h3>
+                        <div class="guide-step"><div class="guide-step-num">🔐</div><div><b>Đăng nhập & bảo mật ứng dụng</b><p>Mở ứng dụng bằng mật khẩu đăng nhập. Có thể tick <b>Ghi nhớ đăng nhập</b> để lưu trên máy hiện tại. Muốn đổi mật khẩu đăng nhập, mở <b>⚙️ Cài đặt AI</b> bằng mật khẩu Cài đặt rồi nhập mật khẩu mới và bấm Lưu. Nút <b>Đăng xuất</b> ở thanh đầu giúp khóa ứng dụng lại.</p></div></div>
                         <div class="guide-step"><div class="guide-step-num">1</div><div><b>Kiểm tra Dữ Liệu Gốc (Master)</b><p>Bấm <b>📂 Dữ Liệu Gốc (Master)</b>. Tên sản phẩm và Quy cách phải chính xác. Mã SP/Hàm lượng/ĐVT nên khai đầy đủ để tham khảo và quản lý tốt hơn.</p></div></div>
                         <div class="guide-step"><div class="guide-step-num">2</div><div><b>Tải phiếu Nhà cung cấp</b><p>Vào <b>NHẬP PHIẾU NCC - AI</b>, chọn ảnh/PDF. Có thể điền Nhà cung cấp, Số phiếu và Người nhận để biên bản đầy đủ hơn.</p></div></div>
                         <div class="guide-step"><div class="guide-step-num">3</div><div><b>Bấm AI PHÂN TÍCH & SOI CHIẾU</b><p>Trong lúc chạy, theo dõi ô trạng thái: đọc PDF/OCR → gọi AI → kiểm tra Lô/HSD → soi Master. Không tắt màn hình khi đang xử lý.</p></div></div>
@@ -1092,7 +1179,7 @@
         document.getElementById('export-filter-end').valueAsDate = new Date();
 
         // LOADING DATA
-        refs.master.on('value', s => { const d=s.val(); const f=d?Object.keys(d).map(k=>({id:k,...d[k]})):[]; renderMasterFilesList(f); refreshMasterData(f); });
+        refs.master.on('value', s => { const d=s.val(); const f=d?Object.keys(d).map(k=>({id:k,...d[k]})):[]; renderMasterFilesList(f); refreshMasterData(f); renderManualMasterSaved(f); });
         refs.items.on('value', s => { const d=s.val(); stockData=d?Object.keys(d).map(k=>({id:k,...d[k]})):[]; renderStockTable(); refs.master.once('value', s=>{const fd=s.val();const f=fd?Object.keys(fd).map(k=>({id:k,...fd[k]})):[]; refreshMasterData(f);}); });
         refs.exports.on('value', s => { 
             const d=s.val(); 
@@ -1151,7 +1238,7 @@
         function refreshMasterData(files) {
             // MASTER CHÍNH THỨC: chỉ lấy từ Dữ Liệu Gốc đã khai/upload. KHÔNG lấy bù từ tồn kho.
             const map = new Map();
-            files.forEach(f => { if(f.data) f.data.forEach(r => {
+            files.forEach(f => { if(f.data) (Array.isArray(f.data)?f.data:Object.values(f.data)).forEach(r => {
                 const rec = masterRecordFromRow(r);
                 const {name,code,unit,strength,packSpec} = rec;
                 // Dòng minh họa của Template không bao giờ được xem là Master thật,
@@ -2063,12 +2150,114 @@
             };
             r.readAsArrayBuffer(f);
         });
-        function renderMasterFilesList(files){ document.getElementById('master-files-list').innerHTML=files.map(f=>`<div>📄 ${f.fileName} <a href="#" onclick="refs.master.child('${f.id}').remove()" style="color:red">Xóa</a></div>`).join(''); }
+        const MANUAL_MASTER_NODE='manualMasterEntries';
+        let manualMasterDraftRows=[{code:'',name:'',unit:'',strength:'',packSpec:''}];
+
+        function manualMasterRowsFromFile(f){
+            if(!f || f.id!==MANUAL_MASTER_NODE || !f.data) return [];
+            return (Array.isArray(f.data)?f.data:Object.entries(f.data).map(([manualId,row])=>({manualId,...row}))).filter(Boolean);
+        }
+        function renderMasterFilesList(files){
+            const normal=files.filter(f=>f.id!==MANUAL_MASTER_NODE);
+            const manual=files.find(f=>f.id===MANUAL_MASTER_NODE);
+            let html=normal.map(f=>`<div>📄 ${escapeHtml(f.fileName||'Master Excel')} <a href="#" onclick="event.preventDefault(); refs.master.child('${f.id}').remove()" style="color:red">Xóa</a></div>`).join('');
+            if(manual){ const n=manualMasterRowsFromFile(manual).length; html+=`<div style="margin-top:5px">✍️ <b>MASTER nhập thủ công</b>: ${n} sản phẩm <span style="color:#64748b;font-size:.76rem">(xóa từng dòng ở khu vực nhập thủ công bên dưới)</span></div>`; }
+            document.getElementById('master-files-list').innerHTML=html;
+        }
+        function setManualMasterStatus(msg,type='info'){
+            const el=document.getElementById('master-manual-status'); if(!el)return;
+            el.textContent=msg||''; el.style.color=type==='error'?'#dc2626':type==='success'?'#059669':'#b45309';
+        }
+        function renderManualMasterDraft(){
+            const tb=document.getElementById('master-manual-body'); if(!tb)return;
+            if(!manualMasterDraftRows.length) manualMasterDraftRows=[{code:'',name:'',unit:'',strength:'',packSpec:''}];
+            tb.innerHTML=manualMasterDraftRows.map((r,i)=>`<tr>
+                <td style="text-align:center;font-weight:800;color:#64748b">${i+1}</td>
+                <td><input value="${escapeHtml(r.code||'')}" placeholder="VD: TH_SIMENIC" oninput="updateManualMasterDraft(${i},'code',this.value)"></td>
+                <td><input value="${escapeHtml(r.name||'')}" placeholder="Tên sản phẩm" oninput="updateManualMasterDraft(${i},'name',this.value)"></td>
+                <td><input value="${escapeHtml(r.unit||'')}" placeholder="Hộp/Chai/Tuýp..." oninput="updateManualMasterDraft(${i},'unit',this.value)"></td>
+                <td><input value="${escapeHtml(r.strength||'')}" placeholder="500mg / 0,1%..." oninput="updateManualMasterDraft(${i},'strength',this.value)"></td>
+                <td><input value="${escapeHtml(r.packSpec||'')}" placeholder="Hộp 10 vỉ x 10 viên" oninput="updateManualMasterDraft(${i},'packSpec',this.value)"></td>
+                <td style="text-align:center"><button type="button" class="btn btn-danger" style="padding:5px 8px" onclick="removeManualMasterRow(${i})">✕</button></td>
+            </tr>`).join('');
+        }
+        window.updateManualMasterDraft=(i,key,value)=>{ if(manualMasterDraftRows[i]) manualMasterDraftRows[i][key]=value; };
+        window.addManualMasterRow=()=>{ manualMasterDraftRows.push({code:'',name:'',unit:'',strength:'',packSpec:''}); renderManualMasterDraft(); };
+        window.removeManualMasterRow=(i)=>{ manualMasterDraftRows.splice(i,1); renderManualMasterDraft(); setManualMasterStatus('Đã xóa hàng đang nhập.','info'); };
+        window.clearManualMasterDraft=()=>{ manualMasterDraftRows=[{code:'',name:'',unit:'',strength:'',packSpec:''}]; renderManualMasterDraft(); setManualMasterStatus('Đã làm sạch dữ liệu đang nhập.','info'); };
+        window.toggleManualMasterEditor=()=>{
+            const el=document.getElementById('master-manual-editor'); if(!el)return;
+            const open=el.style.display==='none'||!el.style.display; el.style.display=open?'block':'none';
+            if(open){renderManualMasterDraft(); refs.master.once('value',s=>{const d=s.val();const f=d?Object.keys(d).map(k=>({id:k,...d[k]})):[];renderManualMasterSaved(f);});}
+        };
+        function manualRowKey(){ return 'm_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,9); }
+        function normalizedManualRow(r){ return {code:String(r.code||'').trim(),name:String(r.name||'').trim(),unit:String(r.unit||'').trim(),strength:String(r.strength||'').trim(),packSpec:String(r.packSpec||'').trim()}; }
+        function validateManualMasterRows(rows){
+            const errors=[]; const seenCodes=new Set(), seenNames=new Set();
+            const existingCodes=new Set(masterData.filter(m=>m.code).map(m=>cleanCode(m.code)));
+            const existingNames=new Set(masterData.filter(m=>m.name).map(m=>cleanStr(m.name)));
+            rows.forEach((r,i)=>{
+                const rowNo=i+1, code=cleanCode(r.code), name=cleanStr(r.name);
+                if(!r.name) errors.push(`Hàng ${rowNo}: thiếu Tên SP.`);
+                if(!r.packSpec) errors.push(`Hàng ${rowNo}: thiếu Quy Cách.`);
+                if(code && existingCodes.has(code)) errors.push(`Hàng ${rowNo}: Mã SP “${r.code}” đã có trong Master.`);
+                if(name && existingNames.has(name)) errors.push(`Hàng ${rowNo}: Tên SP “${r.name}” đã có trong Master.`);
+                if(code && seenCodes.has(code)) errors.push(`Hàng ${rowNo}: trùng Mã SP trong danh sách đang nhập.`);
+                if(name && seenNames.has(name)) errors.push(`Hàng ${rowNo}: trùng Tên SP trong danh sách đang nhập.`);
+                if(code)seenCodes.add(code); if(name)seenNames.add(name);
+            });
+            return errors;
+        }
+        window.saveManualMasterRows=async()=>{
+            const rows=manualMasterDraftRows.map(normalizedManualRow).filter(r=>r.code||r.name||r.unit||r.strength||r.packSpec);
+            if(!rows.length){setManualMasterStatus('Chưa có dữ liệu để lưu.','error');return;}
+            const errors=validateManualMasterRows(rows);
+            if(errors.length){ setManualMasterStatus('⛔ '+errors[0]+(errors.length>1?` (+${errors.length-1} lỗi khác)`:''),'error'); alert('KHÔNG THỂ LƯU MASTER\n\n'+errors.join('\n')); return; }
+            if(!firebaseConnected){setManualMasterStatus('⛔ Firebase đang mất kết nối. Master là dữ liệu chuẩn nên chưa lưu Offline; hãy kết nối lại rồi bấm Lưu.','error');return;}
+            const ok=confirm(`Xác nhận thêm ${rows.length} sản phẩm vào MASTER chính thức?
+
+Tên SP và Quy cách sẽ được dùng làm dữ liệu chuẩn cho Nhập/Xuất kho.`); if(!ok)return;
+            setManualMasterStatus('⏳ Đang lưu và đồng bộ Master...','info');
+            try{
+                const node=refs.master.child(MANUAL_MASTER_NODE);
+                const updates={};
+                rows.forEach(r=>{ const id=manualRowKey(); updates[`data/${id}`]={...r,manualId:id,createdAt:new Date().toISOString(),source:'MANUAL'}; });
+                updates.schemaVersion=2; updates.fileName='✍️ MASTER NHẬP THỦ CÔNG'; updates.manualEntry=true; updates.updatedAt=new Date().toISOString();
+                await node.update(updates);
+                manualMasterDraftRows=[{code:'',name:'',unit:'',strength:'',packSpec:''}]; renderManualMasterDraft();
+                setManualMasterStatus(`✅ Đã lưu & đồng bộ ${rows.length} sản phẩm vào Master.`,'success'); showToast(`Đã thêm ${rows.length} sản phẩm vào Master`,'success');
+            }catch(err){console.error(err);setManualMasterStatus('❌ Lưu Master thất bại: '+err.message,'error');showToast('Lưu Master thất bại','error');}
+        };
+        window.deleteManualMasterSaved=async(id,name)=>{
+            if(!id)return; const ok=confirm(`XÓA sản phẩm thủ công khỏi Master?
+
+${name||id}
+
+Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if(!ok)return;
+            try{await refs.master.child(MANUAL_MASTER_NODE).child('data').child(id).remove();showToast('Đã xóa sản phẩm thủ công khỏi Master','success');}
+            catch(err){showToast('Không xóa được Master: '+err.message,'error');}
+        };
+        function renderManualMasterSaved(files){
+            const box=document.getElementById('master-manual-saved'); if(!box)return;
+            const f=files.find(x=>x.id===MANUAL_MASTER_NODE), rows=manualMasterRowsFromFile(f);
+            if(!rows.length){box.innerHTML='<div class="master-manual-note"><b>Chưa có sản phẩm nào được thêm thủ công.</b></div>';return;}
+            box.innerHTML=`<div style="font-weight:800;color:#9a3412;margin-bottom:5px">📌 Sản phẩm đã thêm thủ công: ${rows.length}</div>`+rows.map(r=>`<div class="master-saved-item">
+                <div><small>Mã SP</small><br><b>${escapeHtml(r.code||'--')}</b></div>
+                <div><small>Tên SP</small><br><b>${escapeHtml(r.name||'')}</b></div>
+                <div><small>Đơn vị</small><br>${escapeHtml(r.unit||'--')}</div>
+                <div><small>Hàm lượng/NĐ</small><br>${escapeHtml(r.strength||'--')}</div>
+                <div><small>Quy cách</small><br>${escapeHtml(r.packSpec||'--')}</div>
+                <div><button type="button" class="btn btn-danger" style="padding:5px 8px;white-space:nowrap" onclick="deleteManualMasterSaved('${escapeHtml(r.manualId||'')}','${escapeHtml(String(r.name||'').replace(/'/g,'&#39;'))}')">🗑 Xóa</button></div>
+            </div>`).join('');
+        }
         
         window.switchTab=(id,el)=>{ document.querySelectorAll('.tab-content').forEach(d=>d.style.display='none'); document.getElementById(id).style.display='block'; document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); }
         window.toggleMode=(m)=>{ document.getElementById('mode-paste').style.display=m==='paste'?'block':'none'; document.getElementById('mode-file').style.display=m==='file'?'block':'none'; }
         window.toggleMasterSection=()=>{ const el=document.getElementById('master-section'); el.style.display=el.style.display==='none'?'block':'none'; }
         window.showToast=(m,t)=>{ const el=document.getElementById('toast'); el.innerText=m; el.style.background=t==='error'?'#ef4444':'#10b981'; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),3000); }
+
+        // Khởi tạo 1 hàng nhập Master thủ công khi giao diện sẵn sàng.
+        renderManualMasterDraft();
 
         // Export Report Excel function (kept from original)
         window.exportReportExcel = () => {
@@ -3021,6 +3210,65 @@ QUY TẮC CỰC KỲ QUAN TRỌNG:
         function bind(){const drop=$('xk-drop'),inp=$('xk-ai-file');if(!drop||!inp)return;drop.onclick=()=>inp.click();drop.ondragover=e=>{e.preventDefault();drop.style.background='#dbeafe'};drop.ondragleave=()=>drop.style.background='';drop.ondrop=e=>{e.preventDefault();drop.style.background='';const f=e.dataTransfer.files?.[0];if(f){S.file=f;$('xk-file-name').textContent=`📄 ${f.name} · ${(f.size/1024).toFixed(1)} KB`}};inp.onchange=()=>{const f=inp.files?.[0];S.file=f||null;$('xk-file-name').textContent=f?`📄 ${f.name} · ${(f.size/1024).toFixed(1)} KB`:'Chưa chọn file.'};$('xk-logo-file').onchange=()=>saveLogo($('xk-logo-file').files?.[0]);loadLogo();$('xk-export-date').value=new Date().toISOString().slice(0,10);$('xk-invoice-date').value=new Date().toISOString().slice(0,10)}
         window.guideGoExportAI=()=>{closeUserGuide();const tab=document.getElementById('btn-tab2');if(tab)tab.click();setTimeout(()=>$('xk-ai-card')?.scrollIntoView({behavior:'smooth',block:'start'}),100)};
         bind();
+    })();
+    </script>
+
+    <script>
+    // ===== ĐĂNG NHẬP TOÀN ỨNG DỤNG · LOCALSTORAGE =====
+    (function(){
+        'use strict';
+        const PASS_HASH_KEY='ideco_app_password_hash_v1';
+        const REMEMBER_KEY='ideco_app_login_remembered_v1';
+        const SESSION_KEY='ideco_app_login_session_v1';
+        const DEFAULT_PASS_HASH='5c2d13a5'; // FNV-1a của ideco@2026
+        const $=id=>document.getElementById(id);
+        function hash(text){let h=2166136261;const s=String(text||'');for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(16).padStart(8,'0')}
+        function savedHash(){try{return localStorage.getItem(PASS_HASH_KEY)||DEFAULT_PASS_HASH}catch{return DEFAULT_PASS_HASH}}
+        function isAuthed(){try{return localStorage.getItem(REMEMBER_KEY)==='1'||sessionStorage.getItem(SESSION_KEY)==='1'}catch{return false}}
+        function hideLogin(){const ov=$('app-login-overlay');if(ov)ov.style.display='none';document.body.style.overflow=''}
+        function showLogin(message=''){
+            const ov=$('app-login-overlay');if(!ov)return;ov.style.display='flex';document.body.style.overflow='hidden';
+            const inp=$('app-login-password'),err=$('app-login-error');if(inp)inp.value='';if(err){err.textContent=message||'Mật khẩu không đúng. Vui lòng kiểm tra lại.';err.style.display=message?'block':'none'}
+            setTimeout(()=>inp?.focus(),30);
+        }
+        function login(){
+            const inp=$('app-login-password'),err=$('app-login-error'),remember=$('app-login-remember');
+            if(!inp)return;
+            if(hash(inp.value)!==savedHash()){if(err){err.textContent='Mật khẩu không đúng. Vui lòng kiểm tra lại.';err.style.display='block'}inp.select();return false}
+            try{
+                sessionStorage.setItem(SESSION_KEY,'1');
+                if(remember?.checked)localStorage.setItem(REMEMBER_KEY,'1'); else localStorage.removeItem(REMEMBER_KEY);
+            }catch{}
+            hideLogin();
+            try{if(typeof showToast==='function')showToast('Đăng nhập ứng dụng thành công.','success')}catch{}
+            return true;
+        }
+        function logout(){
+            try{localStorage.removeItem(REMEMBER_KEY);sessionStorage.removeItem(SESSION_KEY)}catch{}
+            showLogin('Ứng dụng đã được khóa. Vui lòng đăng nhập lại.');
+        }
+        function changePassword(){
+            const a=$('app-new-password'),b=$('app-new-password-confirm'),st=$('app-password-change-status');
+            const p1=String(a?.value||''),p2=String(b?.value||'');
+            if(p1.length<6){if(st){st.textContent='⚠️ Mật khẩu mới cần ít nhất 6 ký tự.';st.style.color='#b45309'};return}
+            if(p1!==p2){if(st){st.textContent='❌ Hai lần nhập mật khẩu chưa giống nhau.';st.style.color='#b91c1c'};return}
+            try{localStorage.setItem(PASS_HASH_KEY,hash(p1))}catch(e){if(st){st.textContent='❌ Không thể lưu LocalStorage: '+e.message;st.style.color='#b91c1c'};return}
+            if(a)a.value='';if(b)b.value='';
+            if(st){st.textContent='✅ Đã đổi mật khẩu đăng nhập. Mật khẩu mới áp dụng cho lần đăng nhập tiếp theo trên máy này.';st.style.color='#047857'}
+            try{if(typeof showToast==='function')showToast('Đã đổi mật khẩu đăng nhập ứng dụng.','success')}catch{}
+        }
+        function toggle(id,btn){const e=$(id);if(!e)return;e.type=e.type==='password'?'text':'password';if(btn)btn.textContent=e.type==='password'?'👁️':'🙈'}
+        function bind(){
+            $('app-login-submit')?.addEventListener('click',login);
+            $('app-login-eye')?.addEventListener('click',function(){toggle('app-login-password',this)});
+            $('app-login-password')?.addEventListener('keydown',e=>{if(e.key==='Enter')login()});
+            $('app-save-new-password')?.addEventListener('click',changePassword);
+            $('app-new-password-eye')?.addEventListener('click',function(){toggle('app-new-password',this)});
+            $('app-new-password-confirm-eye')?.addEventListener('click',function(){toggle('app-new-password-confirm',this)});
+            if(isAuthed())hideLogin();else showLogin();
+        }
+        window.IDECOAppAuth={login,logout,changePassword,showLogin,hash};
+        if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
     })();
     </script>
 

@@ -290,6 +290,13 @@
         @media(max-width:600px){.xk-meta-grid{grid-template-columns:1fr}.xk-meta-grid .span2{grid-column:span 1}.xk-actions .btn{width:100%}}
 
 
+        /* ===== PHIẾU XUẤT THỦ CÔNG + DANH SÁCH PHIẾU FIREBASE ===== */
+        .manual-export-note{background:#fff7ed;border:1px solid #fdba74;border-radius:9px;padding:9px 11px;color:#9a3412;font-size:.8rem;line-height:1.5;margin-bottom:10px}
+        .manual-lot-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:7px 8px;border-bottom:1px solid #e2e8f0;font-size:.8rem}.manual-lot-row:last-child{border-bottom:none}.manual-lot-row b{color:#0f172a}.manual-stock-total{font-weight:900;color:#1d4ed8}
+        .xk-voucher-savebar{display:grid;grid-template-columns:minmax(220px,1fr) auto;gap:8px;align-items:end;margin-top:12px;padding:12px;background:#eef2ff;border:1px solid #c7d2fe;border-radius:10px}.xk-voucher-savebar label{display:block;font-size:.78rem;font-weight:800;color:#3730a3;margin-bottom:4px}.xk-voucher-savebar input{margin:0}.xk-voucher-save-status{grid-column:1/-1;font-size:.76rem;color:#64748b}
+        .xk-voucher-history{border:1px solid #0ea5e9!important;background:linear-gradient(180deg,#f0f9ff,#fff 42%);height:auto!important;margin-bottom:18px}.xk-voucher-filter{display:grid;grid-template-columns:1.3fr .8fr .8fr auto;gap:8px;align-items:end;margin-bottom:10px}.xk-voucher-filter label{font-size:.75rem;font-weight:800;color:#475569}.xk-voucher-filter input{margin:3px 0 0}.xk-voucher-list{display:grid;gap:8px;max-height:430px;overflow:auto}.xk-voucher-item{display:grid;grid-template-columns:1fr auto;gap:10px;border:1px solid #bae6fd;border-radius:10px;background:#fff;padding:10px 12px}.xk-voucher-item .name{font-weight:900;color:#0c4a6e}.xk-voucher-item .meta{font-size:.76rem;color:#64748b;line-height:1.5;margin-top:3px}.xk-voucher-item .actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.xk-voucher-status{display:inline-block;padding:3px 7px;border-radius:999px;font-size:.68rem;font-weight:900}.xk-voucher-status.draft{background:#fff7ed;color:#9a3412}.xk-voucher-status.confirmed{background:#ecfdf5;color:#166534}
+        @media(max-width:760px){.xk-voucher-filter{grid-template-columns:1fr 1fr}.xk-voucher-filter>div:first-child{grid-column:1/-1}.xk-voucher-filter .btn{grid-column:1/-1}.xk-voucher-item{grid-template-columns:1fr}.xk-voucher-savebar{grid-template-columns:1fr}.xk-voucher-savebar .btn{width:100%}}
+
         /* ===== ĐĂNG NHẬP & BẢO MẬT ỨNG DỤNG ===== */
         .app-login-overlay{position:fixed;inset:0;z-index:50000;background:linear-gradient(135deg,rgba(15,23,42,.96),rgba(30,64,175,.94));display:flex;align-items:center;justify-content:center;padding:18px}
         .app-login-box{width:min(440px,96vw);background:#fff;border-radius:18px;padding:24px;box-shadow:0 30px 90px rgba(0,0,0,.38);border:1px solid rgba(255,255,255,.35)}
@@ -330,7 +337,7 @@
     <div class="container">
         <header>
             <div style="min-width:0">
-                <h1>QUẢN LÝ KHO DƯỢC GDP - IDECO ĐƯỢC PHÁT TRIỂN BỞI:MTRIET</h1>
+                <h1>AI AGENT QUẢN LÝ KHO DƯỢC GDP - IDECO ĐƯỢC PHÁT TRIỂN BỞI : MTRIET</h1>
                 <div style="margin-top:5px;display:inline-flex;align-items:center;gap:6px;background:#fef3c7;color:#92400e;border:1px solid #f59e0b;border-radius:999px;padding:4px 9px;font-size:.75rem;font-weight:800;letter-spacing:.2px">🧪 FIREBASE TEST · thunghiem-eeb1f</div>
             </div>
             <div class="header-actions">
@@ -341,7 +348,7 @@
         </header>
 
         <div class="nav-tabs">
-            <div class="nav-tab active" onclick="switchTab('tab3', this)" id="btn-tab3">1. NHẬP PHIẾU NCC</div>
+            <div class="nav-tab active" onclick="switchTab('tab3', this)" id="btn-tab3">1. NHẬP PHIẾU NCC </div>
             <div class="nav-tab" onclick="switchTab('tab1', this)">2. NHẬP KHO & TỒN KHO</div>
             <div class="nav-tab" onclick="switchTab('tab2', this)" id="btn-tab2">3. XUẤT KHO & BÁO CÁO</div>
         </div>
@@ -540,44 +547,66 @@
                         <div class="span2"><label>Địa chỉ giao nhận kho</label><input id="xk-delivery-address" placeholder="Ví dụ: Kho Long An..."></div>
                         <div><label>Lý do xuất kho</label><input id="xk-reason" value="Xuất bán hàng theo đơn hàng"></div>
                         <div><label>Xuất tại kho</label><input id="xk-warehouse" value="Kho IDECO"></div>
+                        <div><label>Tên người lập phiếu <small>(Phụ trách kho)</small></label><input id="xk-preparer" placeholder="Nhập họ tên phụ trách kho"></div>
+                        <div><label>Tên kế toán <small>(Phụ trách kế toán)</small></label><input id="xk-accountant" placeholder="Nhập họ tên phụ trách kế toán"></div>
+                        <div class="span2"><label>Tên Quản lý <small>(Phụ trách quản lý bộ phận Kế toán - Kho)</small></label><input id="xk-manager" placeholder="Nhập họ tên quản lý Kế toán - Kho"></div>
                         <div class="span2"><label>Logo công ty (tùy chọn, lưu trên máy)</label><input type="file" id="xk-logo-file" accept="image/*" style="margin-bottom:3px"><small id="xk-logo-status" style="color:#64748b">Chưa chọn logo.</small></div>
+                    </div>
+                    <div class="xk-voucher-savebar">
+                        <div><label>Tên phiếu xuất kho để lưu Firebase</label><input id="xk-voucher-name" placeholder="Ví dụ: PXK Long Châu 21-08-2026"></div>
+                        <button class="btn btn-primary" type="button" onclick="saveCurrentExportVoucherFirebase()">☁️ LƯU PHIẾU FIREBASE</button>
+                        <div id="xk-voucher-save-status" class="xk-voucher-save-status">Có thể lưu phiếu nháp trước khi trừ kho; máy khác sẽ xem được khi Firebase đã đồng bộ.</div>
                     </div>
                     <div class="xk-actions">
                         <button class="btn btn-primary" type="button" onclick="previewExportVoucher()">👁️ XEM PHIẾU XUẤT CHUẨN</button>
                         <button class="btn btn-success" type="button" onclick="saveExportVoucherPDF()">💾 PDF PHIẾU XUẤT</button>
+                        <button class="btn btn-success" type="button" onclick="saveExportVoucherExcel()">📊 EXCEL PHIẾU XUẤT</button>
                         <button class="btn btn-warning" id="xk-confirm-btn" type="button" onclick="confirmAIExportToStock()" disabled>⚡ XÁC NHẬN TRỪ KHO</button>
+                        <button class="btn btn-danger" type="button" onclick="clearLoadedExportVoucher()">🗑️ XÓA PHIẾU ĐANG LOAD · LÀM LẠI</button>
                     </div>
                     <div id="xk-voucher-preview" style="display:none;overflow:auto;margin-top:14px;border:1px solid #cbd5e1;border-radius:10px;padding:8px;background:#f8fafc"></div>
                 </div>
             </div>
+
+            <div class="card xk-voucher-history" id="xk-voucher-history-card">
+                <div class="card-header" style="color:#0369a1">
+                    <div>☁️ DANH SÁCH PHIẾU XUẤT KHO ĐÃ LƯU · FIREBASE REALTIME</div>
+                    <span style="font-size:.75rem;color:#64748b">Đồng bộ giữa các máy · sắp xếp phiếu mới nhất trước</span>
+                </div>
+                <div class="xk-voucher-filter">
+                    <div><label>Tìm tên phiếu / khách hàng / mã phiếu</label><input id="xk-voucher-search" placeholder="Gõ để tìm..." oninput="filterSavedExportVouchers()"></div>
+                    <div><label>Từ ngày</label><input type="date" id="xk-voucher-from" onchange="filterSavedExportVouchers()"></div>
+                    <div><label>Đến ngày</label><input type="date" id="xk-voucher-to" onchange="filterSavedExportVouchers()"></div>
+                    <button class="btn btn-primary" type="button" onclick="filterSavedExportVouchers()">🔍 LỌC PHIẾU</button>
+                </div>
+                <div id="xk-voucher-list" class="xk-voucher-list"><div style="padding:14px;text-align:center;color:#64748b">Đang tải danh sách phiếu từ Firebase...</div></div>
+            </div>
+
             <div class="grid-layout">
                 <div class="card">
-                    <div class="card-header">A. Xuất Kho Thủ Công</div>
+                    <div class="card-header">A. Xuất Kho Thủ Công Dự Phòng</div>
+                    <div class="manual-export-note"><b>Khi AI/API bị lỗi:</b> chọn sản phẩm từ Master/Kho → nhập <b>số lượng HỘP/đơn vị đóng gói</b> → bấm <b>THÊM VÀO PHIẾU</b>. Hệ thống sẽ đưa dòng này vào đúng luồng So tồn → FEFO → Lô/HSD → Quy đổi ĐVT nhỏ nhất như khi upload PDF. <b>Chưa trừ kho ngay tại đây.</b></div>
                     <label>Tìm sản phẩm xuất:</label>
                     <div class="autocomplete-wrapper">
-                        <input type="text" id="exp-name" placeholder="Gõ tên thuốc..." autocomplete="off">
+                        <input type="text" id="exp-name" placeholder="Gõ tên thuốc trong Master..." autocomplete="off">
                         <div id="exp-suggest" class="autocomplete-items"></div>
                     </div>
-                    
-                    <div id="lot-list" style="margin-top:10px; min-height:50px; flex:1; overflow-y:auto; max-height:300px; border:1px dashed #cbd5e1; padding:5px; border-radius:6px; background:#f8fafc">
-                        <div style="text-align:center; color:#999; padding:10px; font-size:0.85rem">
-                            Vui lòng chọn sản phẩm để xem danh sách lô.
-                        </div>
+                    <div id="lot-list" style="margin-top:10px;min-height:70px;overflow-y:auto;max-height:260px;border:1px dashed #cbd5e1;padding:5px;border-radius:6px;background:#f8fafc">
+                        <div style="text-align:center;color:#999;padding:12px;font-size:.85rem">Chọn sản phẩm để xem các lô đang có theo FEFO.</div>
                     </div>
-                    
-                    <hr style="margin:10px 0">
-                    <div style="background:#fffbeb; padding:10px; border-radius:6px; margin-bottom:10px; border:1px solid #fcd34d">
-                         <div style="font-weight:bold; font-size:0.9rem; margin-bottom:5px; color:#92400e">Đang chọn xuất:</div>
-                         <div id="selected-lot-info" style="font-size:0.85rem; color:#b45309">Chưa chọn lô nào...</div>
+                    <div style="background:#eff6ff;padding:10px;border-radius:6px;margin:10px 0;border:1px solid #bfdbfe">
+                         <div style="font-weight:bold;font-size:.9rem;margin-bottom:5px;color:#1e40af">Sản phẩm đang chọn:</div>
+                         <div id="selected-lot-info" style="font-size:.85rem;color:#1e3a8a">Chưa chọn sản phẩm...</div>
                     </div>
-
-                    <div style="display:flex; gap:10px">
-                         <input type="number" id="exp-qty" placeholder="SL Xuất" disabled style="flex:1">
-                         <input type="text" id="exp-unit" placeholder="Đơn vị" readonly style="flex:1; background:#eee">
+                    <label>Số lượng hộp / đơn vị đóng gói yêu cầu xuất</label>
+                    <div style="display:flex;gap:10px">
+                         <input type="number" id="exp-qty" min="1" step="1" placeholder="Ví dụ: 3 hộp" disabled style="flex:1">
+                         <input type="text" id="exp-unit" placeholder="Quy cách / ĐVT" readonly style="flex:1;background:#eee">
                     </div>
-                    <input type="text" id="exp-dest" placeholder="Nơi nhận (Khách hàng/Kho...)">
+                    <input type="text" id="exp-dest" placeholder="Nơi nhận / Khách hàng (sẽ chuyển sang phiếu chuẩn)">
                     <input type="date" id="exp-date">
-                    <button class="btn btn-warning" id="btn-export" style="width:100%" disabled onclick="confirmExport()">XÁC NHẬN XUẤT</button>
+                    <button class="btn btn-warning" id="btn-export" style="width:100%" disabled onclick="confirmExport()">➕ THÊM VÀO PHIẾU XUẤT THỦ CÔNG</button>
+                    <button class="btn" type="button" style="width:100%;margin-top:7px;background:#64748b" onclick="resetManualExportSelection()">🧹 XÓA LỰA CHỌN</button>
                 </div>
 
                 <div class="card">
@@ -769,6 +798,10 @@
                             <div><label>Chế độ phân tích</label><select id="ai-analysis-mode"><option value="fast">⚡ NHANH · khuyên dùng</option><option value="thorough">🛡️ KIỂM TRA KỸ</option></select></div>
                             <div><label>Giới hạn chờ mỗi tuyến</label><div style="padding:9px 10px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc;color:#475569;font-size:.82rem"><b>NHANH:</b> DeepSeek tối đa ~25 giây, Gemini tối đa ~35 giây/tuyến · <b>KỸ:</b> theo cấu hình cũ.</div></div>
                             <div class="full"><label>B.AI Endpoint</label><input id="ai-bai-endpoint" value="https://api.b.ai/v1/chat/completions"></div>
+                            <div class="full" style="display:flex;align-items:center;gap:10px;padding:9px 10px;border:1px solid #bfdbfe;background:#eff6ff;border-radius:8px">
+                                <input id="ai-bai-vision" type="checkbox" style="width:auto" checked>
+                                <div><b>👁️ B.AI Vision thử nghiệm · DeepSeek V4 Flash</b><div style="font-size:.76rem;color:#475569;margin-top:2px">Ảnh/PDF scan sẽ thử DeepSeek Vision trước; nếu B.AI từ chối ảnh hoặc lỗi, ứng dụng tự chuyển Gemini dự phòng.</div></div>
+                            </div>
                             <div class="full" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
                                 <button id="ai-save-settings" class="btn btn-success" type="button">💾 Lưu cài đặt AI</button>
                                 <button id="ai-test-settings" class="btn btn-primary" type="button">🧪 Kiểm tra AI</button>
@@ -787,7 +820,7 @@
                             </div>
                             <div class="full" id="ai-test-result" style="font-size:.82rem;line-height:1.5;color:#475569"></div>
                             <div class="full" style="font-size:.78rem;color:#64748b;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:9px 10px">
-                                <b>⚡ Chế độ NHANH:</b> PDF có chữ được đọc tại máy; ưu tiên Gemini 3.1/2.5 Flash-Lite khi có key; soi tên Master tại máy; chỉ kiểm tra AI lần 2 khi thiếu Tên/Lô/HSD/Số lượng. <b>🛡️ KIỂM TRA KỸ:</b> giữ thêm lớp AI gợi ý tên Master.<br><br>Cấu hình được lưu bằng LocalStorage. Bản này tự tìm cấu hình NHAP cũ ở <b>ideco_gemini_settings_v3</b>, <b>v2</b> và một số tên key cũ. Với Chrome mở bằng <b>file://</b>, dữ liệu LocalStorage của hai file HTML khác nhau đôi khi bị trình duyệt tách riêng; khi đó cần dán key một lần vào bản mới rồi bấm Lưu.
+                                <b>⚡ Chế độ NHANH:</b> PDF có chữ được đọc tại máy; ảnh/PDF scan ưu tiên <b>B.AI Vision thử nghiệm</b> khi đã bật và có key, sau đó mới Gemini dự phòng; soi tên Master tại máy; chỉ kiểm tra AI lần 2 khi thiếu Tên/Lô/HSD/Số lượng. <b>🛡️ KIỂM TRA KỸ:</b> giữ thêm lớp AI gợi ý tên Master.<br><br>Cấu hình được lưu bằng LocalStorage. Bản này tự tìm cấu hình NHAP cũ ở <b>ideco_gemini_settings_v3</b>, <b>v2</b> và một số tên key cũ. Với Chrome mở bằng <b>file://</b>, dữ liệu LocalStorage của hai file HTML khác nhau đôi khi bị trình duyệt tách riêng; khi đó cần dán key một lần vào bản mới rồi bấm Lưu.
                             </div>
                         </div>
                     </details>
@@ -829,7 +862,7 @@
             <div class="guide-head">
                 <div>
                     <h2 id="user-guide-title">📘 HƯỚNG DẪN VẬN HÀNH KHO IDECO · NHẬP KHO → XUẤT KHO</h2>
-                    <p>Quy trình kiểm soát dữ liệu thuốc: Nhập kho AI/Thủ công, Master, Offline và Xuất kho AI theo phiếu công ty, kiểm tra tồn – FEFO – quy đổi đơn vị trước khi trừ kho.</p>
+                    <p>Quy trình kiểm soát dữ liệu thuốc: Nhập kho AI/Thủ công, Master, Offline và Xuất kho AI theo phiếu công ty. Nhập kho chỉ cộng dồn khi trùng đồng thời Mã SP + Tên SP + Số lô + HSD; xuất kho áp dụng FEFO, cùng HSD thì FIFO.</p>
                 </div>
                 <button class="guide-close" type="button" onclick="closeUserGuide()" aria-label="Đóng hướng dẫn">×</button>
             </div>
@@ -909,9 +942,11 @@
                                 1. Vào <b>XUẤT KHO & BÁO CÁO</b> → chọn PDF/ảnh phiếu xuất kho → bấm <b>HUYỀN PHÂN TÍCH & SOI KHO</b>.<br>
                                 2. Huyền đọc Mã phiếu, Đơn hàng, Khách hàng, Mã SP, Tên SP, ĐVT và <b>SL hộp/đơn vị đóng gói</b>; không tự quy đổi ở bước này.<br>
                                 3. Hệ thống so từng sản phẩm với tổng tồn App. Nếu <b>tồn = 0</b> hoặc <b>tồn &lt; số phiếu</b> sẽ bật popup và <b>khóa trừ kho</b>.<br>
-                                4. Khi đủ hàng, hệ thống phân lô theo <b>FEFO</b> (HSD gần hơn xuất trước), trừ khi nghiệp vụ yêu cầu lô chỉ định.<br>
+                                4. Khi đủ hàng, hệ thống phân lô theo <b>FEFO</b> (HSD gần hơn xuất trước); nếu hai lô cùng HSD thì áp dụng <b>FIFO</b> (lô nhập kho trước xuất trước). Hệ thống lập lại thứ tự này ngay tại thời điểm xác nhận trừ kho trên Firebase.<br>
+                                5. Nếu AI/API bị gián đoạn: dùng <b>Xuất kho thủ công dự phòng</b>, chọn sản phẩm từ Master/Kho và nhập số hộp; dòng thủ công sẽ được đưa vào cùng bảng So tồn → FEFO → Phiếu xuất chuẩn.<br>
+                                6. Có thể đặt <b>Tên phiếu</b> và bấm <b>Lưu phiếu Firebase</b>. Danh sách phiếu được đồng bộ Realtime giữa các máy, có nút <b>Xem</b> và <b>Xóa hồ sơ phiếu</b>.<br>
                                 5. Quy cách Master dùng để quy đổi sang <b>ĐVT nhỏ nhất</b>: Hộp 10 vỉ × 10 viên → 100 viên/hộp; Hộp 1 chai → 1 chai/hộp. Nếu Quy cách không rõ thì không tự đoán.<br>
-                                6. Kiểm tra bảng <b>STT · Mã SP · Tên SP · ĐVT · Lô · HSD · Số lượng</b>, điền Số HĐ, Ký hiệu HĐ, Ngày HĐ, khách hàng và địa chỉ giao nhận.<br>
+                                6. Kiểm tra bảng <b>STT · Mã SP · Tên SP · ĐVT · Lô · HSD · Số lượng</b>, điền Số HĐ, Ký hiệu HĐ, Ngày HĐ, khách hàng, địa chỉ giao nhận, <b>Người lập phiếu (Kho) · Kế toán · Quản lý Kế toán-Kho</b>.<br>7. Phiếu xuất có thể tải <b>PDF</b> hoặc <b>Excel</b>; file Excel kèm sheet <b>Chi tiết FEFO-FIFO</b> để đối chiếu lô/HSD/thời điểm nhập.<br>
                                 7. Xem/In hoặc xuất PDF Phiếu xuất kho chuẩn. Chỉ bấm <b>XÁC NHẬN TRỪ KHO</b> sau khi kiểm tra phiếu gốc, tồn thực tế và nghiệp vụ SOP.<br>
                                 8. Nếu AI/API lỗi, vẫn dùng <b>Xuất kho thủ công</b> hoặc Paste/Excel hiện có; không để nghiệp vụ kho bị đình trệ.
                             </div>
@@ -1092,6 +1127,7 @@
             items: db.ref('pharmaceuticals'), 
             master: db.ref('excelFiles'), 
             exports: db.ref('exports'),
+            exportVouchers: db.ref('exportVouchers'),
             logs: db.ref('systemLogs') 
         };
 
@@ -1426,22 +1462,38 @@
             }
         }
 
+        function inventoryCodeKey(v){ return String(v||'').trim().toUpperCase(); }
+        function inventoryNameKey(v){ return cleanStr(String(v||'')).replace(/\s+/g,' ').trim(); }
+        function inventoryLotKey(v){ return String(v||'').trim().toUpperCase().replace(/\s+/g,''); }
+        function inventoryExpiryKey(v){ return String(v||'').trim(); }
+        function sameInventoryIdentity(a,b){
+            const ac=inventoryCodeKey(a.productCode), bc=inventoryCodeKey(b.productCode);
+            return !!ac && !!bc && ac===bc &&
+                inventoryNameKey(a.productName)===inventoryNameKey(b.productName) &&
+                inventoryLotKey(a.lotNumber)===inventoryLotKey(b.lotNumber) &&
+                inventoryExpiryKey(a.expiryDate)===inventoryExpiryKey(b.expiryDate);
+        }
         async function saveToInventory(item) {
             const tx=String(item.sourceTransactionId||'').trim();
-            const exist = stockData.find(s => {
-                const isBatchMatch = s.lotNumber === item.lotNumber && s.expiryDate === item.expiryDate;
-                if (!isBatchMatch) return false;
-                const sCode = (s.productCode || '').trim().toLowerCase();
-                const iCode = (item.productCode || '').trim().toLowerCase();
-                const sName = (s.productName || '').trim().toLowerCase();
-                const iName = (item.productName || '').trim().toLowerCase();
-                if (iCode.length > 0) return sCode === iCode;
-                return sName === iName;
+            // GDP: chỉ cộng dồn khi đồng thời trùng Mã SP + Tên SP + Số lô + HSD.
+            const exist = stockData.find(s => sameInventoryIdentity(s,item));
+            const iCode=inventoryCodeKey(item.productCode), iName=inventoryNameKey(item.productName), iLot=inventoryLotKey(item.lotNumber), iExp=inventoryExpiryKey(item.expiryDate);
+            const conflict=stockData.find(s=>{
+                const sCode=inventoryCodeKey(s.productCode), sName=inventoryNameKey(s.productName), sameBatch=inventoryLotKey(s.lotNumber)===iLot&&inventoryExpiryKey(s.expiryDate)===iExp;
+                if(!sameBatch)return false;
+                if(iCode&&sCode&&iCode===sCode&&sName!==iName)return true;
+                if(iName&&sName===iName&&iCode&&sCode&&iCode!==sCode)return true;
+                return false;
             });
+            if(conflict) throw new Error(`XUNG ĐỘT GDP: ${item.productName} · Lô ${item.lotNumber} · HSD ${item.expiryDate} có Mã/Tên không đồng nhất với dữ liệu kho. Không cộng dồn; hãy kiểm tra Master và phiếu gốc.`);
 
             if(exist) {
-                await refs.items.child(exist.id).transaction(cur=>{
-                    if(!cur)return cur;
+                let didAdd=false;
+                const txResult=await refs.items.child(exist.id).transaction(cur=>{
+                    didAdd=false;
+                    if(!cur)return;
+                    // Kiểm tra lại 4 khóa GDP ngay trong transaction để tránh dữ liệu bị thay đổi giữa lúc tìm và lúc cộng.
+                    if(!sameInventoryIdentity(cur,item))return;
                     cur.appliedTransactions=cur.appliedTransactions||{};
                     if(tx && cur.appliedTransactions[tx])return cur;
                     cur.quantity=(parseInt(cur.quantity)||0)+(parseInt(item.quantity)||0);
@@ -1449,16 +1501,20 @@
                     cur.productStrength=item.productStrength||cur.productStrength||'';
                     cur.packSpec=item.packSpec||cur.packSpec||'';
                     cur.productCode=item.productCode||cur.productCode||'';
-                    cur.importDate=item.importDate||new Date().toISOString().split('T')[0];
-                    cur.createdAt=item.createdAt||new Date().toISOString();
+                    // Giữ mốc nhập SỚM NHẤT của lô để FIFO không bị đảo khi cùng lô được nhập bổ sung nhiều lần.
+                    const incomingImport=item.importDate||new Date().toISOString().split('T')[0];
+                    const incomingCreated=item.createdAt||new Date().toISOString();
+                    if(!cur.importDate || incomingImport < cur.importDate) cur.importDate=incomingImport;
+                    if(!cur.createdAt || incomingCreated < cur.createdAt) cur.createdAt=incomingCreated;
+                    cur.lastImportAt=incomingCreated;
                     cur.sourceType=item.sourceType||cur.sourceType||'';
                     cur.sourceNote=item.sourceNote||cur.sourceNote||'';
                     if(tx)cur.appliedTransactions[tx]=new Date().toISOString();
-                    return cur;
+                    didAdd=true;return cur;
                 });
-                // Cập nhật tạm bộ nhớ để nhiều dòng cùng lô trong một lượt không dùng số lượng cũ.
-                exist.quantity=(parseInt(exist.quantity)||0)+(parseInt(item.quantity)||0);
-                if(tx){exist.appliedTransactions=exist.appliedTransactions||{};exist.appliedTransactions[tx]=new Date().toISOString();}
+                if(!txResult.committed)throw new Error(`Không cộng dồn ${item.productName}: dữ liệu Mã/Tên/Lô/HSD đã thay đổi trên Firebase. Hãy tải lại kho và kiểm tra.`);
+                const latest=txResult.snapshot?.val?.();if(latest){Object.assign(exist,latest);}
+                if(tx && didAdd){exist.appliedTransactions=exist.appliedTransactions||{};exist.appliedTransactions[tx]=new Date().toISOString();}
             } else {
                 const payload={...item};
                 if(tx)payload.appliedTransactions={[tx]:new Date().toISOString()};
@@ -1677,6 +1733,14 @@
             exportHistoryWithSignatures(keeper, manager);
         }
 
+        function fefoFifoCompare(a,b){
+            const ea=String(a?.expiryDate||'9999-12-31'), eb=String(b?.expiryDate||'9999-12-31');
+            const e=ea.localeCompare(eb); if(e!==0)return e;
+            const ia=String(a?.importDate||a?.createdAt||'9999-12-31T23:59:59'), ib=String(b?.importDate||b?.createdAt||'9999-12-31T23:59:59');
+            const f=ia.localeCompare(ib); if(f!==0)return f;
+            return String(a?.id||'').localeCompare(String(b?.id||''));
+        }
+
         function exportHistoryWithSignatures(keeper, manager) {
             const startDate = document.getElementById('export-filter-start').value;
             const endDate = document.getElementById('export-filter-end').value;
@@ -1698,84 +1762,68 @@
             showToast('Đã xuất file kèm chữ ký!', 'success');
         }
 
-        // --- MANUAL EXPORT & SELECTION LOGIC ---
+        // --- MANUAL EXPORT DỰ PHÒNG → DÙNG CHUNG LUỒNG PHIẾU XUẤT AI ---
         document.getElementById('exp-name').addEventListener('input', function(){
-            const v=cleanStr(this.value); const l=document.getElementById('exp-suggest'); l.innerHTML=''; if(!v)return;
-            const m=stockData.filter(d=>parseInt(d.quantity)>0 && cleanStr(d.productName).includes(v));
-            [...new Set(m.map(x=>x.productName))].forEach(n=>{
-                const d=document.createElement('div'); d.className='autocomplete-item'; d.innerText=n; d.onmousedown=(e)=>{e.preventDefault(); handleProductClick(n);l.innerHTML='';}; l.appendChild(d);
+            const v=cleanStr(this.value), l=document.getElementById('exp-suggest'); l.innerHTML=''; if(!v)return;
+            const names=[];
+            (masterData||[]).forEach(m=>{if(cleanStr(m.name||m.productName).includes(v))names.push(m.name||m.productName)});
+            (stockData||[]).forEach(d=>{if(cleanStr(d.productName).includes(v))names.push(d.productName)});
+            [...new Set(names.filter(Boolean))].slice(0,25).forEach(n=>{
+                const d=document.createElement('div'); d.className='autocomplete-item'; d.innerText=n;
+                d.onmousedown=(e)=>{e.preventDefault();handleProductClick(n);l.innerHTML='';}; l.appendChild(d);
             });
         });
-        document.getElementById('exp-name').addEventListener('blur', ()=>setTimeout(()=>document.getElementById('exp-suggest').innerHTML='',200));
+        document.getElementById('exp-name').addEventListener('blur',()=>setTimeout(()=>document.getElementById('exp-suggest').innerHTML='',200));
 
-        window.handleProductClick = function(name) {
-            document.getElementById('btn-tab2').click(); 
-            window.scrollTo({top:0,behavior:'smooth'}); 
+        window.handleProductClick=function(name){
+            document.getElementById('btn-tab2').click();
             document.getElementById('exp-name').value=name;
-            const l=document.getElementById('lot-list'); l.innerHTML='';
-            currentExportLot = null;
-            document.getElementById('selected-lot-info').innerText = 'Chưa chọn lô nào...';
-            document.getElementById('exp-qty').disabled=true;
-            document.getElementById('btn-export').disabled=true;
+            const master=(masterData||[]).find(m=>cleanStr(m.name||m.productName)===cleanStr(name)) || null;
+            let matches=(stockData||[]).filter(d=>cleanStr(d.productName)===cleanStr(name));
+            if(master?.code)matches=(stockData||[]).filter(d=>cleanCode(d.productCode)===cleanCode(master.code));
+            matches.sort(fefoFifoCompare);
+            const resolvedMaster=master || (matches[0] ? (masterData||[]).find(m=>cleanCode(m.code||m.productCode)===cleanCode(matches[0].productCode)) : null);
+            const first=matches[0]||{};
+            currentExportLot={
+                productName:name,
+                productCode:resolvedMaster?.code||first.productCode||'',
+                productStrength:resolvedMaster?.strength||first.productStrength||'',
+                packSpec:resolvedMaster?.packSpec||first.packSpec||'',
+                unit:resolvedMaster?.unit||first.unit||'Hộp'
+            };
+            const total=matches.reduce((a,x)=>a+(parseFloat(x.quantity)||0),0);
+            const l=document.getElementById('lot-list');
+            l.innerHTML=matches.length?matches.map((lot,i)=>`<div class="manual-lot-row"><div><b>${i+1}. Lô ${escapeHtml(lot.lotNumber||'--')}</b><br><span>HSD: ${escapeHtml(lot.expiryDate||'--')}</span></div><div>Tồn: <b>${Number(lot.quantity||0).toLocaleString('vi-VN')}</b></div><div>${i===0?'⭐ FEFO':''}</div></div>`).join(''):'<div style="padding:12px;color:#b91c1c;text-align:center"><b>Tồn App = 0.</b> Vẫn có thể thêm vào phiếu để hệ thống cảnh báo và kiểm tra ERP.</div>';
+            document.getElementById('selected-lot-info').innerHTML=`<b>${escapeHtml(name)}</b>${currentExportLot.productCode?' · Mã: '+escapeHtml(currentExportLot.productCode):''}<br>Quy cách: <b>${escapeHtml(currentExportLot.packSpec||currentExportLot.unit||'Chưa khai')}</b> · Tổng tồn App: <span class="manual-stock-total">${Number(total).toLocaleString('vi-VN')}</span>`;
+            document.getElementById('exp-qty').disabled=false;
             document.getElementById('exp-qty').value='';
+            document.getElementById('exp-unit').value=currentExportLot.packSpec||currentExportLot.unit||'Hộp';
+            document.getElementById('btn-export').disabled=false;
+            document.getElementById('exp-qty').focus();
+        };
 
-            const matches = stockData.filter(d=>d.productName===name && parseInt(d.quantity)>0).sort((a,b)=>new Date(a.expiryDate)-new Date(b.expiryDate));
-            if(matches.length === 0) { l.innerHTML = '<div style="padding:10px; color:red">Hết hàng!</div>'; return; }
+        window.resetManualExportSelection=function(){
+            currentExportLot=null;
+            document.getElementById('exp-name').value='';
+            document.getElementById('exp-qty').value='';document.getElementById('exp-qty').disabled=true;
+            document.getElementById('exp-unit').value='';document.getElementById('btn-export').disabled=true;
+            document.getElementById('selected-lot-info').textContent='Chưa chọn sản phẩm...';
+            document.getElementById('lot-list').innerHTML='<div style="text-align:center;color:#999;padding:12px;font-size:.85rem">Chọn sản phẩm để xem các lô đang có theo FEFO.</div>';
+        };
 
-            matches.forEach((lot,i)=>{
-                const el=document.createElement('div'); 
-                el.className = 'lot-selector';
-                el.innerHTML=`<div><div style="font-weight:bold">${lot.productCode||'--'} | Lô: ${lot.lotNumber}</div><div style="font-size:0.85rem">Hạn: ${lot.expiryDate} | Tồn: <b style="color:var(--primary)">${lot.quantity}</b></div></div><button class="lot-selector-btn">CHỌN</button>`;
-                el.onclick=()=>{ 
-                    document.querySelectorAll('.lot-selector').forEach(d=>d.classList.remove('active'));
-                    el.classList.add('active');
-                    currentExportLot=lot; 
-                    document.getElementById('selected-lot-info').innerHTML = `<b>${lot.productName}</b>${lot.productStrength ? ' - '+lot.productStrength : ''}${lot.packSpec ? ' - '+lot.packSpec : ''} - Lô: ${lot.lotNumber} (Hạn: ${lot.expiryDate}) - Tồn: ${lot.quantity}`;
-                    document.getElementById('exp-qty').disabled=false; 
-                    document.getElementById('exp-qty').max=lot.quantity; 
-                    document.getElementById('exp-unit').value=lot.unit||''; 
-                    document.getElementById('btn-export').disabled=false; 
-                    document.getElementById('exp-qty').focus();
-                };
-                l.appendChild(el);
-            });
-        }
-        
-        window.confirmExport = async () => {
-            const btn = document.getElementById('btn-export');
-            btn.disabled = true;
-            try {
-                const q = parseInt(document.getElementById('exp-qty').value);
-                if(!currentExportLot) { showToast('Chưa chọn lô hàng!', 'error'); return; }
-                if(!currentExportLot.lotNumber || !currentExportLot.expiryDate) { showToast('Lô hàng thiếu Số lô hoặc Hạn dùng. Không cho phép xuất kho!', 'error'); btn.disabled = false; return; }
-                const currentStock = parseInt(currentExportLot.quantity);
-                if(q > currentStock) { showToast(`Xuất kho vượt quá tồn kho! (Tồn: ${currentStock})`, 'error'); btn.disabled = false; return; }
-                if(q <= 0 || isNaN(q)) { showToast(`Số lượng xuất không hợp lệ!`, 'error'); btn.disabled = false; return; }
-
-                const destination = document.getElementById('exp-dest').value;
-                const exportDate = document.getElementById('exp-date').value;
-                const ok = await openSafetyVerification({
-                    title: 'KIỂM TRA TRƯỚC KHI XUẤT KHO',
-                    subtitle: 'Sắp trừ tồn kho thực tế. Hãy đối chiếu đúng sản phẩm, lô FEFO, hạn dùng và số lượng.',
-                    actionType: 'XUẤT KHO',
-                    destination,
-                    date: exportDate,
-                    items: [{...currentExportLot, quantity:q}]
-                });
-                if(!ok) { btn.disabled = false; return; }
-
-                await refs.exports.push({
-                    productName:currentExportLot.productName, productCode: currentExportLot.productCode, productStrength: currentExportLot.productStrength||'', packSpec: currentExportLot.packSpec||'', unit: currentExportLot.unit, lotNumber: currentExportLot.lotNumber, expiryDate: currentExportLot.expiryDate, quantity:q, destination:destination, exportDate:exportDate, relatedId:currentExportLot.id
-                });
-                await refs.items.child(currentExportLot.id).update({quantity:currentStock - q});
-                showToast('Xuất OK','success'); 
-                document.getElementById('lot-list').innerHTML='<div style="text-align:center; color:#999; padding:10px; font-size:0.85rem">Đã xuất xong. Vui lòng chọn lại.</div>'; 
-                document.getElementById('selected-lot-info').innerText = 'Chưa chọn lô nào...';
-                document.getElementById('exp-name').value='';
-                document.getElementById('exp-qty').value=''; 
-                currentExportLot = null;
-            } catch (err) { console.error(err); showToast('Lỗi hệ thống!', 'error'); btn.disabled = false; }
-        }
+        window.confirmExport=async()=>{
+            const q=parseFloat(document.getElementById('exp-qty').value);
+            if(!currentExportLot)return showToast('Chưa chọn sản phẩm từ Master/Kho.','error');
+            if(!q||q<=0)return showToast('Số lượng hộp/đơn vị đóng gói phải lớn hơn 0.','error');
+            if(typeof window.IDECO_EXPORT_ADD_MANUAL_REQUEST!=='function')return showToast('Module Phiếu xuất chuẩn chưa sẵn sàng. Hãy tải lại ứng dụng.','error');
+            const req={
+                stt:1,maSP:currentExportLot.productCode||'',tenSP:currentExportLot.productName,
+                dvt:currentExportLot.packSpec||currentExportLot.unit||'Hộp',soLuong:q
+            };
+            window.IDECO_EXPORT_ADD_MANUAL_REQUEST(req,{destination:document.getElementById('exp-dest').value||'',date:document.getElementById('exp-date').value||''});
+            showToast(`Đã thêm ${q} đơn vị đóng gói ${currentExportLot.productName} vào Phiếu xuất chuẩn.`,'success');
+            resetManualExportSelection();
+        };
 
         // --- REPORT & SEARCH ---
         document.getElementById('rpt-search-input').addEventListener('input', function() {
@@ -1841,7 +1889,7 @@
                 let matches = []; const searchCode = cleanStr(req.code); const searchName = cleanStr(req.name);
                 if (searchCode) matches = stockData.filter(s => cleanStr(s.productCode) === searchCode && parseInt(s.quantity) > 0);
                 if (matches.length === 0 && searchName) matches = stockData.filter(s => cleanStr(s.productName) === searchName && parseInt(s.quantity) > 0);
-                matches.sort((a,b) => new Date(a.expiryDate) - new Date(b.expiryDate));
+                matches.sort(fefoFifoCompare);
                 const totalStock = matches.reduce((sum, item) => sum + parseInt(item.quantity), 0);
                 if (reqQty > totalStock) {
                     bulkExportPreviewData.push({ isError: true, productCode: req.code || '?', productName: req.name || 'Sản phẩm chưa xác định', reqQty: reqQty, totalStock: totalStock, msg: `Thiếu hàng! (Cần: ${reqQty}, Có: ${totalStock})` });
@@ -1886,19 +1934,25 @@
                 items: bulkExportPreviewData.map(i => ({...i, quantity:i.exportQty}))
             });
             if(!ok) return;
-            let count = 0;
-            for (let item of bulkExportPreviewData) {
-                const stockItem = stockData.find(s => s.id === item.relatedId);
-                if (stockItem) {
-                    const currentQty = parseInt(stockItem.quantity);
-                    if (currentQty >= item.exportQty) {
-                        await refs.exports.push({ productName: item.productName, productCode: item.productCode || '', productStrength: item.productStrength||'', packSpec: item.packSpec||'', unit: item.unit || '', lotNumber: item.lotNumber, expiryDate: item.expiryDate, quantity: item.exportQty, destination: dest, exportDate: date, relatedId: item.relatedId });
-                        await refs.items.child(item.relatedId).update({ quantity: currentQty - item.exportQty });
-                        count++;
-                    }
+            // GDP: lập lại FEFO/FIFO trên dữ liệu Firebase NGAY lúc xác nhận, tránh dùng preview cũ khi tồn đã thay đổi.
+            const demandMap={};
+            for(const x of bulkExportPreviewData){const k=(x.productCode||'').trim()?`C:${cleanStr(x.productCode)}`:`N:${cleanStr(x.productName)}`;if(!demandMap[k])demandMap[k]={productCode:x.productCode||'',productName:x.productName||'',qty:0};demandMap[k].qty+=parseInt(x.exportQty)||0;}
+            let committed=[];
+            const tx=await refs.items.transaction(data=>{
+                if(!data)return;const rows=Object.keys(data).map(id=>({id,...data[id]})),plan=[];
+                for(const d of Object.values(demandMap)){
+                    let matches=[];if((d.productCode||'').trim())matches=rows.filter(x=>cleanStr(x.productCode)===cleanStr(d.productCode)&&parseInt(x.quantity)>0);
+                    if(!matches.length)matches=rows.filter(x=>cleanStr(x.productName)===cleanStr(d.productName)&&parseInt(x.quantity)>0);
+                    matches.sort(fefoFifoCompare);let left=d.qty;
+                    for(const lot of matches){if(left<=0)break;const take=Math.min(parseInt(lot.quantity)||0,left);if(take<=0)continue;plan.push({relatedId:lot.id,productName:lot.productName||'',productCode:lot.productCode||'',productStrength:lot.productStrength||'',packSpec:lot.packSpec||'',unit:lot.unit||'',lotNumber:lot.lotNumber||'',expiryDate:lot.expiryDate||'',quantity:take});left-=take;}
+                    if(left>0)return;
                 }
-            }
-            showToast(`Đã xuất thành công ${count} mục!`, 'success');
+                for(const x of plan){if(!data[x.relatedId]||parseInt(data[x.relatedId].quantity)<x.quantity)return;}
+                for(const x of plan)data[x.relatedId].quantity=(parseInt(data[x.relatedId].quantity)||0)-x.quantity;committed=plan;return data;
+            });
+            if(!tx.committed)return showToast('Tồn kho đã thay đổi hoặc không còn đáp ứng FEFO/FIFO. Hệ thống KHÔNG trừ kho; hãy soi lại.','error');
+            let count=0;for(const item of committed){await refs.exports.push({productName:item.productName,productCode:item.productCode||'',productStrength:item.productStrength||'',packSpec:item.packSpec||'',unit:item.unit||'',lotNumber:item.lotNumber,expiryDate:item.expiryDate,quantity:item.quantity,destination:dest,exportDate:date,relatedId:item.relatedId,fefoFifo:'FEFO_HSD_TRUOC__FIFO_NHAP_TRUOC',sourceType:'BULK_EXPORT_GDP'});count++;}
+            showToast(`Đã xuất thành công ${count} dòng/lô theo FEFO/FIFO!`, 'success');
             document.getElementById('exp-preview-box').style.display = 'none';
             document.getElementById('exp-paste-area').value = '';
             document.getElementById('export-file-input').value = '';
@@ -2283,6 +2337,7 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             fallbackModel:'gemini-3.5-flash-lite',
             timeoutMs:90000,
             analysisMode:'fast',
+            baiVision:true,
             activeKey:0
         };
         const aiState = { files:[], rawItems:[], rows:[], slipInfo:{}, settings:loadAISettings(), busy:false, lastRoute:'', lastError:'', startedAt:0, timer:null, currentStage:'', attempts:[] };
@@ -2467,6 +2522,87 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             }
             throw last||new Error('B.AI không phản hồi.');
         }
+        function baiMessagesEndpoint(){
+            const raw=String(aiState.settings.baiEndpoint||AI_DEFAULT.baiEndpoint).trim().replace(/\/+$/,'');
+            if(/\/v1\/messages$/i.test(raw))return raw;
+            if(/\/v1\/chat\/completions$/i.test(raw))return raw.replace(/\/v1\/chat\/completions$/i,'/v1/messages');
+            if(/\/v1$/i.test(raw))return raw+'/messages';
+            return raw.replace(/\/chat\/completions$/i,'/messages');
+        }
+        function baiVisionEnabled(){ return aiState.settings.baiVision!==false && !!String(aiState.settings.baiKey||'').trim(); }
+        function dataUrlToBaiImageBlock(dataUrl){
+            const m=String(dataUrl||'').match(/^data:(image\/(?:jpeg|png|gif|webp));base64,(.+)$/i);
+            if(!m)throw new Error('Định dạng ảnh Vision không được hỗ trợ.');
+            return {type:'image',source:{type:'base64',media_type:m[1].toLowerCase(),data:m[2]}};
+        }
+        async function renderPdfBaiVisionBlocks(file){
+            if(!window.pdfjsLib)throw new Error('Chưa tải PDF.js để dựng ảnh PDF cho Vision.');
+            try{window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'}catch{}
+            const doc=await window.pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;
+            if(doc.numPages>20)throw new Error(`PDF có ${doc.numPages} trang; Vision thử nghiệm giới hạn 20 trang/lượt để tránh quá tải. Hãy tách file hoặc dùng PDF có lớp chữ.`);
+            const blocks=[];
+            for(let i=1;i<=doc.numPages;i++){
+                setAIProgress(`👁️ Huyền đang chuẩn bị hình ảnh PDF: trang ${i}/${doc.numPages}...`,true);
+                const page=await doc.getPage(i);
+                const baseViewport=page.getViewport({scale:1});
+                const targetWidth=Math.min(1500,Math.max(1050,baseViewport.width*1.6));
+                const viewport=page.getViewport({scale:targetWidth/baseViewport.width});
+                const canvas=document.createElement('canvas');
+                canvas.width=Math.ceil(viewport.width); canvas.height=Math.ceil(viewport.height);
+                const ctx=canvas.getContext('2d',{alpha:false});
+                ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
+                await page.render({canvasContext:ctx,viewport}).promise;
+                blocks.push(dataUrlToBaiImageBlock(canvas.toDataURL('image/jpeg',0.78)));
+                canvas.width=1; canvas.height=1;
+            }
+            return blocks;
+        }
+        async function fileToBaiVisionBlocks(file){
+            const isPdf=file.type==='application/pdf'||String(file.name||'').toLowerCase().endsWith('.pdf');
+            if(isPdf)return await renderPdfBaiVisionBlocks(file);
+            const mime=String(file.type||guessAIMime(file.name)).toLowerCase();
+            if(!/^image\/(jpeg|png|gif|webp)$/.test(mime))throw new Error('B.AI Vision chỉ nhận JPEG/PNG/GIF/WEBP; file này sẽ chuyển tuyến dự phòng.');
+            return [dataUrlToBaiImageBlock(await readAIDataURL(file))];
+        }
+        async function baiVisionAI(file,prompt,{jsonSchema=null,plainText=false,purpose='B.AI Vision'}={}){
+            const key=String(aiState.settings.baiKey||'').trim(); if(!key)throw new Error('Chưa có B.AI key.');
+            const model='deepseek-v4-flash';
+            let instruction=String(prompt||'').trim();
+            if(jsonSchema)instruction+=`\n\nYÊU CẦU ĐẦU RA: Chỉ trả JSON hợp lệ, không Markdown, không giải thích. JSON phải tuân theo schema:\n${JSON.stringify(jsonSchema)}`;
+            const imageBlocks=await fileToBaiVisionBlocks(file);
+            const body={model,max_tokens:plainText?10000:14000,temperature:plainText?0.1:0,
+                system:jsonSchema?'Bạn là AI Vision trích xuất chứng từ dược phẩm cực kỳ chính xác. Không bỏ sót dòng. Số lô, HSD/EXP và số lượng là dữ liệu trọng yếu. Chỉ trả JSON hợp lệ.':'Bạn là trợ lý Vision đọc chứng từ chính xác.',
+                messages:[{role:'user',content:[{type:'text',text:instruction},...imageBlocks]}]};
+            const endpoint=baiMessagesEndpoint();
+            const authModes=[
+                {label:'Bearer',headers:{Authorization:'Bearer '+key,'Content-Type':'application/json'}},
+                {label:'x-api-key',headers:{'x-api-key':key,'Content-Type':'application/json'}}
+            ];
+            let last=null;
+            for(const auth of authModes){
+                try{
+                    setAIProgress('Huyền đang tổng hợp... bạn ráng chờ chút nhé',true);
+                    const res=await fetchAI(endpoint,{method:'POST',headers:auth.headers,body:JSON.stringify(body)},Math.max(baiAttemptTimeout(),35000));
+                    const data=await res.json().catch(()=>({}));
+                    if(!res.ok){const er=new Error(data?.error?.message||data?.message||`HTTP ${res.status}`);er.status=res.status;throw er}
+                    const out=(Array.isArray(data?.content)?data.content:[]).filter(x=>x&&x.type==='text').map(x=>x.text||'').join('').trim();
+                    if(!out)throw new Error('B.AI Vision trả nội dung rỗng.');
+                    aiState.lastRoute=`B.AI Vision · ${model} · ${auth.label}`; aiState.lastError='';
+                    return {text:out,provider:'bai-vision',model,keyIndex:-1,raw:data};
+                }catch(e){
+                    const status=e?.status||0; const msg=e?.name==='AbortError'?'Hết thời gian chờ B.AI Vision':(e?.message||String(e));
+                    last=new Error(msg); last.status=status; aiState.lastError=msg; aiState.attempts.push(`B.AI Vision/${auth.label}: ${msg}`);
+                    if(auth.label==='Bearer'){await sleepAI(120);continue}
+                }
+            }
+            throw last||new Error(`${purpose}: B.AI Vision không phản hồi.`);
+        }
+        async function makeBaiVisionTestFile(){
+            const canvas=document.createElement('canvas'); canvas.width=520; canvas.height=160;
+            const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,520,160);ctx.fillStyle='#111827';ctx.font='bold 30px Arial';ctx.fillText('IDECO VISION TEST 2026',35,92);
+            const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
+            return new File([blob],'ideco-vision-test.png',{type:'image/png',lastModified:Date.now()});
+        }
         function pdfItemsToRows(items){
             const cells=(items||[]).map(it=>({text:String(it.str||'').trim(),x:Number(it.transform?.[4]||0),y:Number(it.transform?.[5]||0),w:Math.max(0,Number(it.width||0)),h:Math.abs(Number(it.height||it.transform?.[3]||10))})).filter(x=>x.text);
             if(!cells.length)return '';
@@ -2495,11 +2631,15 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
         }
         function pdfAIQuality(t){const s=String(t||'').toLowerCase();let score=0;if(/tên\s*(hàng|thuốc|sản phẩm)|mặt\s*hàng/.test(s))score++;if(/số\s*lô|\blot\b|\blô\b/.test(s))score++;if(/hạn\s*(dùng|sử dụng)|\bhsd\b|\bexp\b|expiry/.test(s))score++;if(/số\s*lượng|\bsl\b/.test(s))score++;return score}
         async function ocrAIFile(file,purpose='OCR'){
-            if(!currentAIKeys().length)throw new Error('DeepSeek là model text-only. PDF scan/ảnh cần ít nhất 1 Gemini API key để OCR trước khi DeepSeek phân tích.');
             setAIProgress(`👁️ Huyền đang đọc nội dung PDF/ảnh: ${file.name}...`,true);
-            const part=await fileToAIPart(file);
             const prompt='Chỉ OCR/trích xuất chữ từ TOÀN BỘ tài liệu theo đúng thứ tự. Giữ nguyên số phiếu, ngày, tên hàng, số lô, HSD/EXP, ĐVT, số lượng, đơn giá, thành tiền. Không phân tích, không tóm tắt, không bịa. Trả văn bản thuần.';
-            const r=await geminiAI([part,{text:prompt}],{plainText:true,modelList:geminiEconomyModels(),purpose:`${purpose} · OCR`});
+            if(baiVisionEnabled()){
+                try{ const r=await baiVisionAI(file,prompt,{plainText:true,purpose:`${purpose} · B.AI Vision OCR`}); return r.text; }
+                catch(e){ aiState.attempts.push(`Vision OCR dự phòng: ${e?.message||e}`); }
+            }
+            if(!currentAIKeys().length)throw new Error('B.AI Vision chưa xử lý được file và chưa có Gemini key dự phòng. Mở Cài đặt AI → Kiểm tra Text/Vision.');
+            const part=await fileToAIPart(file);
+            const r=await geminiAI([part,{text:prompt}],{plainText:true,modelList:geminiEconomyModels(),purpose:`${purpose} · Gemini OCR`});
             return r.text;
         }
         async function textForBai(file,purpose='AI'){
@@ -2536,8 +2676,16 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             let pdfInfo=null;
             if(isFastAI()&&isPdf){ try{pdfInfo=await getAIPdfTextInfo(file);}catch{} }
             const needsVision=!isPdf||(pdfInfo&&pdfInfo.chars<120);
-            // Ảnh/PDF scan: ở chế độ NHANH, Gemini đọc + trích bảng trong 1 lần.
-            // Không OCR bằng Gemini rồi gửi tiếp DeepSeek thành 2 lượt.
+            // Ảnh/PDF scan: ở chế độ NHANH thử B.AI Vision trực tiếp trước (1 lượt).
+            // Nếu B.AI Vision không nhận ảnh hoặc lỗi, tự chuyển Gemini Vision dự phòng.
+            if(isFastAI()&&needsVision&&baiVisionEnabled()){
+                try{
+                    setAIProgress(`👁️ Huyền đang đọc trực tiếp ${file.name} và tổng hợp dữ liệu...`,true);
+                    const r=await baiVisionAI(file,prompt,{jsonSchema,plainText,purpose});
+                    const out={...r,sourceText:''}; aiResultCache.set(cacheKey,{text:r.text,sourceText:'',model:r.model,keyIndex:-1});
+                    return out;
+                }catch(e){ last=e; failures.push(`B.AI Vision: ${e?.message||e}`); setAIProgress('⏳ Huyền đang thử phương án phân tích dự phòng... bạn ráng chờ chút nhé',true); }
+            }
             if(isFastAI()&&needsVision&&currentAIKeys().length){
                 try{
                     setAIProgress(`👁️ Huyền đang đọc trực tiếp ${file.name} và tổng hợp dữ liệu...`,true);
@@ -2546,7 +2694,7 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
                     const r=await geminiAI([part,{text:prompt}],{jsonSchema,plainText,modelList:models,purpose});
                     const out={...r,sourceText:''}; aiResultCache.set(cacheKey,{text:r.text,sourceText:'',model:r.model,keyIndex:r.keyIndex});
                     return out;
-                }catch(e){ last=e; failures.push(`Vision nhanh: ${e?.message||e}`); }
+                }catch(e){ last=e; failures.push(`Gemini Vision: ${e?.message||e}`); }
             }
             for(const model of configuredAIModels()){
                 try{
@@ -3066,8 +3214,9 @@ YÊU CẦU BẮT BUỘC:
             $ai('ai-primary-model').value=s.primaryModel||AI_DEFAULT.primaryModel;
             $ai('ai-fallback-model').value=s.fallbackModel||AI_DEFAULT.fallbackModel;
             if($ai('ai-analysis-mode'))$ai('ai-analysis-mode').value=s.analysisMode||'fast';
+            if($ai('ai-bai-vision'))$ai('ai-bai-vision').checked=s.baiVision!==false;
             const g=currentAIKeys().length;
-            $ai('ai-settings-status').textContent=(g?`${g} Gemini key · `:'0 Gemini key · ')+(s.baiKey?'B.AI đã có key':'B.AI chưa có key');
+            $ai('ai-settings-status').textContent=(g?`${g} Gemini key · `:'0 Gemini key · ')+(s.baiKey?`B.AI đã có key · Vision ${s.baiVision!==false?'BẬT':'TẮT'}`:'B.AI chưa có key');
         }
         function collectAISettings(){
             aiState.settings.keys=[1,2,3].map(n=>$ai('ai-key-'+n).value.trim());
@@ -3076,6 +3225,7 @@ YÊU CẦU BẮT BUỘC:
             aiState.settings.primaryModel=$ai('ai-primary-model').value;
             aiState.settings.fallbackModel=$ai('ai-fallback-model').value;
             if($ai('ai-analysis-mode'))aiState.settings.analysisMode=$ai('ai-analysis-mode').value||'fast';
+            if($ai('ai-bai-vision'))aiState.settings.baiVision=!!$ai('ai-bai-vision').checked;
             saveAISettings(); fillAISettings(); aiNotice('Đã lưu cài đặt AI trên trình duyệt này.');
         }
         function restoreLegacyAISettings(){
@@ -3099,7 +3249,15 @@ YÊU CẦU BẮT BUỘC:
                 }catch(e){results.push(`❌ Gemini: ${e.message}`)}
             }else results.push('⚠️ Gemini: chưa có key');
             if(aiState.settings.baiKey){
-                try{const r=await baiAI('Trả lời đúng một từ: OK',{plainText:true,model:'bai:deepseek-v4-flash',purpose:'Kiểm tra B.AI'});results.push(`✅ B.AI hoạt động (${r.model})`)}catch(e){results.push(`❌ B.AI: ${e.message}`)}
+                try{const r=await baiAI('Trả lời đúng một từ: OK',{plainText:true,model:'bai:deepseek-v4-flash',purpose:'Kiểm tra B.AI Text'});results.push(`✅ B.AI Text hoạt động (${r.model})`)}catch(e){results.push(`❌ B.AI Text: ${e.message}`)}
+                if(aiState.settings.baiVision!==false){
+                    try{
+                        const tf=await makeBaiVisionTestFile();
+                        const r=await baiVisionAI(tf,'Đọc chính xác dòng chữ trong ảnh. Nếu thấy IDECO VISION TEST 2026 thì chỉ trả đúng: VISION_OK',{plainText:true,purpose:'Kiểm tra B.AI Vision'});
+                        if(/VISION_OK/i.test(r.text)||/IDECO\s+VISION\s+TEST\s+2026/i.test(r.text))results.push('✅ B.AI Vision hoạt động');
+                        else results.push('⚠️ B.AI Vision có phản hồi nhưng chưa đọc đúng ảnh thử');
+                    }catch(e){results.push(`❌ B.AI Vision: ${e.message}`)}
+                }else results.push('⚠️ B.AI Vision: đang tắt trong Cài đặt');
             }else results.push('⚠️ B.AI: chưa có key');
             el.innerHTML=results.map(x=>`<div style="margin:3px 0;${x.startsWith('✅')?'color:#15803d':x.startsWith('❌')?'color:#b91c1c':'color:#b45309'}">${escAI(x)}</div>`).join('');
         }
@@ -3161,53 +3319,165 @@ QUY TẮC CỰC KỲ QUAN TRỌNG:
 
 
     <script>
-    // ===== XUẤT KHO AI · SO TỒN THEO HỘP · FEFO · QUY ĐỔI ĐVT NHỎ NHẤT =====
+    // ===== XUẤT KHO CHUẨN · AI/PDF + THỦ CÔNG DỰ PHÒNG + FIREBASE VOUCHERS =====
     (()=>{
         'use strict';
-        const S={file:null,parsed:null,requests:[],compare:[],allocations:[],logo:'',busy:false};
+        const S={file:null,parsed:null,requests:[],compare:[],allocations:[],logo:'',busy:false,sourceType:'',loadedVoucherId:null,loadedVoucherStatus:'',voucherCreatedAt:null,archive:[]};
         const $=id=>document.getElementById(id);
         const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         const n=v=>{const x=Number(String(v??'').replace(/\s/g,'').replace(/,/g,''));return Number.isFinite(x)?x:0};
         const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/đ/g,'d').replace(/[^a-z0-9]+/g,' ').trim();
         const fmt=v=>Number(v||0).toLocaleString('vi-VN');
+        const today=()=>new Date().toISOString().slice(0,10);
         const dateVal=v=>{const s=String(v||'').trim();let m=s.match(/(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/);if(m)return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;m=s.match(/(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/);if(m)return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;return ''};
         function setProg(msg,on=true){const e=$('xk-progress');if(!e)return;e.textContent=msg;e.classList.toggle('show',on)}
-        function loadLogo(){try{S.logo=localStorage.getItem('ideco_export_logo_v1')||''}catch{};$('xk-logo-status').textContent=S.logo?'✅ Đã lưu logo trên máy.':'Chưa chọn logo.'}
+        function setSaveStatus(msg,type='info'){const e=$('xk-voucher-save-status');if(!e)return;e.textContent=msg;e.style.color=type==='error'?'#b91c1c':type==='ok'?'#166534':'#64748b'}
+        function loadLogo(){try{S.logo=localStorage.getItem('ideco_export_logo_v1')||''}catch{};if($('xk-logo-status'))$('xk-logo-status').textContent=S.logo?'✅ Đã lưu logo trên máy.':'Chưa chọn logo.'}
         function saveLogo(file){if(!file)return;const r=new FileReader();r.onload=()=>{S.logo=String(r.result||'');try{localStorage.setItem('ideco_export_logo_v1',S.logo)}catch{};$('xk-logo-status').textContent='✅ Đã lưu logo trên máy.';renderVoucher();};r.readAsDataURL(file)}
         function masterFor(req){const code=norm(req.maSP),name=norm(req.tenSP);let m=null;if(code)m=(masterData||[]).find(x=>norm(x.code||x.productCode)===code);if(!m&&name)m=(masterData||[]).find(x=>norm(x.name||x.productName)===name);return m||null}
         function stockFor(req){const code=norm(req.maSP),name=norm(req.tenSP);let arr=[];if(code)arr=(stockData||[]).filter(x=>norm(x.productCode)===code);if(!arr.length&&name)arr=(stockData||[]).filter(x=>norm(x.productName)===name);return arr}
         function smallestConversion(packSpec,unitHint){
-            const raw=String(packSpec||unitHint||'').trim(); const s=norm(raw);
-            // Ưu tiên cấu trúc có lớp trung gian: 10 vỉ x 10 viên => 100 viên.
-            let m=s.match(/(\d+(?:\.\d+)?)\s*(vi|vỉ)\s*(?:x|\*)\s*(\d+(?:\.\d+)?)\s*(vien|viên)/i);
-            if(m)return {factor:n(m[1])*n(m[3]),unit:'viên',explain:`${m[1]} vỉ × ${m[3]} viên`};
-            // Hộp N đơn vị đếm trực tiếp. Không nhân số ml/g vì đó là thể tích/khối lượng của 1 đơn vị.
-            const defs=[['viên',/(\d+(?:\.\d+)?)\s*(?:vien|viên)\b/i],['tuýp',/(\d+(?:\.\d+)?)\s*(?:tuyp|tube)\b/i],['chai',/(\d+(?:\.\d+)?)\s*chai\b/i],['lọ',/(\d+(?:\.\d+)?)\s*(?:lo|lọ)\b/i],['ống',/(\d+(?:\.\d+)?)\s*(?:ong|ống|amp(?:oule)?)\b/i],['gói',/(\d+(?:\.\d+)?)\s*(?:goi|gói|sachet)\b/i],['vỉ',/(\d+(?:\.\d+)?)\s*(?:vi|vỉ)\b/i]];
+            const raw=String(packSpec||unitHint||'').trim(),s=norm(raw);
+            let m=s.match(/(\d+(?:\.\d+)?)\s*vi\s*(?:x|\*)\s*(\d+(?:\.\d+)?)\s*vien/i);
+            if(m)return {factor:n(m[1])*n(m[2]),unit:'viên',explain:`${m[1]} vỉ × ${m[2]} viên`};
+            const defs=[['viên',/(\d+(?:\.\d+)?)\s*vien\b/i],['tuýp',/(\d+(?:\.\d+)?)\s*(?:tuyp|tube)\b/i],['chai',/(\d+(?:\.\d+)?)\s*chai\b/i],['lọ',/(\d+(?:\.\d+)?)\s*lo\b/i],['ống',/(\d+(?:\.\d+)?)\s*(?:ong|amp(?:oule)?)\b/i],['gói',/(\d+(?:\.\d+)?)\s*(?:goi|sachet)\b/i],['vỉ',/(\d+(?:\.\d+)?)\s*vi\b/i]];
             for(const [unit,re] of defs){const mm=s.match(re);if(mm)return {factor:n(mm[1])||1,unit,explain:`${mm[1]} ${unit}/đơn vị đóng gói`}}
-            // Nếu chính ĐVT là chai/lọ/tuýp... thì hệ số 1.
             for(const u of ['viên','tuýp','chai','lọ','ống','gói','vỉ'])if(s===norm(u)||s.includes('1 '+norm(u)))return {factor:1,unit:u,explain:`1 ${u}`};
             return {factor:null,unit:'',explain:'Chưa xác định được hệ số từ Quy cách Master'};
         }
-        function allocateLots(matches,boxes,factor,smallUnit){let left=boxes,out=[];const sorted=[...matches].filter(x=>n(x.quantity)>0).sort((a,b)=>String(a.expiryDate||'9999').localeCompare(String(b.expiryDate||'9999')));for(const lot of sorted){if(left<=0)break;const take=Math.min(n(lot.quantity),left);if(take<=0)continue;out.push({relatedId:lot.id,productCode:lot.productCode||'',productName:lot.productName||'',lotNumber:lot.lotNumber||'',expiryDate:lot.expiryDate||'',boxesTake:take,smallUnit,smallQty:factor?take*factor:take,packSpec:lot.packSpec||'',unit:lot.unit||''});left-=take}return {rows:out,left}}
+        function allocateLots(matches,boxes,factor,smallUnit){let left=boxes,out=[];const sorted=[...matches].filter(x=>n(x.quantity)>0).sort(fefoFifoCompare);for(const lot of sorted){if(left<=0)break;const take=Math.min(n(lot.quantity),left);if(take<=0)continue;out.push({relatedId:lot.id,productCode:lot.productCode||'',productName:lot.productName||'',lotNumber:lot.lotNumber||'',expiryDate:lot.expiryDate||'',boxesTake:take,smallUnit,smallQty:factor?take*factor:take,packSpec:lot.packSpec||'',unit:lot.unit||''});left-=take}return {rows:out,left}}
         function evaluate(){
             S.compare=[];S.allocations=[];
-            for(const req of S.requests){const matches=stockFor(req),master=masterFor(req),boxes=n(req.soLuong),total=matches.reduce((a,x)=>a+n(x.quantity),0),pack=(master?.packSpec||master?.['Quy Cách']||matches[0]?.packSpec||req.dvt||''),conv=smallestConversion(pack,req.dvt);let status='ok',msg='Đủ tồn';if(!matches.length||total<=0){status='zero';msg='Tồn kho = 0'}else if(total<boxes){status='short';msg=`Thiếu ${fmt(boxes-total)} hộp`}else if(!conv.factor){status='conversion';msg='Cần xác nhận quy đổi'};const row={...req,boxes,total,packSpec:pack,conversion:conv,status,msg,master,matches};S.compare.push(row);if(status==='ok'){const a=allocateLots(matches,boxes,conv.factor,conv.unit);S.allocations.push(...a.rows)}}
-            renderCompare();renderAlloc();renderSummary();showStockWarnings();$('xk-confirm-btn').disabled=!(S.compare.length&&S.compare.every(x=>x.status==='ok')&&S.allocations.length);
+            for(const req of S.requests){
+                const matches=stockFor(req),master=masterFor(req),boxes=n(req.soLuong),total=matches.reduce((a,x)=>a+n(x.quantity),0),pack=(master?.packSpec||master?.['Quy Cách']||matches[0]?.packSpec||req.dvt||''),conv=smallestConversion(pack,req.dvt);
+                let status='ok',msg='Đủ tồn';
+                if(!matches.length||total<=0){status='zero';msg='Tồn kho = 0'}else if(total<boxes){status='short';msg=`Thiếu ${fmt(boxes-total)} hộp`}else if(!conv.factor){status='conversion';msg='Cần xác nhận quy đổi'};
+                const row={...req,boxes,total,packSpec:pack,conversion:conv,status,msg};S.compare.push(row);
+                if(status==='ok'){const a=allocateLots(matches,boxes,conv.factor,conv.unit);S.allocations.push(...a.rows)}
+            }
+            renderCompare();renderAlloc();renderSummary();showStockWarnings();
+            $('xk-confirm-btn').disabled=!!(S.loadedVoucherStatus==='CONFIRMED')||!(S.compare.length&&S.compare.every(x=>x.status==='ok')&&S.allocations.length);
         }
-        function renderCompare(){const tb=$('xk-compare-body');tb.innerHTML=S.compare.map((r,i)=>`<tr class="${r.status==='ok'?'xk-row-ok':r.status==='zero'?'xk-row-zero':r.status==='short'?'xk-row-short':'xk-row-unmatched'}"><td>${i+1}</td><td>${esc(r.maSP||'')}</td><td><b>${esc(r.tenSP||'')}</b></td><td>${esc(r.dvt||'')}</td><td style="text-align:center;font-weight:800">${fmt(r.boxes)}</td><td style="text-align:center;font-weight:800">${fmt(r.total)}</td><td>${esc(r.packSpec||'')}</td><td><b>${esc(r.conversion.unit||'—')}</b></td><td style="text-align:right;font-weight:800">${r.conversion.factor?fmt(r.boxes*r.conversion.factor):'—'}</td><td><b>${esc(r.msg)}</b></td></tr>`).join('')||'<tr><td colspan="10" style="text-align:center">Chưa có dữ liệu.</td></tr>'}
-        function renderAlloc(){const tb=$('xk-allocation-body');tb.innerHTML=S.allocations.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.productCode)}</td><td><b>${esc(r.productName)}</b></td><td>${esc(r.smallUnit)}</td><td><b>${esc(r.lotNumber)}</b></td><td>${esc(r.expiryDate)}</td><td style="text-align:right;font-weight:800">${fmt(r.smallQty)}</td><td style="text-align:right">${fmt(r.boxesTake)}</td></tr>`).join('')||'<tr><td colspan="8" style="text-align:center;color:#64748b">Chưa có dòng đủ điều kiện để phân lô FEFO.</td></tr>'}
-        function renderSummary(){const z=S.compare.filter(x=>x.status==='zero').length,sh=S.compare.filter(x=>x.status==='short').length,cv=S.compare.filter(x=>x.status==='conversion').length,ok=S.compare.filter(x=>x.status==='ok').length,total=S.compare.reduce((a,x)=>a+x.boxes,0);$('xk-summary').innerHTML=`<span class="xk-pill xk-info">Phiếu: ${S.compare.length} SP · ${fmt(total)} hộp/đv đóng gói</span><span class="xk-pill xk-ok">Đủ: ${ok}</span>${sh?`<span class="xk-pill xk-warn">Thiếu: ${sh}</span>`:''}${z?`<span class="xk-pill xk-bad">Tồn 0: ${z}</span>`:''}${cv?`<span class="xk-pill xk-warn">Chưa rõ quy đổi: ${cv}</span>`:''}`}
-        function showStockWarnings(){const zero=S.compare.filter(x=>x.status==='zero'),short=S.compare.filter(x=>x.status==='short');if(!zero.length&&!short.length)return;let h='';if(zero.length)h+=`<div class="xk-warning-box zero"><b>⛔ TỒN KHO = 0</b><br>${zero.map(x=>`• ${esc(x.tenSP)} — Phiếu cần ${fmt(x.boxes)}`).join('<br>')}<hr style="margin:8px 0;border:0;border-top:1px solid #fecaca"><b>Bạn ơi kiểm lại kho ERP xem nếu cũng không có thì báo kế toán đặt hàng ngay và nhớ báo kinh doanh biết luôn nhé</b></div>`;if(short.length)h+=`<div class="xk-warning-box short"><b>⚠️ KHO ĐANG THIẾU</b><br>${short.map(x=>`• ${esc(x.tenSP)} — Cần ${fmt(x.boxes)}, kho có ${fmt(x.total)}, thiếu ${fmt(x.boxes-x.total)}`).join('<br>')}<hr style="margin:8px 0;border:0;border-top:1px solid #fed7aa"><b>Số lượng sản phẩm này còn thiếu- bạn liên hệ đặt hàng nhanh bổ sung- nhắc với kinh doanh thông tin khách hàng biết nhé</b></div>`;$('xk-warning-body').innerHTML=h;$('xk-warning-modal').style.display='flex'}
+        function renderCompare(){const tb=$('xk-compare-body');if(!tb)return;tb.innerHTML=S.compare.map((r,i)=>`<tr class="${r.status==='ok'?'xk-row-ok':r.status==='zero'?'xk-row-zero':r.status==='short'?'xk-row-short':'xk-row-unmatched'}"><td>${i+1}</td><td>${esc(r.maSP||'')}</td><td><b>${esc(r.tenSP||'')}</b></td><td>${esc(r.dvt||'')}</td><td style="text-align:center;font-weight:800">${fmt(r.boxes??r.soLuong)}</td><td style="text-align:center;font-weight:800">${fmt(r.total)}</td><td>${esc(r.packSpec||'')}</td><td><b>${esc(r.conversion?.unit||'—')}</b></td><td style="text-align:right;font-weight:800">${r.conversion?.factor?fmt((r.boxes??r.soLuong)*r.conversion.factor):'—'}</td><td><b>${esc(r.msg||'')}</b></td></tr>`).join('')||'<tr><td colspan="10" style="text-align:center">Chưa có dữ liệu.</td></tr>'}
+        function renderAlloc(){const tb=$('xk-allocation-body');if(!tb)return;tb.innerHTML=S.allocations.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.productCode)}</td><td><b>${esc(r.productName)}</b></td><td>${esc(r.smallUnit)}</td><td><b>${esc(r.lotNumber)}</b></td><td>${esc(r.expiryDate)}</td><td style="text-align:right;font-weight:800">${fmt(r.smallQty)}</td><td style="text-align:right">${fmt(r.boxesTake)}</td></tr>`).join('')||'<tr><td colspan="8" style="text-align:center;color:#64748b">Chưa có dòng đủ điều kiện để phân lô FEFO.</td></tr>'}
+        function renderSummary(){if(!$('xk-summary'))return;const z=S.compare.filter(x=>x.status==='zero').length,sh=S.compare.filter(x=>x.status==='short').length,cv=S.compare.filter(x=>x.status==='conversion').length,ok=S.compare.filter(x=>x.status==='ok').length,total=S.compare.reduce((a,x)=>a+n(x.boxes??x.soLuong),0);$('xk-summary').innerHTML=`<span class="xk-pill xk-info">Phiếu: ${S.compare.length} SP · ${fmt(total)} hộp/đv đóng gói</span><span class="xk-pill xk-ok">Đủ: ${ok}</span>${sh?`<span class="xk-pill xk-warn">Thiếu: ${sh}</span>`:''}${z?`<span class="xk-pill xk-bad">Tồn 0: ${z}</span>`:''}${cv?`<span class="xk-pill xk-warn">Chưa rõ quy đổi: ${cv}</span>`:''}`}
+        function showStockWarnings(){const zero=S.compare.filter(x=>x.status==='zero'),short=S.compare.filter(x=>x.status==='short');if(!zero.length&&!short.length)return;let h='';if(zero.length)h+=`<div class="xk-warning-box zero"><b>⛔ TỒN KHO = 0</b><br>${zero.map(x=>`• ${esc(x.tenSP)} — Phiếu cần ${fmt(x.boxes??x.soLuong)}`).join('<br>')}<hr style="margin:8px 0;border:0;border-top:1px solid #fecaca"><b>Bạn ơi kiểm lại kho ERP xem nếu cũng không có thì báo kế toán đặt hàng ngay và nhớ báo kinh doanh biết luôn nhé</b></div>`;if(short.length)h+=`<div class="xk-warning-box short"><b>⚠️ KHO ĐANG THIẾU</b><br>${short.map(x=>`• ${esc(x.tenSP)} — Cần ${fmt(x.boxes??x.soLuong)}, kho có ${fmt(x.total)}, thiếu ${fmt((x.boxes??x.soLuong)-x.total)}`).join('<br>')}<hr style="margin:8px 0;border:0;border-top:1px solid #fed7aa"><b>Số lượng sản phẩm này còn thiếu- bạn liên hệ đặt hàng nhanh bổ sung- nhắc với kinh doanh thông tin khách hàng biết nhé</b></div>`;$('xk-warning-body').innerHTML=h;$('xk-warning-modal').style.display='flex'}
         window.closeExportStockWarning=()=>{$('xk-warning-modal').style.display='none'};
-        function fillMeta(info){info=info||{};$('xk-slip-no').value=info.maPhieu||'';$('xk-order-no').value=info.donHang||'';$('xk-customer').value=info.nguoiNhan||'';$('xk-customer-address').value=info.diaChi||'';const d=dateVal(info.ngay);$('xk-export-date').value=d||new Date().toISOString().slice(0,10);if(!$('xk-invoice-date').value)$('xk-invoice-date').value=d||new Date().toISOString().slice(0,10)}
-        window.analyzeExportSlipAI=async()=>{if(S.busy)return;const f=S.file||$('xk-ai-file').files?.[0];if(!f)return showToast('Vui lòng chọn Phiếu xuất kho PDF/ảnh.','error');if(typeof window.IDECO_AI_EXPORT_ANALYZE!=='function')return showToast('Module AI chưa sẵn sàng. Hãy tải lại ứng dụng.','error');S.busy=true;$('xk-analyze-btn').disabled=true;setProg('Huyền đang tổng hợp phiếu xuất... bạn ráng chờ chút nhé',true);try{const data=await window.IDECO_AI_EXPORT_ANALYZE(f);S.parsed=data;S.requests=(data?.items||data?.data||[]).map((x,i)=>({stt:x.stt||i+1,maSP:x.maSP||x.ma_sp||x.code||'',tenSP:x.tenSP||x.tenSp||x.tenHang||x.name||'',dvt:x.dvt||x.donVi||x.unit||'',soLuong:n(x.soLuong??x.quantity)})).filter(x=>x.tenSP&&x.soLuong>0);if(!S.requests.length)throw new Error('Không tìm thấy dòng hàng hợp lệ trên phiếu.');fillMeta(data?.slipInfo||data?.info||{});evaluate();$('xk-result-area').style.display='block';setProg(`✅ Huyền đã đọc ${S.requests.length} sản phẩm và soi tồn kho xong.`,true);setTimeout(()=>setProg('',false),4500);$('xk-result-area').scrollIntoView({behavior:'smooth',block:'start'})}catch(e){console.error(e);setProg('',false);showToast('Huyền chưa phân tích được phiếu xuất. Kiểm tra API/kết nối hoặc dùng Xuất kho thủ công.','error')}finally{S.busy=false;$('xk-analyze-btn').disabled=false}};
-        window.clearExportAI=()=>{S.file=null;S.parsed=null;S.requests=[];S.compare=[];S.allocations=[];$('xk-ai-file').value='';$('xk-file-name').textContent='Chưa chọn file.';$('xk-result-area').style.display='none';$('xk-summary').innerHTML='<span class="xk-pill xk-info">Chưa phân tích phiếu</span>';setProg('',false)};
-        function voucherHTML(){const info={company:$('xk-company').value,mst:$('xk-mst').value,address:$('xk-company-address').value,slip:$('xk-slip-no').value,order:$('xk-order-no').value,inv:$('xk-invoice-no').value,sym:$('xk-invoice-symbol').value,invDate:$('xk-invoice-date').value,exDate:$('xk-export-date').value,cust:$('xk-customer').value,custAddr:$('xk-customer-address').value,delivery:$('xk-delivery-address').value,reason:$('xk-reason').value,warehouse:$('xk-warehouse').value};const rows=S.allocations;return `<div class="xk-print-sheet" id="xk-print-sheet"><div class="xk-print-head"><div class="xk-print-company">${S.logo?`<img src="${S.logo}" class="xk-logo-preview">`:''}<b>${esc(info.company)}</b><br>Địa chỉ: ${esc(info.address)}<br>MST: ${esc(info.mst||'........................')}</div><div class="xk-print-title"><b>Mẫu số 02 - VT</b><div style="font-size:12px;font-style:italic">Phiếu xuất kho nội bộ / giao khách</div><h2>PHIẾU XUẤT KHO</h2><div>Ngày ${esc((info.exDate||'').split('-').reverse().join('/'))}</div><div class="xk-invoice-box">Số HĐ: <b>${esc(info.inv||'........')}</b><br>Ký hiệu HĐ: <b>${esc(info.sym||'........')}</b><br>Ngày HĐ: <b>${esc((info.invDate||'').split('-').reverse().join('/')||'........')}</b></div></div></div><div style="margin-top:12px;line-height:1.7">- Họ và tên người nhận hàng / Khách hàng: <b>${esc(info.cust)}</b><br>- Địa chỉ khách hàng: ${esc(info.custAddr)}<br>- Địa chỉ giao nhận kho: <b>${esc(info.delivery||'................................')}</b><br>- Lý do xuất kho: ${esc(info.reason)}<br>- Xuất tại kho: <b>${esc(info.warehouse)}</b> &nbsp;&nbsp; Mã phiếu: <b>${esc(info.slip)}</b> &nbsp;&nbsp; Đơn hàng: <b>${esc(info.order)}</b></div><table class="xk-print-table"><thead><tr><th>STT</th><th>Tên hàng hóa</th><th>Mã số</th><th>Lô</th><th>HSD</th><th>ĐVT</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td style="text-align:center">${i+1}</td><td>${esc(r.productName)}</td><td>${esc(r.productCode)}</td><td>${esc(r.lotNumber)}</td><td>${esc(r.expiryDate)}</td><td style="text-align:center">${esc(r.smallUnit)}</td><td style="text-align:right"><b>${fmt(r.smallQty)}</b></td><td></td><td></td></tr>`).join('')}<tr><td colspan="6" style="text-align:center"><b>Cộng</b></td><td></td><td></td><td></td></tr></tbody></table><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:30px;text-align:center;margin-top:34px"><div><b>NGƯỜI LẬP PHIẾU</b><br><br><br><br>(Ký, họ tên)</div><div><b>PHỤ TRÁCH KHO</b><br><br><br><br>(Ký, họ tên)</div><div><b>NGƯỜI NHẬN HÀNG</b><br><br><br><br>(Ký, họ tên)</div></div></div>`}
-        function renderVoucher(){if(!$('xk-voucher-preview'))return;$('xk-voucher-preview').innerHTML=voucherHTML()}
+
+        function collectMeta(){return {company:$('xk-company').value,mst:$('xk-mst').value,address:$('xk-company-address').value,slip:$('xk-slip-no').value,order:$('xk-order-no').value,invoiceNo:$('xk-invoice-no').value,invoiceSymbol:$('xk-invoice-symbol').value,invoiceDate:$('xk-invoice-date').value,exportDate:$('xk-export-date').value,customer:$('xk-customer').value,customerAddress:$('xk-customer-address').value,deliveryAddress:$('xk-delivery-address').value,reason:$('xk-reason').value,warehouse:$('xk-warehouse').value,preparer:$('xk-preparer').value,accountant:$('xk-accountant').value,manager:$('xk-manager').value}}
+        function applyMeta(m={}){$('xk-company').value=m.company||$('xk-company').value;$('xk-mst').value=m.mst||'';$('xk-company-address').value=m.address||$('xk-company-address').value;$('xk-slip-no').value=m.slip||'';$('xk-order-no').value=m.order||'';$('xk-invoice-no').value=m.invoiceNo||'';$('xk-invoice-symbol').value=m.invoiceSymbol||'';$('xk-invoice-date').value=m.invoiceDate||today();$('xk-export-date').value=m.exportDate||today();$('xk-customer').value=m.customer||'';$('xk-customer-address').value=m.customerAddress||'';$('xk-delivery-address').value=m.deliveryAddress||'';$('xk-reason').value=m.reason||'Xuất bán hàng theo đơn hàng';$('xk-warehouse').value=m.warehouse||'Kho IDECO';$('xk-preparer').value=m.preparer||'';$('xk-accountant').value=m.accountant||'';$('xk-manager').value=m.manager||''}
+        function fillMeta(info){info=info||{};$('xk-slip-no').value=info.maPhieu||'';$('xk-order-no').value=info.donHang||'';$('xk-customer').value=info.nguoiNhan||'';$('xk-customer-address').value=info.diaChi||'';const d=dateVal(info.ngay);$('xk-export-date').value=d||today();if(!$('xk-invoice-date').value)$('xk-invoice-date').value=d||today()}
+        function suggestVoucherName(){const slip=$('xk-slip-no').value.trim(),cust=$('xk-customer').value.trim(),d=$('xk-export-date').value||today();return slip?`${slip}${cust?' - '+cust:''}`:`PXK ${d.split('-').reverse().join('-')}${cust?' - '+cust:''}`}
+        function ensureVoucherName(){let v=$('xk-voucher-name').value.trim();if(!v){v=suggestVoucherName();$('xk-voucher-name').value=v}return v}
+
+        window.analyzeExportSlipAI=async()=>{
+            if(S.busy)return;const f=S.file||$('xk-ai-file').files?.[0];if(!f)return showToast('Vui lòng chọn Phiếu xuất kho PDF/ảnh.','error');if(typeof window.IDECO_AI_EXPORT_ANALYZE!=='function')return showToast('Module AI chưa sẵn sàng. Hãy tải lại ứng dụng.','error');
+            S.busy=true;S.sourceType='AI_PDF';S.loadedVoucherId=null;S.loadedVoucherStatus='';S.voucherCreatedAt=null;$('xk-analyze-btn').disabled=true;setProg('Huyền đang tổng hợp phiếu xuất... bạn ráng chờ chút nhé',true);
+            try{const data=await window.IDECO_AI_EXPORT_ANALYZE(f);S.parsed=data;S.requests=(data?.items||data?.data||[]).map((x,i)=>({stt:x.stt||i+1,maSP:x.maSP||x.ma_sp||x.code||'',tenSP:x.tenSP||x.tenSp||x.tenHang||x.name||'',dvt:x.dvt||x.donVi||x.unit||'',soLuong:n(x.soLuong??x.quantity)})).filter(x=>x.tenSP&&x.soLuong>0);if(!S.requests.length)throw new Error('Không tìm thấy dòng hàng hợp lệ trên phiếu.');fillMeta(data?.slipInfo||data?.info||{});$('xk-voucher-name').value=suggestVoucherName();evaluate();$('xk-result-area').style.display='block';setProg(`✅ Huyền đã đọc ${S.requests.length} sản phẩm và soi tồn kho xong.`,true);setTimeout(()=>setProg('',false),4500);$('xk-result-area').scrollIntoView({behavior:'smooth',block:'start'})}catch(e){console.error(e);setProg('',false);showToast('Huyền chưa phân tích được phiếu xuất. Kiểm tra API/kết nối hoặc dùng Xuất kho thủ công.','error')}finally{S.busy=false;$('xk-analyze-btn').disabled=false}
+        };
+
+        window.IDECO_EXPORT_ADD_MANUAL_REQUEST=(req,meta={})=>{
+            if(!req?.tenSP||n(req.soLuong)<=0)return false;
+            if(S.loadedVoucherStatus==='CONFIRMED'){S.loadedVoucherId=null;S.loadedVoucherStatus='';S.voucherCreatedAt=null;S.requests=[];S.compare=[];S.allocations=[]}
+            S.sourceType=S.sourceType==='AI_PDF'?'AI_PDF_BO_SUNG_THU_CONG':(S.sourceType||'THU_CONG_DU_PHONG');
+            const code=norm(req.maSP),name=norm(req.tenSP);const old=S.requests.find(x=>(code&&norm(x.maSP)===code)||(!code&&norm(x.tenSP)===name));
+            if(old)old.soLuong=n(old.soLuong)+n(req.soLuong);else S.requests.push({...req,stt:S.requests.length+1,soLuong:n(req.soLuong)});
+            S.requests.forEach((x,i)=>x.stt=i+1);
+            if(meta.destination){if(!$('xk-customer').value)$('xk-customer').value=meta.destination;if(!$('xk-delivery-address').value)$('xk-delivery-address').value=meta.destination}
+            if(meta.date)$('xk-export-date').value=meta.date;
+            if(!$('xk-voucher-name').value)$('xk-voucher-name').value=suggestVoucherName();
+            evaluate();$('xk-result-area').style.display='block';$('xk-result-area').scrollIntoView({behavior:'smooth',block:'start'});setSaveStatus(`Đã có ${S.requests.length} sản phẩm trong phiếu thủ công. Chưa trừ kho.`,'ok');return true
+        };
+
+        function resetLoadedState(clearMeta=true){S.file=null;S.parsed=null;S.requests=[];S.compare=[];S.allocations=[];S.sourceType='';S.loadedVoucherId=null;S.loadedVoucherStatus='';S.voucherCreatedAt=null;if($('xk-ai-file'))$('xk-ai-file').value='';if($('xk-file-name'))$('xk-file-name').textContent='Chưa chọn file.';$('xk-result-area').style.display='none';$('xk-summary').innerHTML='<span class="xk-pill xk-info">Chưa phân tích phiếu</span>';$('xk-voucher-preview').style.display='none';$('xk-voucher-preview').innerHTML='';$('xk-voucher-name').value='';setProg('',false);setSaveStatus('Có thể lưu phiếu nháp trước khi trừ kho; máy khác sẽ xem được khi Firebase đã đồng bộ.');if(clearMeta)applyMeta({exportDate:today(),invoiceDate:today(),reason:'Xuất bán hàng theo đơn hàng',warehouse:'Kho IDECO'});try{window.resetManualExportSelection?.()}catch{}}
+        window.clearExportAI=()=>resetLoadedState(true);
+        window.clearLoadedExportVoucher=()=>{if(!S.requests.length&&!S.allocations.length)return resetLoadedState(true);if(confirm('Xóa toàn bộ phiếu đang load trên màn hình để làm lại? Thao tác này KHÔNG xóa phiếu đã lưu trên Firebase.'))resetLoadedState(true)};
+
+        function voucherHTML(){const m=collectMeta(),rows=S.allocations;return `<div class="xk-print-sheet" id="xk-print-sheet"><div class="xk-print-head"><div class="xk-print-company">${S.logo?`<img src="${S.logo}" class="xk-logo-preview">`:''}<b>${esc(m.company)}</b><br>Địa chỉ: ${esc(m.address)}<br>MST: ${esc(m.mst||'........................')}</div><div class="xk-print-title"><b>Mẫu số 02 - VT</b><div style="font-size:12px;font-style:italic">Phiếu xuất kho nội bộ / giao khách</div><h2>PHIẾU XUẤT KHO</h2><div>Ngày ${esc((m.exportDate||'').split('-').reverse().join('/'))}</div><div class="xk-invoice-box">Số HĐ: <b>${esc(m.invoiceNo||'........')}</b><br>Ký hiệu HĐ: <b>${esc(m.invoiceSymbol||'........')}</b><br>Ngày HĐ: <b>${esc((m.invoiceDate||'').split('-').reverse().join('/')||'........')}</b></div></div></div><div style="margin-top:12px;line-height:1.7">- Họ và tên người nhận hàng / Khách hàng: <b>${esc(m.customer)}</b><br>- Địa chỉ khách hàng: ${esc(m.customerAddress)}<br>- Địa chỉ giao nhận kho: <b>${esc(m.deliveryAddress||'................................')}</b><br>- Lý do xuất kho: ${esc(m.reason)}<br>- Xuất tại kho: <b>${esc(m.warehouse)}</b> &nbsp;&nbsp; Mã phiếu: <b>${esc(m.slip)}</b> &nbsp;&nbsp; Đơn hàng: <b>${esc(m.order)}</b></div><table class="xk-print-table"><thead><tr><th>STT</th><th>Tên hàng hóa</th><th>Mã số</th><th>Lô</th><th>HSD</th><th>ĐVT</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td style="text-align:center">${i+1}</td><td>${esc(r.productName)}</td><td>${esc(r.productCode)}</td><td>${esc(r.lotNumber)}</td><td>${esc(r.expiryDate)}</td><td style="text-align:center">${esc(r.smallUnit)}</td><td style="text-align:right"><b>${fmt(r.smallQty)}</b></td><td></td><td></td></tr>`).join('')}<tr><td colspan="6" style="text-align:center"><b>Cộng</b></td><td></td><td></td><td></td></tr></tbody></table><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;text-align:center;margin-top:34px;font-size:12px"><div><b>NGƯỜI LẬP PHIẾU</b><br><small>Phụ trách kho</small><br><br><br><b>${esc(m.preparer||'')}</b><br>(Ký, họ tên)</div><div><b>KẾ TOÁN</b><br><small>Phụ trách kế toán</small><br><br><br><b>${esc(m.accountant||'')}</b><br>(Ký, họ tên)</div><div><b>QUẢN LÝ</b><br><small>Phụ trách Kế toán - Kho</small><br><br><br><b>${esc(m.manager||'')}</b><br>(Ký, họ tên)</div><div><b>NGƯỜI NHẬN HÀNG</b><br><small>Khách hàng/Đơn vị nhận</small><br><br><br><b>${esc(m.customer||'')}</b><br>(Ký, họ tên)</div></div></div>`}
+        function renderVoucher(){if($('xk-voucher-preview'))$('xk-voucher-preview').innerHTML=voucherHTML()}
         window.previewExportVoucher=()=>{if(!S.allocations.length)return showToast('Chưa có dữ liệu lô đủ điều kiện để lập phiếu.','error');renderVoucher();$('xk-voucher-preview').style.display='block';$('xk-voucher-preview').scrollIntoView({behavior:'smooth',block:'start'})};
-        window.saveExportVoucherPDF=async()=>{if(!S.allocations.length)return showToast('Chưa có dữ liệu để xuất PDF.','error');renderVoucher();$('xk-voucher-preview').style.display='block';const el=$('xk-print-sheet');try{const canvas=await html2canvas(el,{scale:1.7,useCORS:true,backgroundColor:'#fff'});const {jsPDF}=window.jspdf,pdf=new jsPDF({orientation:'p',unit:'mm',format:'a4'}),pw=pdf.internal.pageSize.getWidth(),ph=pdf.internal.pageSize.getHeight(),ratio=Math.min((pw-8)/canvas.width,(ph-8)/canvas.height),w=canvas.width*ratio,h=canvas.height*ratio;pdf.addImage(canvas.toDataURL('image/png'),'PNG',(pw-w)/2,4,w,h);pdf.save(`Phieu_Xuat_Kho_${$('xk-slip-no').value||new Date().toISOString().slice(0,10)}.pdf`)}catch(e){showToast('Lỗi tạo PDF: '+e.message,'error')}};
-        window.confirmAIExportToStock=async()=>{if(!S.compare.length||S.compare.some(x=>x.status!=='ok'))return showToast('Còn sản phẩm thiếu tồn hoặc chưa xác định quy đổi. Không cho phép trừ kho.','error');evaluate();if(S.compare.some(x=>x.status!=='ok'))return;const meta={destination:$('xk-delivery-address').value||$('xk-customer').value||'Khách hàng',date:$('xk-export-date').value||new Date().toISOString().slice(0,10)};const ok=await openSafetyVerification({title:'KIỂM TRA TRƯỚC KHI TRỪ KHO THEO PHIẾU AI',subtitle:`Phiếu ${$('xk-slip-no').value||''} · ${$('xk-customer').value||''}. Hãy kiểm tra số hộp, lô, HSD và số lượng quy đổi trước khi xác nhận.`,actionType:'XUẤT KHO AI',destination:meta.destination,date:meta.date,items:S.allocations.map(x=>({productCode:x.productCode,productName:x.productName,unit:x.smallUnit,lotNumber:x.lotNumber,expiryDate:x.expiryDate,quantity:x.smallQty,packSpec:x.packSpec}))});if(!ok)return;const deductions={};S.allocations.forEach(x=>deductions[x.relatedId]=(deductions[x.relatedId]||0)+x.boxesTake);try{const tx=await refs.items.transaction(data=>{if(!data)return;for(const [id,q] of Object.entries(deductions)){if(!data[id]||n(data[id].quantity)<q)return;}for(const [id,q] of Object.entries(deductions))data[id].quantity=n(data[id].quantity)-q;return data;});if(!tx.committed)throw new Error('Tồn kho đã thay đổi hoặc không đủ tại thời điểm xác nhận. Hãy phân tích/soi kho lại.');for(const x of S.allocations){await refs.exports.push({productName:x.productName,productCode:x.productCode,productStrength:'',packSpec:x.packSpec||'',unit:x.smallUnit,lotNumber:x.lotNumber,expiryDate:x.expiryDate,quantity:x.smallQty,boxQuantity:x.boxesTake,destination:meta.destination,exportDate:meta.date,relatedId:x.relatedId,sourceType:'AI_PHIEU_XUAT',slipNo:$('xk-slip-no').value||'',orderNo:$('xk-order-no').value||'',invoiceNo:$('xk-invoice-no').value||'',invoiceSymbol:$('xk-invoice-symbol').value||'',invoiceDate:$('xk-invoice-date').value||'',customer:$('xk-customer').value||'',customerAddress:$('xk-customer-address').value||'',deliveryAddress:$('xk-delivery-address').value||''})}showToast(`Đã trừ kho theo phiếu AI: ${S.allocations.length} dòng/lô.`,'success');$('xk-confirm-btn').disabled=true;setTimeout(()=>evaluate(),400)}catch(e){console.error(e);showToast('Không trừ kho: '+e.message,'error')}};
-        function bind(){const drop=$('xk-drop'),inp=$('xk-ai-file');if(!drop||!inp)return;drop.onclick=()=>inp.click();drop.ondragover=e=>{e.preventDefault();drop.style.background='#dbeafe'};drop.ondragleave=()=>drop.style.background='';drop.ondrop=e=>{e.preventDefault();drop.style.background='';const f=e.dataTransfer.files?.[0];if(f){S.file=f;$('xk-file-name').textContent=`📄 ${f.name} · ${(f.size/1024).toFixed(1)} KB`}};inp.onchange=()=>{const f=inp.files?.[0];S.file=f||null;$('xk-file-name').textContent=f?`📄 ${f.name} · ${(f.size/1024).toFixed(1)} KB`:'Chưa chọn file.'};$('xk-logo-file').onchange=()=>saveLogo($('xk-logo-file').files?.[0]);loadLogo();$('xk-export-date').value=new Date().toISOString().slice(0,10);$('xk-invoice-date').value=new Date().toISOString().slice(0,10)}
+        window.saveExportVoucherPDF=async()=>{if(!S.allocations.length)return showToast('Chưa có dữ liệu để xuất PDF.','error');renderVoucher();$('xk-voucher-preview').style.display='block';const el=$('xk-print-sheet');try{const canvas=await html2canvas(el,{scale:1.7,useCORS:true,backgroundColor:'#fff'});const {jsPDF}=window.jspdf,pdf=new jsPDF({orientation:'p',unit:'mm',format:'a4'}),pw=pdf.internal.pageSize.getWidth(),ph=pdf.internal.pageSize.getHeight(),ratio=Math.min((pw-8)/canvas.width,(ph-8)/canvas.height),w=canvas.width*ratio,h=canvas.height*ratio;pdf.addImage(canvas.toDataURL('image/png'),'PNG',(pw-w)/2,4,w,h);pdf.save(`Phieu_Xuat_Kho_${$('xk-slip-no').value||today()}.pdf`)}catch(e){showToast('Lỗi tạo PDF: '+e.message,'error')}};
+        window.saveExportVoucherExcel=()=>{
+            if(!S.allocations.length)return showToast('Chưa có dữ liệu để xuất Excel.','error');
+            try{
+                const m=collectMeta(),rows=S.allocations,dateText=(m.exportDate||'').split('-').reverse().join('/'),invoiceDateText=(m.invoiceDate||'').split('-').reverse().join('/');
+                const aoa=[[m.company||'CÔNG TY IDECO'],['Địa chỉ:',m.address||'','','','','','Mẫu số 02 - VT'],['MST:',m.mst||'','','','','','PHIẾU XUẤT KHO'],['Ngày xuất kho:',dateText,'','Mã phiếu:',m.slip||'','Số HĐ:',m.invoiceNo||''],['Đơn hàng:',m.order||'','','Ký hiệu HĐ:',m.invoiceSymbol||'','Ngày HĐ:',invoiceDateText],['Khách hàng / Người nhận:',m.customer||''],['Địa chỉ khách hàng:',m.customerAddress||''],['Địa chỉ giao nhận kho:',m.deliveryAddress||''],['Lý do xuất kho:',m.reason||'','Xuất tại kho:',m.warehouse||''],[],['STT','Tên hàng hóa','Mã số','Lô','HSD','ĐVT','Số lượng','Đơn giá','Thành tiền'],...rows.map((r,i)=>[i+1,r.productName||'',r.productCode||'',r.lotNumber||'',r.expiryDate||'',r.smallUnit||'',n(r.smallQty),'','']),['','','','','','Cộng','','',''],[],['NGƯỜI LẬP PHIẾU','KẾ TOÁN','QUẢN LÝ','NGƯỜI NHẬN HÀNG'],['Phụ trách kho','Phụ trách kế toán','Phụ trách Kế toán - Kho','Khách hàng/Đơn vị nhận'],[m.preparer||'',m.accountant||'',m.manager||'',m.customer||'']];
+                const ws=XLSX.utils.aoa_to_sheet(aoa);ws['!cols']=[{wch:7},{wch:42},{wch:18},{wch:16},{wch:14},{wch:12},{wch:14},{wch:14},{wch:16}];ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:8}},{s:{r:5,c:1},e:{r:5,c:8}},{s:{r:6,c:1},e:{r:6,c:8}},{s:{r:7,c:1},e:{r:7,c:8}}];
+                const detail=[['STT','Mã SP','Tên SP','Lô','HSD','Ngày nhập/FIFO','Số hộp xuất','Quy cách','ĐVT nhỏ nhất','SL quy đổi'],...rows.map((r,i)=>{const stock=(stockData||[]).find(x=>x.id===r.relatedId)||{};return [i+1,r.productCode||'',r.productName||'',r.lotNumber||'',r.expiryDate||'',stock.importDate||stock.createdAt||'',n(r.boxesTake),r.packSpec||'',r.smallUnit||'',n(r.smallQty)]})];
+                const ws2=XLSX.utils.aoa_to_sheet(detail);ws2['!cols']=[{wch:7},{wch:18},{wch:38},{wch:16},{wch:14},{wch:22},{wch:14},{wch:26},{wch:14},{wch:14}];
+                const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Phiếu xuất kho');XLSX.utils.book_append_sheet(wb,ws2,'Chi tiết FEFO-FIFO');XLSX.writeFile(wb,`Phieu_Xuat_Kho_${m.slip||today()}.xlsx`);showToast('Đã xuất Excel Phiếu xuất kho + Chi tiết FEFO/FIFO.','success');
+            }catch(e){showToast('Lỗi tạo Excel: '+(e.message||e),'error')}
+        };
+
+
+        function voucherSnapshot(status){return {name:ensureVoucherName(),status,sourceType:S.sourceType||'KHONG_XAC_DINH',createdAt:S.voucherCreatedAt||new Date().toISOString(),updatedAt:new Date().toISOString(),confirmedAt:status==='CONFIRMED'?new Date().toISOString():null,meta:collectMeta(),requests:S.requests.map(x=>({stt:x.stt,maSP:x.maSP||'',tenSP:x.tenSP||'',dvt:x.dvt||'',soLuong:n(x.soLuong)})),compare:S.compare.map(x=>({stt:x.stt,maSP:x.maSP||'',tenSP:x.tenSP||'',dvt:x.dvt||'',soLuong:n(x.soLuong),boxes:n(x.boxes??x.soLuong),total:n(x.total),packSpec:x.packSpec||'',conversion:{factor:x.conversion?.factor??null,unit:x.conversion?.unit||'',explain:x.conversion?.explain||''},status:x.status||'',msg:x.msg||''})),allocations:S.allocations.map(x=>({relatedId:x.relatedId||'',productCode:x.productCode||'',productName:x.productName||'',lotNumber:x.lotNumber||'',expiryDate:x.expiryDate||'',boxesTake:n(x.boxesTake),smallUnit:x.smallUnit||'',smallQty:n(x.smallQty),packSpec:x.packSpec||'',unit:x.unit||''})),snapshotVersion:1}}
+        async function saveVoucherRecord(status='DRAFT',silent=false){
+            if(!S.requests.length)return silent?null:showToast('Chưa có dữ liệu phiếu để lưu.','error');
+            if(typeof networkReady==='function'&&!networkReady())return silent?null:showToast('Firebase chưa kết nối. Chưa thể lưu phiếu để máy khác xem.','error');
+            if(S.loadedVoucherStatus==='CONFIRMED'&&status!=='CONFIRMED')return silent?null:showToast('Phiếu này đã xác nhận trừ kho. Không ghi đè bản đã xác nhận. Hãy tạo phiếu mới.','error');
+            const data=voucherSnapshot(status);
+            try{
+                if(S.loadedVoucherId){await refs.exportVouchers.child(S.loadedVoucherId).set(data)}else{const r=refs.exportVouchers.push();S.loadedVoucherId=r.key;S.voucherCreatedAt=data.createdAt;await r.set(data)}
+                S.loadedVoucherStatus=status;setSaveStatus(`✅ Đã lưu Firebase: ${data.name} · ${status==='CONFIRMED'?'ĐÃ TRỪ KHO':'PHIẾU NHÁP'}`,'ok');
+                if(!silent)showToast('Đã lưu phiếu xuất kho lên Firebase Realtime.','success');return S.loadedVoucherId;
+            }catch(e){console.error(e);setSaveStatus('❌ Lưu Firebase thất bại: '+(e.message||e),'error');if(!silent)showToast('Không lưu được phiếu Firebase: '+(e.message||e),'error');return null}
+        }
+        window.saveCurrentExportVoucherFirebase=()=>saveVoucherRecord('DRAFT',false);
+
+        function renderVoucherArchive(){
+            const root=$('xk-voucher-list');if(!root)return;const q=norm($('xk-voucher-search')?.value||''),from=$('xk-voucher-from')?.value||'',to=$('xk-voucher-to')?.value||'';
+            const list=[...S.archive].filter(v=>{const m=v.meta||{},d=m.exportDate||String(v.createdAt||'').slice(0,10);if(from&&d<from)return false;if(to&&d>to)return false;if(q&&!norm(`${v.name} ${m.customer} ${m.slip} ${m.order}`).includes(q))return false;return true}).sort((a,b)=>String(b.createdAt||b.updatedAt||'').localeCompare(String(a.createdAt||a.updatedAt||'')));
+            if(!list.length){root.innerHTML='<div style="padding:14px;text-align:center;color:#64748b">Chưa có phiếu phù hợp trong Firebase.</div>';return}
+            root.innerHTML=list.map(v=>{const m=v.meta||{},when=v.createdAt?new Date(v.createdAt).toLocaleString('vi-VN'):'—',st=v.status==='CONFIRMED'?'ĐÃ TRỪ KHO':'PHIẾU NHÁP';return `<div class="xk-voucher-item"><div><div class="name">${esc(v.name||'Phiếu chưa đặt tên')} <span class="xk-voucher-status ${v.status==='CONFIRMED'?'confirmed':'draft'}">${st}</span></div><div class="meta">Ngày xuất: <b>${esc(m.exportDate||'—')}</b> · Khách hàng: <b>${esc(m.customer||'—')}</b> · Mã phiếu: ${esc(m.slip||'—')}<br>Lưu lúc: ${esc(when)} · Nguồn: ${esc(v.sourceType||'—')} · ${v.requests?.length||0} sản phẩm / ${v.allocations?.length||0} dòng lô</div></div><div class="actions"><button class="btn btn-primary" type="button" onclick="viewSavedExportVoucher('${v.id}')">👁 Xem</button><button class="btn btn-danger" type="button" onclick="deleteSavedExportVoucher('${v.id}')">🗑 Xóa</button></div></div>`}).join('')
+        }
+        window.filterSavedExportVouchers=renderVoucherArchive;
+        window.viewSavedExportVoucher=id=>{
+            const v=S.archive.find(x=>x.id===id);if(!v)return showToast('Không tìm thấy phiếu trong Firebase.','error');
+            S.file=null;S.parsed=null;S.requests=(v.requests||[]).map(x=>({...x}));S.compare=(v.compare||[]).map(x=>({...x,conversion:{...(x.conversion||{})}}));S.allocations=(v.allocations||[]).map(x=>({...x}));S.sourceType=v.sourceType||'FIREBASE';S.loadedVoucherId=id;S.loadedVoucherStatus=v.status||'DRAFT';S.voucherCreatedAt=v.createdAt||null;applyMeta(v.meta||{});$('xk-voucher-name').value=v.name||'';renderCompare();renderAlloc();renderSummary();$('xk-result-area').style.display='block';$('xk-voucher-preview').style.display='none';$('xk-confirm-btn').disabled=v.status==='CONFIRMED'||!(S.compare.length&&S.compare.every(x=>x.status==='ok')&&S.allocations.length);setSaveStatus(v.status==='CONFIRMED'?'✅ Đang xem phiếu đã trừ kho. Không thể trừ kho lần hai.':'🟠 Đang xem phiếu nháp. Khi xác nhận trừ kho, hệ thống sẽ kiểm tra tồn lại theo dữ liệu hiện tại.',v.status==='CONFIRMED'?'ok':'info');document.getElementById('btn-tab2')?.click();setTimeout(()=>$('xk-result-area')?.scrollIntoView({behavior:'smooth',block:'start'}),80)
+        };
+        window.deleteSavedExportVoucher=async id=>{
+            const v=S.archive.find(x=>x.id===id);if(!v)return;
+            const msg=v.status==='CONFIRMED'?'Phiếu này ĐÃ TRỪ KHO. Xóa ở đây CHỈ xóa hồ sơ phiếu lưu, KHÔNG hoàn tồn kho. Vẫn xóa?':'Xóa phiếu nháp này khỏi Firebase?';if(!confirm(msg))return;
+            try{await refs.exportVouchers.child(id).remove();if(S.loadedVoucherId===id)resetLoadedState(true);showToast('Đã xóa hồ sơ phiếu xuất khỏi Firebase.','success')}catch(e){showToast('Không xóa được phiếu: '+(e.message||e),'error')}
+        };
+
+        window.confirmAIExportToStock=async()=>{
+            if(S.loadedVoucherStatus==='CONFIRMED')return showToast('Phiếu này đã trừ kho trước đó. Không cho phép trừ lần hai.','error');
+            if(!S.requests.length)return showToast('Chưa có dữ liệu phiếu xuất.','error');
+            evaluate();if(!S.compare.length||S.compare.some(x=>x.status!=='ok'))return showToast('Còn sản phẩm thiếu tồn hoặc chưa xác định quy đổi. Không cho phép trừ kho.','error');
+            const meta={destination:$('xk-delivery-address').value||$('xk-customer').value||'Khách hàng',date:$('xk-export-date').value||today()};
+            const ok=await openSafetyVerification({title:'KIỂM TRA TRƯỚC KHI TRỪ KHO THEO PHIẾU',subtitle:`Phiếu ${$('xk-slip-no').value||''} · ${$('xk-customer').value||''}. Hãy kiểm tra số hộp, lô, HSD và số lượng quy đổi trước khi xác nhận.`,actionType:S.sourceType==='THU_CONG_DU_PHONG'?'XUẤT KHO THỦ CÔNG DỰ PHÒNG':'XUẤT KHO AI',destination:meta.destination,date:meta.date,items:S.allocations.map(x=>({productCode:x.productCode,productName:x.productName,unit:x.smallUnit,lotNumber:x.lotNumber,expiryDate:x.expiryDate,quantity:x.smallQty,packSpec:x.packSpec}))});if(!ok)return;
+            try{
+                let committedAllocations=[];
+                const tx=await refs.items.transaction(data=>{
+                    if(!data)return;
+                    const rows=Object.keys(data).map(id=>({id,...data[id]})),fresh=[];
+                    for(const req of S.requests){
+                        const code=norm(req.maSP),name=norm(req.tenSP);let matches=[];
+                        if(code)matches=rows.filter(x=>norm(x.productCode)===code);
+                        if(!matches.length&&name)matches=rows.filter(x=>norm(x.productName)===name);
+                        matches=matches.filter(x=>n(x.quantity)>0).sort(fefoFifoCompare);
+                        const master=masterFor(req),pack=(master?.packSpec||master?.['Quy Cách']||matches[0]?.packSpec||req.dvt||''),conv=smallestConversion(pack,req.dvt);if(!conv.factor)return;
+                        let left=n(req.soLuong);
+                        for(const lot of matches){if(left<=0)break;const take=Math.min(n(lot.quantity),left);if(take<=0)continue;fresh.push({relatedId:lot.id,productCode:lot.productCode||'',productName:lot.productName||'',lotNumber:lot.lotNumber||'',expiryDate:lot.expiryDate||'',boxesTake:take,smallUnit:conv.unit,smallQty:take*conv.factor,packSpec:lot.packSpec||pack||'',unit:lot.unit||'',importDate:lot.importDate||'',createdAt:lot.createdAt||''});left-=take;}
+                        if(left>0)return;
+                    }
+                    for(const x of fresh){if(!data[x.relatedId]||n(data[x.relatedId].quantity)<n(x.boxesTake))return;}
+                    for(const x of fresh)data[x.relatedId].quantity=n(data[x.relatedId].quantity)-n(x.boxesTake);
+                    committedAllocations=fresh;return data;
+                });
+                if(!tx.committed)throw new Error('Tồn kho đã thay đổi, không đủ hoặc không còn đáp ứng FEFO/FIFO tại thời điểm xác nhận. Hệ thống không trừ kho. Hãy SOI TỒN lại.');
+                S.allocations=committedAllocations;renderAlloc();renderVoucher();
+                for(const x of committedAllocations){await refs.exports.push({productName:x.productName,productCode:x.productCode,productStrength:'',packSpec:x.packSpec||'',unit:x.smallUnit,lotNumber:x.lotNumber,expiryDate:x.expiryDate,quantity:x.smallQty,boxQuantity:x.boxesTake,destination:meta.destination,exportDate:meta.date,relatedId:x.relatedId,sourceType:S.sourceType==='THU_CONG_DU_PHONG'?'MANUAL_VOUCHER':'AI_PHIEU_XUAT',slipNo:$('xk-slip-no').value||'',orderNo:$('xk-order-no').value||'',invoiceNo:$('xk-invoice-no').value||'',invoiceSymbol:$('xk-invoice-symbol').value||'',invoiceDate:$('xk-invoice-date').value||'',customer:$('xk-customer').value||'',customerAddress:$('xk-customer-address').value||'',deliveryAddress:$('xk-delivery-address').value||'',preparer:$('xk-preparer').value||'',accountant:$('xk-accountant').value||'',manager:$('xk-manager').value||'',fefoFifo:'FEFO_HSD_TRUOC__FIFO_NHAP_TRUOC'})}
+                const savedId=await saveVoucherRecord('CONFIRMED',true);S.loadedVoucherStatus='CONFIRMED';$('xk-confirm-btn').disabled=true;setSaveStatus(savedId?'✅ Đã trừ kho và lưu hồ sơ phiếu trên Firebase.':'⚠️ Đã trừ kho nhưng chưa lưu được hồ sơ phiếu Firebase. Hãy kiểm tra kết nối và lưu lại. ',savedId?'ok':'error');showToast(`Đã trừ kho theo phiếu: ${S.allocations.length} dòng/lô.`,'success');
+            }catch(e){console.error(e);showToast('Không trừ kho: '+e.message,'error')}
+        };
+
+        function bind(){
+            const drop=$('xk-drop'),inp=$('xk-ai-file');if(drop&&inp){drop.onclick=()=>inp.click();drop.ondragover=e=>{e.preventDefault();drop.style.background='#dbeafe'};drop.ondragleave=()=>drop.style.background='';drop.ondrop=e=>{e.preventDefault();drop.style.background='';const f=e.dataTransfer.files?.[0];if(f){S.file=f;$('xk-file-name').textContent=`📄 ${f.name} · ${(f.size/1024).toFixed(1)} KB`}};inp.onchange=()=>{const f=inp.files?.[0];S.file=f||null;$('xk-file-name').textContent=f?`📄 ${f.name} · ${(f.size/1024).toFixed(1)} KB`:'Chưa chọn file.'}}
+            if($('xk-logo-file'))$('xk-logo-file').onchange=()=>saveLogo($('xk-logo-file').files?.[0]);loadLogo();$('xk-export-date').value=today();$('xk-invoice-date').value=today();
+            try{refs.exportVouchers.on('value',snap=>{const d=snap.val();S.archive=d?Object.keys(d).map(k=>({id:k,...d[k]})):[];renderVoucherArchive()})}catch(e){console.warn('Không nghe được exportVouchers',e);if($('xk-voucher-list'))$('xk-voucher-list').innerHTML='<div style="padding:12px;color:#b91c1c">Chưa kết nối được danh sách phiếu Firebase.</div>'}
+        }
         window.guideGoExportAI=()=>{closeUserGuide();const tab=document.getElementById('btn-tab2');if(tab)tab.click();setTimeout(()=>$('xk-ai-card')?.scrollIntoView({behavior:'smooth',block:'start'}),100)};
         bind();
     })();

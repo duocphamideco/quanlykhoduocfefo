@@ -29,6 +29,18 @@
 
         .grid-layout { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
         @media(max-width:1000px) { .grid-layout { grid-template-columns: 1fr; } }
+        .panel-tools { display:flex; justify-content:flex-end; gap:8px; flex-wrap:wrap; margin:0 0 10px; }
+        .panel-toggle-btn { background:#0f766e; color:#fff; border:none; border-radius:8px; padding:8px 12px; font-size:.82rem; font-weight:800; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,.08); }
+        .panel-toggle-btn:hover { opacity:.92; }
+        .panel-collapse-shell { transition:all .25s ease; }
+        .panel-collapse-target { min-width:0; }
+        .panel-collapse-shell.is-collapsed { grid-template-columns:minmax(0,1fr) !important; }
+        .panel-collapse-shell.is-collapsed > .panel-collapse-target { display:none !important; }
+        .scroll-hint { display:flex; align-items:center; gap:8px; margin:8px 0 6px; padding:7px 10px; border:1px dashed #93c5fd; border-radius:8px; background:#eff6ff; color:#1e40af; font-size:.78rem; font-weight:700; }
+        .ai-table-wrap, .xk-table-wrap, .ic-table-wrap { overflow:auto; scrollbar-gutter:stable both-edges; }
+        .ai-table-wrap::-webkit-scrollbar, .xk-table-wrap::-webkit-scrollbar, .ic-table-wrap::-webkit-scrollbar { height:12px; width:12px; }
+        .ai-table-wrap::-webkit-scrollbar-thumb, .xk-table-wrap::-webkit-scrollbar-thumb, .ic-table-wrap::-webkit-scrollbar-thumb { background:#94a3b8; border-radius:999px; border:2px solid #e2e8f0; }
+        .ai-table-wrap::-webkit-scrollbar-track, .xk-table-wrap::-webkit-scrollbar-track, .ic-table-wrap::-webkit-scrollbar-track { background:#e2e8f0; border-radius:999px; }
         
         .card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); height: 100%; display: flex; flex-direction: column; }
         .card-header { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 15px; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
@@ -208,7 +220,19 @@
         .ai-receipt table { font-size:.78rem; }
         .ai-receipt th { position:static; background:#1e40af; color:#fff; }
         .ai-signatures { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:22px; text-align:center; font-weight:700; }
-        .ai-signatures div { padding-top:45px; border-top:1px dashed #64748b; }
+        .ai-signature-box { padding-top:12px; min-height:128px; border-top:1px dashed #64748b; }
+        .ai-signature-role { font-weight:900; color:#0f172a; display:flex; align-items:center; justify-content:center; gap:7px; flex-wrap:wrap; }
+        .ai-signed-mark { display:inline-block; padding:2px 7px; border:1px solid #15803d; color:#15803d; border-radius:999px; font-size:.68rem; font-weight:900; letter-spacing:.04em; }
+        .ai-signature-space { height:46px; display:flex; align-items:center; justify-content:center; color:#15803d; font-weight:900; font-style:italic; font-size:.8rem; }
+        .ai-signature-name { font-weight:900; text-transform:uppercase; color:#0f172a; min-height:20px; }
+        .ai-receipt-sign-config { margin-top:14px; padding:12px; border:1px solid #bfdbfe; background:#eff6ff; border-radius:10px; }
+        .ai-receipt-sign-config h4 { margin:0 0 8px; color:#1e40af; }
+        .ai-receipt-sign-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+        .ai-receipt-sign-item { background:#fff; border:1px solid #dbeafe; border-radius:8px; padding:9px; }
+        .ai-receipt-sign-item input[type=text] { margin:4px 0 7px; }
+        .ai-sign-check { display:flex; align-items:center; gap:7px; font-size:.78rem; font-weight:800; color:#166534; }
+        .ai-sign-check input { width:auto; margin:0; }
+        @media(max-width:900px){ .ai-receipt-sign-grid{grid-template-columns:1fr;} }
         @media(max-width:900px){ .ai-flow{grid-template-columns:1fr 1fr;} .ai-settings-body{grid-template-columns:1fr;} .ai-receipt-meta{grid-template-columns:1fr;} }
         @media(max-width:560px){ .ai-flow{grid-template-columns:1fr;} }
 
@@ -239,6 +263,13 @@
 
         /* HƯỚNG DẪN SỬ DỤNG */
         .header-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+        .ai-route-switch{display:flex;align-items:center;gap:5px;padding:5px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);border-radius:10px;flex-wrap:wrap}
+        .ai-route-label{font-size:.68rem;font-weight:900;opacity:.95;padding:0 3px;white-space:nowrap}
+        .ai-route-btn{border:1px solid rgba(255,255,255,.45);background:rgba(15,23,42,.25);color:#fff;border-radius:8px;padding:6px 9px;font-size:.72rem;font-weight:900;cursor:pointer;transition:.18s;white-space:nowrap}
+        .ai-route-btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.2)}
+        .ai-route-btn.active-main{background:#16a34a;border-color:#86efac;box-shadow:0 0 0 2px rgba(134,239,172,.18)}
+        .ai-route-btn.active-backup{background:#7c3aed;border-color:#c4b5fd;box-shadow:0 0 0 2px rgba(196,181,253,.18)}
+        .ai-route-status{font-size:.68rem;font-weight:800;color:#fff;opacity:.95;max-width:180px;line-height:1.15}
         .btn-guide{background:#fff;color:#1e40af;border:1px solid rgba(255,255,255,.7);box-shadow:0 1px 2px rgba(15,23,42,.12)}
         .btn-guide:hover{background:#eff6ff;opacity:1}
         .guide-modal{display:none;position:fixed;inset:0;background:rgba(15,23,42,.76);z-index:30000;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px)}
@@ -433,10 +464,16 @@
     <div class="container">
         <header>
             <div style="min-width:0">
-                <h1>HỆ THỐNG AI-AGENT QUẢN LÝ KHO TOÀN DIỆN ĐƯỢC PHÁT TRIỂN BỞI: MTRIET</h1>
+                <h1>AI AGENT HỆ THỐNG QUẢN LÝ KHO PHÁT TRIỂN BỞI: MTRIET</h1>
                 <div style="margin-top:5px;display:inline-flex;align-items:center;gap:6px;background:#fef3c7;color:#92400e;border:1px solid #f59e0b;border-radius:999px;padding:4px 9px;font-size:.75rem;font-weight:800;letter-spacing:.2px">🧪 FIREBASE TEST · thunghiem-eeb1f</div>
             </div>
             <div class="header-actions">
+                <div class="ai-route-switch" title="Chuyển nhanh AI cho toàn bộ hệ sinh thái">
+                    <button id="ai-route-main-btn" class="ai-route-btn" type="button" onclick="window.IDECOAIRoute&&window.IDECOAIRoute.set('main')">AI CHÍNH</button>
+                    <button id="ai-route-backup-btn" class="ai-route-btn" type="button" onclick="window.IDECOAIRoute&&window.IDECOAIRoute.set('backup')">AI PHỤ</button>
+                    <span id="ai-route-status" class="ai-route-status" style="display:none">Đang khởi tạo...</span>
+                </div>
+                <button class="btn btn-primary" type="button" onclick="openIDECOSettingsPanel()">⚙️ Cài đặt</button>
                 <button class="btn btn-guide" type="button" onclick="openUserGuide()">📘 Hướng dẫn sử dụng</button>
                 <button class="btn btn-warning" type="button" onclick="toggleMasterSection()">📂 Dữ Liệu Gốc (Master)</button>
                 <button class="btn btn-danger" type="button" onclick="window.IDECOAppAuth&&window.IDECOAppAuth.logout()">🔒 Đăng xuất</button>
@@ -587,16 +624,18 @@
                     <div>🤖 A. XUẤT KHO AI TỪ PHIẾU CÔNG TY · SOI TỒN KHO</div>
                     <span style="font-size:.75rem;color:#64748b">Phiếu PDF/ảnh → Huyền đọc → so tồn theo hộp → FEFO → quy đổi ĐVT nhỏ nhất</span>
                 </div>
-                <div class="xk-ai-top">
-                    <div>
+                <div class="panel-tools"><button id="toggle-xk-upload-panel" class="panel-toggle-btn" type="button">↔ Ẩn khung tải phiếu · Mở rộng bảng</button></div>
+                <div id="xk-ai-top-shell" class="xk-ai-top panel-collapse-shell">
+                    <div class="panel-collapse-target">
                         <div id="xk-drop" class="xk-drop">
                             📄 Chọn hoặc kéo thả PHIẾU XUẤT KHO vào đây<br>
                             <small style="font-weight:500;color:#64748b">PDF, PNG, JPG, WEBP · ví dụ XUATKHOLC.pdf</small>
                             <input type="file" id="xk-ai-file" accept=".pdf,image/png,image/jpeg,image/webp" style="display:none">
                         </div>
                         <div id="xk-file-name" style="font-size:.82rem;color:#475569;margin-top:7px">Chưa chọn file.</div>
-                        <div style="display:flex;gap:8px;margin-top:8px">
-                            <button class="btn btn-primary" id="xk-analyze-btn" type="button" onclick="analyzeExportSlipAI()" style="flex:1">🤖 HUYỀN PHÂN TÍCH & SOI KHO</button>
+                        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+                            <button class="btn" id="xk-pick-file-btn" type="button" style="background:#0f766e">📂 CHỌN PDF / ẢNH</button>
+                            <button class="btn btn-primary" id="xk-analyze-btn" type="button" style="flex:1;min-width:230px">🤖 HUYỀN PHÂN TÍCH & SOI KHO</button>
                             <button class="btn" type="button" onclick="clearExportAI()" style="background:#64748b">Làm mới</button>
                         </div>
                         <div id="xk-progress" class="xk-progress">Huyền đang tổng hợp... bạn ráng chờ chút nhé</div>
@@ -614,14 +653,16 @@
 
                 <div id="xk-result-area" style="display:none;margin-top:14px">
                     <div style="font-weight:800;color:#1e3a8a;margin-bottom:6px">1. SOI CHIẾU SỐ HỘP TRÊN PHIẾU ↔ TỒN KHO</div>
+                    <div class="scroll-hint">↔ Kéo ngang để xem đầy đủ cột Đồng bộ Master, Quy cách, ĐVT nhỏ nhất và trạng thái.</div>
                     <div class="xk-table-wrap">
                         <table>
-                            <thead><tr><th>STT</th><th>Mã SP</th><th>Tên sản phẩm</th><th>ĐVT phiếu</th><th>SL phiếu</th><th>Tồn kho</th><th>Quy cách Master</th><th>ĐVT nhỏ nhất</th><th>SL quy đổi</th><th>Trạng thái</th></tr></thead>
+                            <thead><tr><th>STT</th><th>Mã SP · sửa được</th><th>Tên sản phẩm · sửa được</th><th>ĐVT phiếu · sửa được</th><th>SL phiếu · sửa được</th><th>Tồn kho</th><th>Quy cách Master</th><th>ĐVT nhỏ nhất</th><th>SL quy đổi</th><th>Trạng thái / Đồng bộ Master</th></tr></thead>
                             <tbody id="xk-compare-body"></tbody>
                         </table>
                     </div>
 
                     <div style="font-weight:800;color:#1e3a8a;margin:14px 0 6px">2. PHÂN LÔ FEFO · DỮ LIỆU SẼ ĐƯA VÀO PHIẾU XUẤT</div>
+                    <div class="scroll-hint">↔ Kéo ngang để xem đầy đủ toàn bộ bảng phân lô FEFO.</div>
                     <div class="xk-table-wrap">
                         <table>
                             <thead><tr><th>STT</th><th>Mã SP</th><th>Tên sản phẩm</th><th>ĐVT</th><th>Số lô</th><th>Hạn dùng</th><th>Số lượng</th><th>SL hộp dùng</th></tr></thead>
@@ -680,8 +721,9 @@
                 <div id="xk-voucher-list" class="xk-voucher-list"><div style="padding:14px;text-align:center;color:#64748b">Đang tải danh sách phiếu từ Firebase...</div></div>
             </div>
 
-            <div class="grid-layout">
-                <div class="card">
+            <div class="panel-tools"><button id="toggle-xk-manual-left-panel" class="panel-toggle-btn" type="button">↔ Ẩn menu trái trang xuất kho</button></div>
+            <div id="xk-manual-grid-shell" class="grid-layout panel-collapse-shell">
+                <div class="card panel-collapse-target">
                     <div class="card-header">A. Xuất Kho Thủ Công Dự Phòng</div>
                     <div class="manual-export-note"><b>Khi AI/API bị lỗi:</b> chọn sản phẩm từ Master/Kho → nhập <b>số lượng HỘP/đơn vị đóng gói</b> → bấm <b>THÊM VÀO PHIẾU</b>. Hệ thống sẽ đưa dòng này vào đúng luồng So tồn → FEFO → Lô/HSD → Quy đổi ĐVT nhỏ nhất như khi upload PDF. <b>Chưa trừ kho ngay tại đây.</b></div>
                     <label>Tìm sản phẩm xuất:</label>
@@ -928,8 +970,9 @@
                 <div class="ai-step"><b>4. Nạp vào Nhập kho</b>Chỉ nạp bảng chờ; chưa cộng tồn cho đến khi xác nhận.</div>
             </div>
 
-            <div class="grid-layout" style="grid-template-columns:1fr 1.45fr">
-                <div class="card">
+            <div class="panel-tools"><button id="toggle-ai-left-panel" class="panel-toggle-btn" type="button">↔ Ẩn menu trái · Mở rộng bảng</button></div>
+            <div id="ai-grid-shell" class="grid-layout panel-collapse-shell" style="grid-template-columns:1fr 1.45fr">
+                <div class="card panel-collapse-target">
                     <div class="card-header">A. Nhận Phiếu Giao Hàng Nhà Cung Cấp</div>
                     <div class="ai-note"><b>Nguyên tắc an toàn:</b> <b>Tên sản phẩm và Quy cách phải khớp MASTER KHO</b> trước khi nhập kho. Mã SP · Hàm lượng/Nồng độ · ĐVT ưu tiên lấy từ Master để tham khảo/bổ sung nhưng thiếu các trường này không khóa nhập kho. Phiếu NCC/AI dùng để lấy <b>Số lô · Hạn dùng · Số lượng</b>. Tên gần giống chỉ là gợi ý, không tự động được xem là đúng. Sản phẩm mới phải bổ sung Master trước khi ghi tồn.</div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
@@ -985,14 +1028,15 @@
                             <div><label>Gemini API Key 2</label><div style="display:flex;gap:6px"><input type="password" id="ai-key-2" autocomplete="off"><button class="btn btn-primary ai-key-eye" type="button" data-eye-target="ai-key-2" style="width:auto;padding:6px 9px">👁️</button></div></div>
                             <div><label>Gemini API Key 3</label><div style="display:flex;gap:6px"><input type="password" id="ai-key-3" autocomplete="off"><button class="btn btn-primary ai-key-eye" type="button" data-eye-target="ai-key-3" style="width:auto;padding:6px 9px">👁️</button></div></div>
                             <div><label>B.AI API Key</label><div style="display:flex;gap:6px"><input type="password" id="ai-bai-key" autocomplete="off"><button class="btn btn-primary ai-key-eye" type="button" data-eye-target="ai-bai-key" style="width:auto;padding:6px 9px">👁️</button></div></div>
-                            <div><label>AI chính</label><select id="ai-primary-model"><option value="bai:deepseek-v4-flash">DeepSeek V4 Flash · B.AI</option><option value="gemini-3.7-flash">Gemini 3.7 Flash</option><option value="gemini-3.6-flash">Gemini 3.6 Flash</option><option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite · nhẹ</option><option value="gemini-3.1-flash-lite">Gemini 3.1 Flash-Lite · nhẹ</option><option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite · tiết kiệm</option><option value="gemini-2.5-flash">Gemini 2.5 Flash · ổn định</option></select></div>
+                            <div><label>AI chính</label><select id="ai-primary-model"><option value="bai:deepseek-v4-flash">DeepSeek V4 Flash · B.AI · Vision</option><option value="gemini-3.7-flash">Gemini 3.7 Flash</option><option value="gemini-3.6-flash">Gemini 3.6 Flash</option><option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite · nhẹ</option><option value="gemini-3.1-flash-lite">Gemini 3.1 Flash-Lite · nhẹ</option><option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite · tiết kiệm</option><option value="gemini-2.5-flash">Gemini 2.5 Flash · ổn định</option></select></div>
                             <div><label>AI dự phòng</label><select id="ai-fallback-model"><option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite · khuyên dùng</option><option value="gemini-3.1-flash-lite">Gemini 3.1 Flash-Lite · nhẹ</option><option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite · tiết kiệm</option><option value="gemini-2.5-flash">Gemini 2.5 Flash · ổn định</option><option value="gemini-3.6-flash">Gemini 3.6 Flash</option><option value="gemini-3.7-flash">Gemini 3.7 Flash</option><option value="bai:deepseek-v4-flash">DeepSeek V4 Flash · B.AI</option></select></div>
                             <div><label>Chế độ phân tích</label><select id="ai-analysis-mode"><option value="fast">⚡ NHANH · khuyên dùng</option><option value="thorough">🛡️ KIỂM TRA KỸ</option></select></div>
-                            <div><label>Giới hạn chờ mỗi tuyến</label><div style="padding:9px 10px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc;color:#475569;font-size:.82rem"><b>NHANH:</b> DeepSeek tối đa ~25 giây, Gemini tối đa ~35 giây/tuyến · <b>KỸ:</b> theo cấu hình cũ.</div></div>
+                            <div><label>Giới hạn chờ mỗi tuyến</label><div style="padding:9px 10px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc;color:#475569;font-size:.82rem"><b>NHANH:</b> ưu tiên đúng AI chính đã chọn · DeepSeek tối đa ~45 giây, Gemini tối đa ~35 giây/tuyến · <b>KỸ:</b> theo cấu hình cũ.</div></div>
                             <div class="full"><label>B.AI Endpoint</label><input id="ai-bai-endpoint" value="https://api.b.ai/v1/chat/completions"></div>
+                            <div class="full"><label>B.AI Vision Model ID</label><input id="ai-bai-vision-model" value="deepseek-v4-flash" placeholder="deepseek-v4-flash"><div style="font-size:.72rem;color:#64748b;margin-top:3px">Nếu tài khoản B.AI cung cấp alias Vision riêng, có thể nhập đúng Model ID tại đây. Ứng dụng cũng tự thử alias dấu gạch ngang / gạch dưới khi API báo sai model.</div></div>
                             <div class="full" style="display:flex;align-items:center;gap:10px;padding:9px 10px;border:1px solid #bfdbfe;background:#eff6ff;border-radius:8px">
                                 <input id="ai-bai-vision" type="checkbox" style="width:auto" checked>
-                                <div><b>👁️ B.AI Vision thử nghiệm · DeepSeek V4 Flash</b><div style="font-size:.76rem;color:#475569;margin-top:2px">Ảnh/PDF scan sẽ thử DeepSeek Vision trước; nếu B.AI từ chối ảnh hoặc lỗi, ứng dụng tự chuyển Gemini dự phòng.</div></div>
+                                <div><b>👁️ B.AI Vision · DeepSeek ưu tiên + B.AI Vision dự phòng</b><div style="font-size:.76rem;color:#475569;margin-top:2px">Ảnh/PDF scan sẽ thử DeepSeek V4 Flash Vision trực tiếp qua B.AI; tự thử 2 chuẩn Vision tương thích. Gemini chỉ là dự phòng khi đã có key.</div></div>
                             </div>
                             <div class="full" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
                                 <button id="ai-save-settings" class="btn btn-success" type="button">💾 Lưu cài đặt AI</button>
@@ -1022,13 +1066,25 @@
                     <div class="card-header">B. Bảng Biên Bản → Soi Chiếu Master KHO</div>
                     <div id="ai-match-summary" class="ai-match-summary"><span class="ai-pill ai-info">Chưa có dữ liệu</span></div>
                     <div id="ai-block-note" class="ai-block-note" style="display:none"></div>
+                    <div class="scroll-hint">↔ Kéo thanh trượt ngang để xem hết các cột Chọn Master / Chỉnh sửa / Đồng bộ.</div>
                     <div id="ai-compare-root" class="ai-table-wrap"><div style="padding:45px;text-align:center;color:#94a3b8">Tải phiếu NCC và bấm AI PHÂN TÍCH.</div></div>
                     <div class="ai-actions">
                         <button id="ai-rematch-btn" class="btn btn-warning" disabled>🔍 SOI CHIẾU LẠI MASTER</button>
+                        <button id="ai-sync-master-btn" class="btn btn-primary" disabled>🔄 ĐỒNG BỘ DỮ LIỆU PDF → MASTER</button><span style="font-size:.72rem;color:#64748b;margin-left:6px">Chỉ chuẩn hóa Mã/Tên/ĐVT theo Master; giữ nguyên Lô/HSD/Số lượng từ phiếu.</span>
                         <button id="ai-to-warehouse-btn" class="btn btn-success" disabled style="flex:1">📦 TỰ ĐỘNG LOAD SANG NHẬP KHO</button>
                         <button id="ai-receipt-pdf-btn" class="btn btn-primary" disabled>💾 PDF BIÊN BẢN</button>
                     </div>
                 </div>
+            </div>
+
+            <div id="ai-receipt-sign-config" class="ai-receipt-sign-config">
+                <h4>✍️ Người phụ trách ký Biên bản nhận hàng</h4>
+                <div class="ai-receipt-sign-grid">
+                    <div class="ai-receipt-sign-item"><label>Bộ phận Kho/Kế toán</label><input id="ai-sign-warehouse-accounting" type="text" placeholder="Nhập họ tên"><label class="ai-sign-check"><input id="ai-signed-warehouse-accounting" type="checkbox"> Đã ký</label></div>
+                    <div class="ai-receipt-sign-item"><label>Người lập biên bản</label><input id="ai-sign-preparer" type="text" placeholder="Nhập họ tên"><label class="ai-sign-check"><input id="ai-signed-preparer" type="checkbox"> Đã ký</label></div>
+                    <div class="ai-receipt-sign-item"><label>Phụ trách chuyên môn</label><input id="ai-sign-professional" type="text" placeholder="Nhập họ tên"><label class="ai-sign-check"><input id="ai-signed-professional" type="checkbox"> Đã ký</label></div>
+                </div>
+                <div style="font-size:.74rem;color:#475569;margin-top:7px">Tên và trạng thái ký được lưu trên máy. Khi chọn “Đã ký”, chữ <b>ĐÃ KÝ</b> sẽ xuất hiện ngay cạnh chức danh trên biên bản và PDF.</div>
             </div>
 
             <div id="ai-receipt" class="ai-receipt" style="display:none">
@@ -1039,7 +1095,7 @@
                 </div>
                 <div id="ai-receipt-meta" class="ai-receipt-meta"></div>
                 <div style="overflow:auto"><table><thead><tr><th>STT</th><th>Mã SP</th><th>Tên hàng</th><th>Hàm lượng/NĐ</th><th>Quy cách</th><th>ĐVT</th><th>Số lô</th><th>Hạn dùng</th><th>SL nhận</th><th>Tình trạng</th></tr></thead><tbody id="ai-receipt-body"></tbody></table></div>
-                <div class="ai-signatures"><div>Bộ phận Kho/Kế toán</div><div>Người lập biên bản</div><div>Phụ trách chuyên môn</div></div>
+                <div id="ai-receipt-signatures" class="ai-signatures"></div>
             </div>
         </div>
 
@@ -1050,7 +1106,7 @@
             <div class="ic-header">
               <div class="ic-brand">
                 <div class="ic-logo">📄</div>
-                <div><h2>KIỂM TRA HÓA ĐƠN THUỐC</h2><small>Hệ thống đối chiếu kho & lưu trữ thông minh</small></div>
+                <div><h2>KIỂM TRA HÓA ĐƠN THUỐC</h2><small>Đồng bộ trực tiếp MASTER + Tồn kho trên Firebase TEST chung</small></div>
               </div>
               <div class="ic-head-right">
                 <span id="ic-firebase-status" class="ic-fb-status">⏳ Đang kết nối dữ liệu hóa đơn...</span>
@@ -1069,7 +1125,7 @@
                       <input id="ic-file-input" type="file" accept="application/pdf,.pdf">
                       <button id="ic-analyze-btn" class="ic-btn primary ic-wide" type="button" disabled>✅ Kiểm Tra Hóa Đơn</button>
                       <div id="ic-status-line" class="ic-status-line"></div>
-                      <div class="ic-muted" style="margin-top:8px">File được lưu vào kho hóa đơn Firebase tối đa 10 ngày. Nếu Storage chậm quá 10 giây, phân tích vẫn tiếp tục như ứng dụng gốc.</div>
+                      <div class="ic-muted" style="margin-top:8px">Dữ liệu soi chiếu dùng chung Firebase TEST với Kho GDP. Hóa đơn được thử lưu Storage tối đa 10 ngày; nếu Storage chưa bật/chậm, phân tích vẫn tiếp tục.</div>
                     </div>
 
                     <div class="ic-card ic-grow">
@@ -2588,6 +2644,7 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
         const AI_LS_OLD = 'ideco_gemini_settings_v2';
         const AI_SETTINGS_AUTH = 'ideco_settings_unlocked_v1';
         const AI_SETTINGS_PASS_HASH = 'f3f929d3'; // FNV-1a của mật khẩu cài đặt
+        const AI_ROUTE_LS = 'ideco_ai_route_mode_v1';
         const AI_DEFAULT = {
             keys:['','',''],
             baiKey:'sk-i2zxo8byhg6uetizhlz4x6ikq80f5bgs',
@@ -2597,11 +2654,15 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             timeoutMs:90000,
             analysisMode:'fast',
             baiVision:true,
+            baiVisionModel:'deepseek-v4-flash',
             activeKey:0
         };
         const aiState = { files:[], rawItems:[], rows:[], slipInfo:{}, settings:loadAISettings(), busy:false, lastRoute:'', lastError:'', startedAt:0, timer:null, currentStage:'', attempts:[] };
+        let aiRouteModeState=(()=>{try{return localStorage.getItem(AI_ROUTE_LS)==='backup'?'backup':'main'}catch{return 'main'}})();
         const aiPdfTextCache = new WeakMap();
         const aiResultCache = new Map(); // cache trong phiên: bấm lại cùng file không gọi AI lần nữa
+        // Ghi nhớ model B.AI đã từ chối ảnh trong PHIÊN hiện tại để file sau không mất thời gian thử lại.
+        const baiVisionRejectedModels = new Set();
         const $ai = id => document.getElementById(id);
         const escAI = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         const sleepAI = ms => new Promise(r=>setTimeout(r,ms));
@@ -2632,7 +2693,7 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
                 return best;
             }catch{return {...AI_DEFAULT,keys:[...AI_DEFAULT.keys]};}
         }
-        function saveAISettings(){ localStorage.setItem(AI_LS,JSON.stringify(aiState.settings)); }
+        function saveAISettings(){ localStorage.setItem(AI_LS,JSON.stringify(aiState.settings)); try{updateAIRouteUI()}catch{} }
         function settingsPassHashAI(text){let h=2166136261;const s=String(text||'');for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(16).padStart(8,'0')}
         function isAISettingsUnlocked(){try{return localStorage.getItem(AI_SETTINGS_AUTH)==='1'}catch{return false}}
         function lockAISettingsAccess(){
@@ -2671,33 +2732,60 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
         function fmtAIBytes(n){ if(n<1024)return n+' B'; if(n<1048576)return (n/1024).toFixed(1)+' KB'; return (n/1048576).toFixed(1)+' MB'; }
         function currentAIKeys(){ return (aiState.settings.keys||[]).map((key,index)=>({key:String(key||'').trim(),index})).filter(x=>x.key); }
         function isBai(model){ return String(model||'').startsWith('bai:'); }
+        function activeAIRoute(){ return aiRouteModeState==='backup'?'backup':'main'; }
+        function updateAIRouteUI(){
+            if(aiRouteModeState==='backup'&&!currentAIKeys().length){
+                aiRouteModeState='main';
+                try{localStorage.setItem(AI_ROUTE_LS,'main')}catch{}
+            }
+            const main=document.getElementById('ai-route-main-btn'), backup=document.getElementById('ai-route-backup-btn'), status=document.getElementById('ai-route-status');
+            if(main){main.classList.toggle('active-main',activeAIRoute()==='main');main.setAttribute('aria-pressed',String(activeAIRoute()==='main'));}
+            if(backup){backup.classList.toggle('active-backup',activeAIRoute()==='backup');backup.setAttribute('aria-pressed',String(activeAIRoute()==='backup'));backup.title=currentAIKeys().length?'Bật AI PHỤ':'AI PHỤ chưa được cấu hình trong Cài đặt AI';}
+            if(status)status.textContent=activeAIRoute()==='backup'?'ĐANG DÙNG AI PHỤ':'ĐANG DÙNG AI CHÍNH';
+        }
+        function setAIRoute(mode,{silent=false}={}){
+            mode=mode==='backup'?'backup':'main';
+            if(mode==='backup'&&!currentAIKeys().length){
+                updateAIRouteUI();
+                if(!silent)aiNotice('AI PHỤ chưa thể bật vì chưa được cấu hình. Vào Cài đặt AI để kiểm tra trước.','error');
+                return false;
+            }
+            aiRouteModeState=mode;
+            try{localStorage.setItem(AI_ROUTE_LS,mode)}catch{}
+            aiResultCache.clear();
+            updateAIRouteUI();
+            if(!silent) aiNotice(mode==='backup'?'Đã bật AI PHỤ cho toàn bộ chức năng phân tích.':'Đã bật AI CHÍNH cho toàn bộ chức năng phân tích.');
+            return true;
+        }
         const GEMINI_ECO_CHAIN=['gemini-3.5-flash-lite','gemini-3.1-flash-lite','gemini-2.5-flash-lite','gemini-2.5-flash','gemini-3.6-flash','gemini-3.7-flash'];
         function isFastAI(){ return String(aiState.settings.analysisMode||'fast')!=='thorough'; }
         function aiAttemptTimeout(){ const n=Number(aiState.settings.timeoutMs)||90000; return isFastAI()?Math.min(n,35000):n; }
-        function baiAttemptTimeout(){ return isFastAI()?Math.min(aiAttemptTimeout(),25000):aiAttemptTimeout(); }
+        function baiAttemptTimeout(){ return isFastAI()?Math.max(42000,Math.min(Number(aiState.settings.timeoutMs)||90000,45000)):aiAttemptTimeout(); }
         function configuredAIModels(){
-            const primary=aiState.settings.primaryModel, fallback=aiState.settings.fallbackModel;
-            if(isFastAI()){
-                // FAST ưu tiên Flash-Lite ổn định khi có Gemini key để giảm độ trễ và tránh tuyến B.AI đang lỗi.
-                // DeepSeek/model người dùng chọn vẫn giữ làm dự phòng; tuyến sau chỉ chạy khi tuyến trước thất bại.
-                const a=[];
-                if(currentAIKeys().length)a.push('gemini-3.1-flash-lite','gemini-2.5-flash-lite');
-                a.push(primary,fallback);
-                if(aiState.settings.baiKey)a.push('bai:deepseek-v4-flash');
-                return [...new Set(a.filter(Boolean))].slice(0,5);
+            const primary=aiState.settings.primaryModel||AI_DEFAULT.primaryModel, fallback=aiState.settings.fallbackModel;
+            if(activeAIRoute()==='backup'){
+                // AI PHỤ được bật thủ công: Gemini trở thành tuyến chính và bỏ qua DeepSeek ở lượt xử lý này.
+                const selected=[fallback,primary].filter(m=>m&&!isBai(m));
+                const chain=isFastAI()?['gemini-3.1-flash-lite','gemini-2.5-flash-lite','gemini-3.5-flash-lite']:GEMINI_ECO_CHAIN;
+                return [...new Set([...selected,...chain].filter(Boolean))].slice(0,isFastAI()?4:10);
             }
-            const a=[primary,fallback].filter(Boolean);
-            if(currentAIKeys().length) a.push(...GEMINI_ECO_CHAIN);
-            if(aiState.settings.baiKey&&!a.some(isBai))a.push('bai:deepseek-v4-flash');
-            return [...new Set(a.filter(Boolean))];
+            const a=[...(aiState.settings.baiKey?['bai:deepseek-v4-flash']:[]),primary,fallback].filter(Boolean);
+            // AI CHÍNH trên thanh đầu là quyền ưu tiên cao nhất: nếu có B.AI key thì DeepSeek luôn chạy trước.
+            if(currentAIKeys().length){
+                if(isFastAI())a.push('gemini-3.1-flash-lite','gemini-2.5-flash-lite');
+                else a.push(...GEMINI_ECO_CHAIN);
+            }
+            return [...new Set(a.filter(Boolean))].slice(0,isFastAI()?5:12);
         }
         function geminiEconomyModels(){
             const selected=[aiState.settings.fallbackModel,aiState.settings.primaryModel].filter(m=>m&&!isBai(m));
             const fastStable=['gemini-3.1-flash-lite','gemini-2.5-flash-lite'];
-            const list=isFastAI()?[...new Set([...fastStable,...selected])]:[...new Set([...selected,...GEMINI_ECO_CHAIN])];
+            const list=activeAIRoute()==='backup'
+                ? [...new Set([...selected,...fastStable,...GEMINI_ECO_CHAIN])]
+                : (isFastAI()?[...new Set([...fastStable,...selected])]:[...new Set([...selected,...GEMINI_ECO_CHAIN])]);
             return isFastAI()?list.slice(0,4):list;
         }
-        function aiCacheKey(file,purpose){ return `${purpose||'AI'}|${file?.name||''}|${file?.size||0}|${file?.lastModified||0}`; }
+        function aiCacheKey(file,purpose){ return `${activeAIRoute()}|${purpose||'AI'}|${file?.name||''}|${file?.size||0}|${file?.lastModified||0}`; }
         async function fetchAI(url,options,ms){ const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),ms||aiAttemptTimeout()); try{return await fetch(url,{...options,signal:ctl.signal});} finally{clearTimeout(t);} }
         function extractAIJson(text){ let s=String(text||'').trim(); const m=s.match(/```(?:json)?\s*([\s\S]*?)\s*```/i); if(m)s=m[1].trim(); return JSON.parse(s); }
         function parseAINumber(v){ if(v===null||v===undefined||v==='')return null; if(typeof v==='number')return Number.isFinite(v)?v:null; let s=String(v).trim().replace(/\s/g,''); if(/^[-+]?\d{1,3}(\.\d{3})+(,\d+)?$/.test(s))s=s.replace(/\./g,'').replace(',','.'); else if(/^[-+]?\d+(,\d+)$/.test(s))s=s.replace(',','.'); else s=s.replace(/,/g,''); const n=Number(s); return Number.isFinite(n)?n:null; }
@@ -2706,9 +2794,10 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
         async function fileToAIPart(file){ if(file.size>19*1024*1024)throw new Error(`${file.name} lớn hơn 19MB.`); const url=await readAIDataURL(file); return {inlineData:{mimeType:file.type||guessAIMime(file.name),data:url.split(',')[1]}}; }
         function isRetryableAI(status,msg){const s=String(msg||'').toLowerCase();return status===408||status===409||status===429||status>=500||s.includes('quota')||s.includes('rate limit')||s.includes('resource_exhausted')||s.includes('token')||s.includes('unavailable')||s.includes('timeout')||s.includes('network')||s.includes('fetch')}
         function isAuthErrorAI(status,msg){const s=String(msg||'').toLowerCase();return status===401||status===403||s.includes('api key')||s.includes('permission_denied')||s.includes('unauthenticated')}
+        function shouldRetryAltAuthAI(status,msg){const s=String(msg||'').toLowerCase();return status===401||s.includes('invalid api key')||s.includes('missing api key')||s.includes('unauthenticated')||s.includes('invalid token')||s.includes('missing token')}
         function isModelErrorAI(status,msg){const s=String(msg||'').toLowerCase();return status===404||(status===400&&(s.includes('model')||s.includes('not found')||s.includes('not supported')))}
         async function geminiAI(parts,{jsonSchema=null,plainText=false,modelOverride=null,modelList=null,purpose='AI'}={}){
-            const keys=currentAIKeys(); if(!keys.length)throw new Error('Chưa có Gemini API key. PDF scan/ảnh cần Gemini để OCR hoặc phân tích trực tiếp.');
+            const keys=currentAIKeys(); if(!keys.length)throw new Error('Chưa có Gemini API key dự phòng. Nếu đã chọn DeepSeek V4 Flash Vision, ứng dụng vẫn có thể chạy bằng B.AI.');
             const models=(modelList&&modelList.length?modelList:(modelOverride?[modelOverride]:geminiEconomyModels())).filter((x,i,a)=>x&&!isBai(x)&&a.indexOf(x)===i);
             const start=Number(aiState.settings.activeKey)||0;
             const ordered=[...keys].sort((a,b)=>((a.index-start+3)%3)-((b.index-start+3)%3));
@@ -2759,11 +2848,12 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             ],stream:false,temperature:plainText?0.1:0,max_tokens:plainText?10000:14000};
             const endpoint=String(aiState.settings.baiEndpoint||AI_DEFAULT.baiEndpoint).trim()||AI_DEFAULT.baiEndpoint;
             const authModes=[
-                {label:'Bearer',headers:{Authorization:'Bearer '+key,'Content-Type':'application/json'}},
-                {label:'x-api-key',headers:{'x-api-key':key,'Content-Type':'application/json'}}
+                {label:'x-api-key',headers:{'x-api-key':key,'Content-Type':'application/json'}},
+                {label:'Bearer',headers:{Authorization:'Bearer '+key,'Content-Type':'application/json'}}
             ];
             let last=null;
-            for(const auth of authModes){
+            for(let ai=0;ai<authModes.length;ai++){
+                const auth=authModes[ai];
                 try{
                     setAIProgress('Huyền đang tổng hợp... bạn ráng chờ chút nhé',true);
                     const res=await fetchAI(endpoint,{method:'POST',headers:auth.headers,body:JSON.stringify(body)},baiAttemptTimeout());
@@ -2775,11 +2865,20 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
                 }catch(e){
                     const status=e?.status||0; const msg=e?.name==='AbortError'?'Hết thời gian chờ B.AI':(e?.message||String(e));
                     last=new Error(msg); last.status=status; aiState.lastError=msg; aiState.attempts.push(`B.AI/${auth.label}: ${msg}`);
-                    // Nếu lỗi quyền/key thì thử phương thức xác thực còn lại. Với lỗi server/network cũng cho thử một lần nữa.
-                    if(auth.label==='Bearer'){await sleepAI(120);continue}
+                    // Hai header đều được B.AI hỗ trợ. Chỉ thử header thứ hai khi lỗi xác thực/quyền;
+                    // lỗi mạng/server thì chuyển tuyến dự phòng ngay để tránh chờ gấp đôi.
+                    if(ai===0 && shouldRetryAltAuthAI(status,msg)){await sleepAI(80);continue}
+                    break;
                 }
             }
             throw last||new Error('B.AI không phản hồi.');
+        }
+        function baiChatEndpoint(){
+            const raw=String(aiState.settings.baiEndpoint||AI_DEFAULT.baiEndpoint).trim().replace(/\/+$/,'');
+            if(/\/v1\/chat\/completions$/i.test(raw))return raw;
+            if(/\/v1\/messages$/i.test(raw))return raw.replace(/\/v1\/messages$/i,'/v1/chat/completions');
+            if(/\/v1$/i.test(raw))return raw+'/chat/completions';
+            return raw+'/v1/chat/completions';
         }
         function baiMessagesEndpoint(){
             const raw=String(aiState.settings.baiEndpoint||AI_DEFAULT.baiEndpoint).trim().replace(/\/+$/,'');
@@ -2804,14 +2903,14 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
                 setAIProgress(`👁️ Huyền đang chuẩn bị hình ảnh PDF: trang ${i}/${doc.numPages}...`,true);
                 const page=await doc.getPage(i);
                 const baseViewport=page.getViewport({scale:1});
-                const targetWidth=Math.min(1500,Math.max(1050,baseViewport.width*1.6));
+                const targetWidth=Math.min(1280,Math.max(900,baseViewport.width*1.35));
                 const viewport=page.getViewport({scale:targetWidth/baseViewport.width});
                 const canvas=document.createElement('canvas');
                 canvas.width=Math.ceil(viewport.width); canvas.height=Math.ceil(viewport.height);
                 const ctx=canvas.getContext('2d',{alpha:false});
                 ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
                 await page.render({canvasContext:ctx,viewport}).promise;
-                blocks.push(dataUrlToBaiImageBlock(canvas.toDataURL('image/jpeg',0.78)));
+                blocks.push(dataUrlToBaiImageBlock(canvas.toDataURL('image/jpeg',0.68)));
                 canvas.width=1; canvas.height=1;
             }
             return blocks;
@@ -2825,34 +2924,53 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
         }
         async function baiVisionAI(file,prompt,{jsonSchema=null,plainText=false,purpose='B.AI Vision'}={}){
             const key=String(aiState.settings.baiKey||'').trim(); if(!key)throw new Error('Chưa có B.AI key.');
-            const model='deepseek-v4-flash';
             let instruction=String(prompt||'').trim();
             if(jsonSchema)instruction+=`\n\nYÊU CẦU ĐẦU RA: Chỉ trả JSON hợp lệ, không Markdown, không giải thích. JSON phải tuân theo schema:\n${JSON.stringify(jsonSchema)}`;
             const imageBlocks=await fileToBaiVisionBlocks(file);
-            const body={model,max_tokens:plainText?10000:14000,temperature:plainText?0.1:0,
-                system:jsonSchema?'Bạn là AI Vision trích xuất chứng từ dược phẩm cực kỳ chính xác. Không bỏ sót dòng. Số lô, HSD/EXP và số lượng là dữ liệu trọng yếu. Chỉ trả JSON hợp lệ.':'Bạn là trợ lý Vision đọc chứng từ chính xác.',
-                messages:[{role:'user',content:[{type:'text',text:instruction},...imageBlocks]}]};
-            const endpoint=baiMessagesEndpoint();
+            const systemText=jsonSchema?'Bạn là AI Vision trích xuất chứng từ dược phẩm cực kỳ chính xác. Không bỏ sót dòng. Số lô, HSD/EXP và số lượng là dữ liệu trọng yếu. Chỉ trả JSON hợp lệ.':'Bạn là trợ lý Vision đọc chứng từ chính xác.';
+            const configured=String(aiState.settings.baiVisionModel||'deepseek-v4-flash').trim();
+            const aliases=[configured,configured.replace(/_/g,'-'),configured.replace(/-/g,'_'),'deepseek-v4-flash','deepseek_v4_flash'];
+            // Nếu runtime DeepSeek của tài khoản chưa nhận ảnh, dùng model multimodal trên B.AI bằng CÙNG B.AI key.
+            // Không yêu cầu người dùng phải nhập thêm Google Gemini API key.
+            const modelCandidates=[...new Set([...aliases,'gemini-3-flash'].filter(Boolean))].filter(m=>!baiVisionRejectedModels.has(m));
             const authModes=[
-                {label:'Bearer',headers:{Authorization:'Bearer '+key,'Content-Type':'application/json'}},
-                {label:'x-api-key',headers:{'x-api-key':key,'Content-Type':'application/json'}}
+                {label:'x-api-key',headers:{'x-api-key':key,'Content-Type':'application/json'}},
+                {label:'Bearer',headers:{Authorization:'Bearer '+key,'Content-Type':'application/json'}}
             ];
             let last=null;
-            for(const auth of authModes){
-                try{
-                    setAIProgress('Huyền đang tổng hợp... bạn ráng chờ chút nhé',true);
-                    const res=await fetchAI(endpoint,{method:'POST',headers:auth.headers,body:JSON.stringify(body)},Math.max(baiAttemptTimeout(),35000));
-                    const data=await res.json().catch(()=>({}));
-                    if(!res.ok){const er=new Error(data?.error?.message||data?.message||`HTTP ${res.status}`);er.status=res.status;throw er}
-                    const out=(Array.isArray(data?.content)?data.content:[]).filter(x=>x&&x.type==='text').map(x=>x.text||'').join('').trim();
-                    if(!out)throw new Error('B.AI Vision trả nội dung rỗng.');
-                    aiState.lastRoute=`B.AI Vision · ${model} · ${auth.label}`; aiState.lastError='';
-                    return {text:out,provider:'bai-vision',model,keyIndex:-1,raw:data};
-                }catch(e){
-                    const status=e?.status||0; const msg=e?.name==='AbortError'?'Hết thời gian chờ B.AI Vision':(e?.message||String(e));
-                    last=new Error(msg); last.status=status; aiState.lastError=msg; aiState.attempts.push(`B.AI Vision/${auth.label}: ${msg}`);
-                    if(auth.label==='Bearer'){await sleepAI(120);continue}
+            for(const model of modelCandidates){
+                // B.AI công bố content block ảnh ở Messages API; dùng route này làm chuẩn để tránh request image_url sai schema.
+                const body={model,max_tokens:plainText?10000:14000,stream:false,temperature:0,system:systemText,messages:[{role:'user',content:[{type:'text',text:instruction},...imageBlocks]}]};
+                for(let ai=0;ai<authModes.length;ai++){
+                    const auth=authModes[ai];
+                    try{
+                        setAIProgress('Huyền đang tổng hợp... bạn ráng chờ chút nhé',true);
+                        const res=await fetchAI(baiMessagesEndpoint(),{method:'POST',headers:auth.headers,body:JSON.stringify(body)},Math.max(32000,Math.min(baiAttemptTimeout(),45000)));
+                        const data=await res.json().catch(()=>({}));
+                        if(!res.ok){const er=new Error(data?.error?.message||data?.message||`HTTP ${res.status}`);er.status=res.status;throw er}
+                        const out=(Array.isArray(data?.content)?data.content:[]).filter(x=>x&&x.type==='text').map(x=>x.text||'').join('').trim();
+                        if(!out)throw new Error('B.AI Vision trả nội dung rỗng.');
+                        if(/^deepseek[-_]v4[-_]flash$/i.test(model)){
+                            aiState.settings.baiVisionModel=model;
+                            baiVisionRejectedModels.delete(model);
+                            saveAISettings();
+                        }
+                        aiState.lastRoute=`B.AI Vision · ${model} · Messages · ${auth.label}`; aiState.lastError='';
+                        return {text:out,provider:'bai-vision',model,keyIndex:-1,raw:data,visionProtocol:'Messages Vision',visionBridge:!/^deepseek[-_]v4[-_]flash$/i.test(model)};
+                    }catch(e){
+                        const status=e?.status||0, msg=e?.name==='AbortError'?'Hết thời gian chờ B.AI Vision':(e?.message||String(e));
+                        last=new Error(msg); last.status=status; aiState.lastError=msg; aiState.attempts.push(`B.AI Vision/${model}/Messages/${auth.label}: ${msg}`);
+                        if(ai===0 && shouldRetryAltAuthAI(status,msg)){await sleepAI(60);continue}
+                        const lm=msg.toLowerCase();
+                        const rejectsImage=(status===400||status===404||status===422)&&(/image|vision|multimodal|media|content block|not support|unsupported|text[- ]?only|model/.test(lm));
+                        if(rejectsImage && /^deepseek[-_]v4[-_]flash$/i.test(model))baiVisionRejectedModels.add(model);
+                        break;
+                    }
                 }
+                const lm=String(last?.message||'').toLowerCase();
+                // Lỗi xác thực/quyền toàn cục thì dừng sớm; lỗi model/ảnh thì chuyển model B.AI kế tiếp.
+                if(isAuthErrorAI(last?.status||0,lm) && !/model access|model.*permission|no access to model/.test(lm))break;
+                if(last?.status===429||last?.status>=500||/network|fetch|timeout|failed to fetch/.test(lm))break;
             }
             throw last||new Error(`${purpose}: B.AI Vision không phản hồi.`);
         }
@@ -2892,7 +3010,7 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
         async function ocrAIFile(file,purpose='OCR'){
             setAIProgress(`👁️ Huyền đang đọc nội dung PDF/ảnh: ${file.name}...`,true);
             const prompt='Chỉ OCR/trích xuất chữ từ TOÀN BỘ tài liệu theo đúng thứ tự. Giữ nguyên số phiếu, ngày, tên hàng, số lô, HSD/EXP, ĐVT, số lượng, đơn giá, thành tiền. Không phân tích, không tóm tắt, không bịa. Trả văn bản thuần.';
-            if(baiVisionEnabled()){
+            if(activeAIRoute()==='main'&&baiVisionEnabled()){
                 try{ const r=await baiVisionAI(file,prompt,{plainText:true,purpose:`${purpose} · B.AI Vision OCR`}); return r.text; }
                 catch(e){ aiState.attempts.push(`Vision OCR dự phòng: ${e?.message||e}`); }
             }
@@ -2935,9 +3053,11 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             let pdfInfo=null;
             if(isFastAI()&&isPdf){ try{pdfInfo=await getAIPdfTextInfo(file);}catch{} }
             const needsVision=!isPdf||(pdfInfo&&pdfInfo.chars<120);
+            let baiVisionTried=false;
             // Ảnh/PDF scan: ở chế độ NHANH thử B.AI Vision trực tiếp trước (1 lượt).
             // Nếu B.AI Vision không nhận ảnh hoặc lỗi, tự chuyển Gemini Vision dự phòng.
-            if(isFastAI()&&needsVision&&baiVisionEnabled()){
+            if(activeAIRoute()==='main'&&needsVision&&baiVisionEnabled()&&(isFastAI()||isBai(aiState.settings.primaryModel))){
+                baiVisionTried=true;
                 try{
                     setAIProgress(`👁️ Huyền đang đọc trực tiếp ${file.name} và tổng hợp dữ liệu...`,true);
                     const r=await baiVisionAI(file,prompt,{jsonSchema,plainText,purpose});
@@ -2959,6 +3079,7 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
                 try{
                     if(isBai(model)){
                         if(!String(aiState.settings.baiKey||'').trim())continue;
+                        if(needsVision&&baiVisionTried){failures.push(`${model}: Vision đã thử ở tuyến trước, không lặp lại để tránh chờ lâu.`);continue;}
                         const txt=(pdfInfo&&pdfInfo.chars>=120)?pdfInfo.text:await textForBai(file,purpose);
                         const r=await baiAI(`${prompt}
 
@@ -3163,7 +3284,7 @@ YÊU CẦU BẮT BUỘC:
         }
         // Giữ alias để các đoạn code cũ không lỗi; chỉ trả về các trường thực sự có quyền chặn nhập kho.
         function checkMasterFields(m){ return checkMasterRequiredFields(m); }
-        function buildMatchedRow(src,index){ const d=chooseDeterministic(src); const exp=parseFullExpiry(src.hanDung); const r={id:index,sourceName:src.tenHang,sourceCode:src.maSP||'',sourceUnit:src.donVi||'',lotNumber:src.soLo||'',expiryRaw:src.hanDung||'',expiryDate:exp.date,quantity:src.soLuong,match:d.match,candidates:d.candidates,matchMethod:d.method,matchScore:d.score,aiReason:'',manual:!!src.masterExplicitlyConfirmed,manualCode:src.maSP||'',manualName:src.tenHang||'',manualStrength:'',manualPackSpec:'',manualUnit:src.donVi||''}; return finalizeRow(r); }
+        function buildMatchedRow(src,index){ const d=chooseDeterministic(src); const exp=parseFullExpiry(src.hanDung); const r={id:index,sourceName:src.tenHang,sourceCode:src.maSP||'',sourceUnit:src.donVi||'',sourceOriginalName:src.originalTenHang||src.tenHang||'',sourceOriginalCode:src.originalMaSP||src.maSP||'',sourceOriginalUnit:src.originalDonVi||src.donVi||'',lotNumber:src.soLo||'',expiryRaw:src.hanDung||'',expiryDate:exp.date,quantity:src.soLuong,match:d.match,candidates:d.candidates,matchMethod:d.method,matchScore:d.score,aiReason:'',manual:!!src.masterExplicitlyConfirmed,pendingMasterCode:src.pendingMasterCode||'',manualCode:src.maSP||'',manualName:src.tenHang||'',manualStrength:'',manualPackSpec:'',manualUnit:src.donVi||''}; return finalizeRow(r); }
         function rowWarehouseProduct(r){
             // Khi đã xác nhận Master: 5 trường định danh lấy NGUYÊN VẸN từ Master.
             if(r.match)return {
@@ -3276,11 +3397,10 @@ YÊU CẦU BẮT BUỘC:
             const opts=['<option value="">-- CHỌN MASTER ĐÚNG / GẦN ĐÚNG TÊN --</option>'];
             for(const c of (r.candidates||[])){
                 const compat=masterNameCompatibility(r.sourceName,c.m.name);
-                const selected=r.match&&compat.accepted&&((r.match.code&&c.m.code&&cleanCode(r.match.code)===cleanCode(c.m.code))||r.match.name===c.m.name)?'selected':'';
+                const selected=(r.match&&((r.match.code&&c.m.code&&cleanCode(r.match.code)===cleanCode(c.m.code))||r.match.name===c.m.name))||(r.pendingMasterCode&&c.m.code&&cleanCode(r.pendingMasterCode)===cleanCode(c.m.code))?'selected':'';
                 const suggested=r.aiSuggestedCode&&c.m.code&&cleanCode(r.aiSuggestedCode)===cleanCode(c.m.code)?' ⭐ Huyền gợi ý':'';
-                const tag=compat.accepted?(compat.level==='exact'?' ✅ đúng tên':compat.level==='safe'?' ✅ gần đúng an toàn':' ⚠ gần đúng'):' ⛔ khác tên';
-                const disabled=compat.accepted?'':'disabled';
-                opts.push(`<option ${selected} ${disabled} value="${escAI(c.m.code||'NAME:'+c.m.name)}">${escAI(c.m.code||'--')} · ${escAI(c.m.name)} · ${Math.round(compat.score*100)}%${tag}${suggested}</option>`);
+                const tag=compat.accepted?(compat.level==='exact'?' ✅ đúng tên':compat.level==='safe'?' ✅ gần đúng an toàn':' ⚠ gần đúng'):' ⛔ khác tên · chỉ dùng khi xác nhận ĐỒNG BỘ';
+                opts.push(`<option ${selected} value="${escAI(c.m.code||'NAME:'+c.m.name)}">${escAI(c.m.code||'--')} · ${escAI(c.m.name)} · ${Math.round(compat.score*100)}%${tag}${suggested}</option>`);
             }
             return opts.join('');
         }
@@ -3310,10 +3430,10 @@ YÊU CẦU BẮT BUỘC:
                 if(readyNow)parts.unshift(`<b>✅ ${readyNow} dòng đã đạt chuẩn sẽ được load sang Nhập kho.</b> Các dòng lỗi bên dưới được giữ lại tại đây và tuyệt đối không đi vào tồn kho.`);
                 block.innerHTML=parts.join('<br><br>');
             }else{block.style.display='none';block.innerHTML='';}
-            root.innerHTML=`<table class="ai-compare-table"><thead><tr><th>TT</th><th>Trạng thái</th><th>Tên trên phiếu NCC</th><th>ĐVT phiếu</th><th>Số lô</th><th>HSD gốc</th><th>SL</th><th>Xác nhận Master</th><th>Mã SP MASTER</th><th>Tên thuốc MASTER</th><th>Hàm lượng/NĐ MASTER</th><th>Quy cách MASTER</th><th>ĐVT MASTER</th><th>Ghi chú kiểm tra</th></tr></thead><tbody>${aiState.rows.map((r,i)=>{
+            root.innerHTML=`<table class="ai-compare-table"><thead><tr><th>TT</th><th>Trạng thái</th><th>Mã trên PDF</th><th>Tên trên PDF · có thể sửa</th><th>ĐVT PDF · có thể sửa</th><th>Số lô</th><th>HSD gốc</th><th>SL</th><th>Chọn Master / Đồng bộ</th><th>Mã SP MASTER</th><th>Tên thuốc MASTER</th><th>Hàm lượng/NĐ MASTER</th><th>Quy cách MASTER</th><th>ĐVT MASTER</th><th>Ghi chú kiểm tra</th></tr></thead><tbody>${aiState.rows.map((r,i)=>{
                 const m=r.match,p=rowWarehouseProduct(r),isNew=!m,cls=r.status==='ok'?'ai-row-ok':r.status==='warning'?'ai-row-warn':r.status==='new'?'ai-row-new':'ai-row-bad';
                 const note=[...(r.issues||[]),...(r.referenceWarnings||[]),r.newProductWarning||'',r.aiSuggestedCode?('AI gợi ý mã: '+r.aiSuggestedCode):'',r.aiReason?('AI: '+r.aiReason):''].filter(Boolean).join(' · ');
-                return `<tr class="${cls}"><td>${i+1}</td><td>${statusBadge(r)}</td><td class="ai-source-name"><b>${escAI(r.sourceName)}</b><div style="font-size:.68rem;color:#64748b">Chỉ dùng để soi chiếu</div></td><td>${escAI(r.sourceUnit)}</td><td><input data-ai-edit="lot" data-row="${i}" value="${escAI(r.lotNumber)}"></td><td><input data-ai-edit="exp" data-row="${i}" value="${escAI(r.expiryRaw)}"></td><td><input type="number" data-ai-edit="qty" data-row="${i}" value="${escAI(r.quantity??'')}"></td><td><select data-ai-select="${i}" style="min-width:270px">${candidateOptions(r)}</select>${r.status==='warning'?`<div style="margin-top:6px;color:#92400e;font-size:.72rem;font-weight:800">✓ Tên đã khớp Master · cảnh báo chỉ để tham khảo</div>`:''}${isNew?`<div style="margin-top:5px;color:#b45309;font-weight:800">Chưa xác nhận Master → KHÔNG tự load KHO</div><button type="button" class="btn btn-warning" style="margin-top:6px;padding:5px 8px" data-ai-add-master="${i}">➕ Thêm SP mới vào Master</button>`:''}</td><td>${isNew?`<input class="ai-new-input" data-ai-manual="code" data-row="${i}" value="${escAI(p.code)}" placeholder="Mã SP bắt buộc">`:`<b>${escAI(p.code)}</b>`}</td><td class="ai-canonical-name">${isNew?`<input class="ai-new-input" data-ai-manual="name" data-row="${i}" value="${escAI(p.name)}" placeholder="Tên thuốc chuẩn">`:`<b>${escAI(p.name)}</b>`}</td><td>${isNew?`<input class="ai-new-input" data-ai-manual="strength" data-row="${i}" value="${escAI(p.strength)}" placeholder="Bắt buộc">`:escAI(p.strength)}</td><td>${isNew?`<input class="ai-new-input" data-ai-manual="pack" data-row="${i}" value="${escAI(p.packSpec)}" placeholder="Bắt buộc">`:escAI(p.packSpec)}</td><td>${isNew?`<input class="ai-new-input" data-ai-manual="unit" data-row="${i}" value="${escAI(p.unit)}" placeholder="Bắt buộc">`:escAI(p.unit)}</td><td>${escAI(note)}</td></tr>`;
+                return `<tr class="${cls}"><td>${i+1}</td><td>${statusBadge(r)}</td><td><input data-ai-edit="code" data-row="${i}" value="${escAI(r.sourceCode)}" style="min-width:120px"></td><td class="ai-source-name"><input data-ai-edit="name" data-row="${i}" value="${escAI(r.sourceName)}" style="min-width:235px;font-weight:800"><div style="font-size:.68rem;color:#64748b">Có thể sửa nếu AI/PDF đọc lệch</div></td><td><input data-ai-edit="unit" data-row="${i}" value="${escAI(r.sourceUnit)}" style="min-width:105px"></td><td><input data-ai-edit="lot" data-row="${i}" value="${escAI(r.lotNumber)}"></td><td><input data-ai-edit="exp" data-row="${i}" value="${escAI(r.expiryRaw)}"></td><td><input type="number" data-ai-edit="qty" data-row="${i}" value="${escAI(r.quantity??'')}"></td><td><select data-ai-select="${i}" style="min-width:290px">${candidateOptions(r)}</select><button type="button" class="btn btn-primary" style="margin-top:6px;padding:5px 8px;width:100%" data-ai-sync-master="${i}">🔄 ĐỒNG BỘ DÒNG NÀY THEO MASTER</button>${r.status==='warning'?`<div style="margin-top:6px;color:#92400e;font-size:.72rem;font-weight:800">✓ Tên đã khớp Master · cảnh báo chỉ để tham khảo</div>`:''}${isNew?`<div style="margin-top:5px;color:#b45309;font-weight:800">Chưa xác nhận Master → KHÔNG tự load KHO</div><button type="button" class="btn btn-warning" style="margin-top:6px;padding:5px 8px" data-ai-add-master="${i}">➕ Thêm SP mới vào Master</button>`:''}</td><td>${isNew?`<input class="ai-new-input" data-ai-manual="code" data-row="${i}" value="${escAI(p.code)}" placeholder="Mã SP">`:`<b>${escAI(p.code)}</b>`}</td><td class="ai-canonical-name">${isNew?`<input class="ai-new-input" data-ai-manual="name" data-row="${i}" value="${escAI(p.name)}" placeholder="Tên thuốc chuẩn">`:`<b>${escAI(p.name)}</b>`}</td><td>${isNew?`<input class="ai-new-input" data-ai-manual="strength" data-row="${i}" value="${escAI(p.strength)}" placeholder="Hàm lượng/NĐ">`:escAI(p.strength)}</td><td>${isNew?`<input class="ai-new-input" data-ai-manual="pack" data-row="${i}" value="${escAI(p.packSpec)}" placeholder="Bắt buộc">`:escAI(p.packSpec)}</td><td>${isNew?`<input class="ai-new-input" data-ai-manual="unit" data-row="${i}" value="${escAI(p.unit)}" placeholder="ĐVT">`:escAI(p.unit)}</td><td>${escAI(note)}</td></tr>`;
             }).join('')}</tbody></table>`;
             root.querySelectorAll('[data-ai-select]').forEach(sel=>sel.onchange=()=>{
                 const idx=Number(sel.dataset.aiSelect),r=aiState.rows[idx],val=sel.value;
@@ -3321,24 +3441,32 @@ YÊU CẦU BẮT BUỘC:
                 else{
                     const hit=masterData.find(m=>m.code&&cleanCode(m.code)===cleanCode(val))||masterData.find(m=>'NAME:'+m.name===val);
                     const compat=hit?masterNameCompatibility(r.sourceName,hit.name):{accepted:false,score:0};
-                    if(!hit || !compat.accepted){
-                        r.match=null; r.manual=false; r.matchMethod='rejected-name';
-                        if(aiState.rawItems[idx]){aiState.rawItems[idx].confirmedMasterCode='';aiState.rawItems[idx].masterExplicitlyConfirmed=false;}
-                        aiNotice(`⛔ KHÔNG THỂ XÁC NHẬN MASTER. Tên trên phiếu “${r.sourceName}” không đủ giống với “${hit?.name||'sản phẩm đã chọn'}”. Hãy chọn đúng hoặc gần đúng tên sản phẩm.`, 'error');
+                    if(!hit){r.match=null;r.pendingMasterCode='';r.manual=false;}
+                    else if(!compat.accepted){
+                        // Không cho xác nhận trực tiếp tên khác. Chỉ lưu như một lựa chọn CHỜ ĐỒNG BỘ có chủ đích.
+                        r.match=null; r.pendingMasterCode=hit.code||('NAME:'+hit.name); r.manual=false; r.matchMethod='pending-sync';
+                        if(aiState.rawItems[idx]){aiState.rawItems[idx].pendingMasterCode=r.pendingMasterCode;aiState.rawItems[idx].confirmedMasterCode='';aiState.rawItems[idx].masterExplicitlyConfirmed=false;}
+                        aiNotice(`⚠️ Tên PDF “${r.sourceName}” chưa đủ khớp “${hit.name}”. Nếu đây là lỗi đọc PDF, kiểm tra đúng sản phẩm rồi bấm ĐỒNG BỘ DÒNG NÀY THEO MASTER.`, 'info');
                     }else{
-                        r.match=hit; r.matchMethod=compat.level==='exact'?'manual-exact':'manual-near'; r.manual=true;
-                        if(aiState.rawItems[idx]){aiState.rawItems[idx].confirmedMasterCode=hit?.code||'';aiState.rawItems[idx].masterExplicitlyConfirmed=true;}
+                        r.match=hit; r.pendingMasterCode=''; r.matchMethod=compat.level==='exact'?'manual-exact':'manual-near'; r.manual=true;
+                        if(aiState.rawItems[idx]){aiState.rawItems[idx].pendingMasterCode='';aiState.rawItems[idx].confirmedMasterCode=hit?.code||'';aiState.rawItems[idx].masterExplicitlyConfirmed=true;}
                         if(compat.level==='near') aiNotice(`⚠️ Tên gần đúng ${Math.round(compat.score*100)}%: “${r.sourceName}” ↔ “${hit.name}”. Vui lòng nhìn lại tên thuốc trước khi nhập kho.`,'info');
                     }
                 }
                 finalizeRow(r); renderCompare(); renderReceipt(); autoLoadWarehousePreview(false);
             });
             root.querySelectorAll('[data-ai-edit]').forEach(inp=>inp.onchange=()=>{
-                const r=aiState.rows[Number(inp.dataset.row)];
-                if(inp.dataset.aiEdit==='lot')r.lotNumber=inp.value.trim();
-                if(inp.dataset.aiEdit==='exp')r.expiryRaw=inp.value.trim();
-                if(inp.dataset.aiEdit==='qty')r.quantity=Number(inp.value);
-                finalizeRow(r); renderCompare(); renderReceipt(); autoLoadWarehousePreview(false);
+                const idx=Number(inp.dataset.row),r=aiState.rows[idx],raw=aiState.rawItems[idx]||{};
+                const kind=inp.dataset.aiEdit;
+                if(kind==='code'){r.sourceCode=inp.value.trim();raw.maSP=r.sourceCode;raw.confirmedMasterCode='';raw.masterExplicitlyConfirmed=false;raw.pendingMasterCode='';}
+                if(kind==='name'){r.sourceName=inp.value.trim();raw.tenHang=r.sourceName;raw.confirmedMasterCode='';raw.masterExplicitlyConfirmed=false;raw.pendingMasterCode='';}
+                if(kind==='unit'){r.sourceUnit=inp.value.trim();raw.donVi=r.sourceUnit;}
+                if(kind==='lot'){r.lotNumber=inp.value.trim();raw.soLo=r.lotNumber;}
+                if(kind==='exp'){r.expiryRaw=inp.value.trim();raw.hanDung=r.expiryRaw;}
+                if(kind==='qty'){r.quantity=Number(inp.value);raw.soLuong=r.quantity;}
+                aiState.rawItems[idx]=raw;
+                if(kind==='name'||kind==='code')aiState.rows[idx]=buildMatchedRow(raw,idx);else finalizeRow(r);
+                renderCompare(); renderReceipt(); autoLoadWarehousePreview(false);
             });
             root.querySelectorAll('[data-ai-manual]').forEach(inp=>inp.onchange=()=>{
                 const r=aiState.rows[Number(inp.dataset.row)],v=inp.value.trim();
@@ -3362,8 +3490,9 @@ YÊU CẦU BẮT BUỘC:
                 if(aiState.rawItems[idx]){aiState.rawItems[idx].confirmedMasterCode=r.match.code||'';aiState.rawItems[idx].masterExplicitlyConfirmed=true;}
                 finalizeRow(r); renderCompare(); renderReceipt(); autoLoadWarehousePreview(false);
             });
+            root.querySelectorAll('[data-ai-sync-master]').forEach(btn=>btn.onclick=()=>{if(syncRowFromMaster(Number(btn.dataset.aiSyncMaster),true)){renderCompare();renderReceipt();autoLoadWarehousePreview(false);aiNotice('✅ Đã đồng bộ dòng PDF theo Master.','info')}});
             root.querySelectorAll('[data-ai-add-master]').forEach(btn=>btn.onclick=()=>addRowToMaster(Number(btn.dataset.aiAddMaster)));
-            $ai('ai-rematch-btn').disabled=false; $ai('ai-receipt-pdf-btn').disabled=false; updateWarehouseButton();
+            $ai('ai-rematch-btn').disabled=false; if($ai('ai-sync-master-btn'))$ai('ai-sync-master-btn').disabled=!aiState.rows.some(r=>r.pendingMasterCode); $ai('ai-receipt-pdf-btn').disabled=false; updateWarehouseButton();
         }
         async function addRowToMaster(index){
             const r=aiState.rows[index]; if(!r||r.match)return;
@@ -3392,6 +3521,27 @@ YÊU CẦU BẮT BUỘC:
                 aiNotice(`Đã thêm ${p.code||'--'} · ${p.name} vào Master. Tên + Quy cách là chuẩn bắt buộc; Mã/ĐVT/Hàm lượng là thông tin tham khảo.`);
             }catch(e){aiNotice('Không thêm được Master: '+(e?.message||e),'error');}
         }
+        function chosenMasterForSync(r){
+            const key=r?.pendingMasterCode||r?.match?.code||'';
+            if(key){const hit=masterData.find(m=>m.code&&cleanCode(m.code)===cleanCode(key))||masterData.find(m=>'NAME:'+m.name===key);if(hit)return hit}
+            return r?.match||null;
+        }
+        function syncRowFromMaster(index,ask=true){
+            const r=aiState.rows[index],raw=aiState.rawItems[index]; if(!r||!raw)return false;
+            const m=chosenMasterForSync(r); if(!m){aiNotice('Hãy chọn một sản phẩm Master trước khi Đồng bộ.','error');return false}
+            const msg=`ĐỒNG BỘ DỮ LIỆU PDF THEO MASTER?\n\nPDF đang đọc: ${r.sourceCode||'--'} · ${r.sourceName||'--'} · ${r.sourceUnit||'--'}\nMASTER chuẩn: ${m.code||'--'} · ${m.name||'--'} · ${m.unit||'--'}\n\nHệ thống chỉ thay Mã/Tên/ĐVT nhận dạng sản phẩm. SỐ LÔ, HSD và SỐ LƯỢNG vẫn giữ nguyên từ phiếu. Master gốc KHÔNG bị sửa.`;
+            if(ask&&!confirm(msg))return false;
+            raw.originalTenHang=raw.originalTenHang||raw.tenHang||'';raw.originalMaSP=raw.originalMaSP||raw.maSP||'';raw.originalDonVi=raw.originalDonVi||raw.donVi||'';
+            raw.tenHang=m.name||raw.tenHang;raw.maSP=m.code||raw.maSP;raw.donVi=m.unit||raw.donVi;raw.confirmedMasterCode=m.code||'';raw.masterExplicitlyConfirmed=true;raw.pendingMasterCode='';raw.syncedToMasterAt=new Date().toISOString();
+            aiState.rows[index]=buildMatchedRow(raw,index);aiState.rows[index].match=m;aiState.rows[index].manual=true;aiState.rows[index].matchMethod='pdf-synced-to-master';finalizeRow(aiState.rows[index]);return true;
+        }
+        function syncSelectedRowsFromMaster(){
+            const ids=aiState.rows.map((r,i)=>({r,i})).filter(x=>x.r.pendingMasterCode);
+            if(!ids.length)return aiNotice('Chưa có dòng nào đang chờ Đồng bộ. Hãy chọn Master ở dòng PDF bị đọc sai trước.','info');
+            if(!confirm(`Đồng bộ ${ids.length} dòng đang chọn theo Master? Mã/Tên/ĐVT sẽ lấy từ Master; Lô/HSD/Số lượng giữ nguyên từ PDF.`))return;
+            let done=0;for(const x of ids)if(syncRowFromMaster(x.i,false))done++;
+            renderCompare();renderReceipt();autoLoadWarehousePreview(false);aiNotice(`✅ Đã đồng bộ ${done} dòng PDF theo dữ liệu Master chuẩn.`,'info');
+        }
         function updateWarehouseButton(){
             const readyCount=aiState.rows.filter(isWarehouseReady).length;
             const blockedCount=Math.max(0,aiState.rows.length-readyCount);
@@ -3406,7 +3556,7 @@ YÊU CẦU BẮT BUỘC:
                 const p=rowWarehouseProduct(r);
                 return {id:i,productName:p.name,productCode:p.code,productStrength:p.strength,packSpec:p.packSpec,unit:p.unit,
                     lotNumber:r.lotNumber,expiryDate:r.expiryDate,quantity:Number(r.quantity)||0,
-                    masterLocked:true,masterVerified:true,masterCode:p.code,masterName:p.name,sourceName:r.sourceName,sourceUnit:r.sourceUnit,sourceType:'AI_NCC_MASTER'};
+                    masterLocked:true,masterVerified:true,masterCode:p.code,masterName:p.name,sourceName:r.sourceName,sourceOriginalName:r.sourceOriginalName||r.sourceName,sourceUnit:r.sourceUnit,sourceType:'AI_NCC_MASTER'};
             });
         }
         function autoLoadWarehousePreview(showMessage=true){
@@ -3429,9 +3579,32 @@ YÊU CẦU BẮT BUỘC:
             const tab=document.querySelector('.nav-tab[onclick*="tab1"]'); switchTab('tab1',tab);
             setTimeout(()=>document.getElementById('preview-box')?.scrollIntoView({behavior:'smooth',block:'start'}),100);
         }
+        const AI_RECEIPT_SIGNERS_KEY='ideco_ai_receipt_signers_v1';
+        function getReceiptSignerData(){
+            return [
+                {role:'Bộ phận Kho/Kế toán',name:($ai('ai-sign-warehouse-accounting')?.value||'').trim(),signed:!!$ai('ai-signed-warehouse-accounting')?.checked},
+                {role:'Người lập biên bản',name:($ai('ai-sign-preparer')?.value||'').trim(),signed:!!$ai('ai-signed-preparer')?.checked},
+                {role:'Phụ trách chuyên môn',name:($ai('ai-sign-professional')?.value||'').trim(),signed:!!$ai('ai-signed-professional')?.checked}
+            ];
+        }
+        function saveReceiptSignerData(){
+            try{ localStorage.setItem(AI_RECEIPT_SIGNERS_KEY,JSON.stringify(getReceiptSignerData())); }catch(e){}
+            if(aiState.rows.length)renderReceipt();
+        }
+        function loadReceiptSignerData(){
+            let d=[]; try{d=JSON.parse(localStorage.getItem(AI_RECEIPT_SIGNERS_KEY)||'[]')}catch(e){}
+            const ids=[['ai-sign-warehouse-accounting','ai-signed-warehouse-accounting'],['ai-sign-preparer','ai-signed-preparer'],['ai-sign-professional','ai-signed-professional']];
+            ids.forEach((pair,i)=>{ const x=d[i]||{}; const inp=$ai(pair[0]), chk=$ai(pair[1]); if(inp&&typeof x.name==='string')inp.value=x.name; if(chk)chk.checked=!!x.signed; });
+        }
+        function renderReceiptSignatures(){
+            const box=$ai('ai-receipt-signatures'); if(!box)return;
+            box.innerHTML=getReceiptSignerData().map(x=>`<div class="ai-signature-box"><div class="ai-signature-role">${escAI(x.role)} ${x.signed?'<span class="ai-signed-mark">ĐÃ KÝ</span>':''}</div><div class="ai-signature-space"></div><div class="ai-signature-name">${escAI(x.name||'................................')}</div><div style="font-size:.7rem;color:#64748b;font-weight:600">(Họ và tên)</div></div>`).join('');
+        }
+
         function renderReceipt(){ const el=$ai('ai-receipt'); if(!aiState.rows.length){el.style.display='none';return;} el.style.display='block'; const supplier=$ai('ai-supplier').value||aiState.slipInfo.nhaCungCap||''; const invoice=$ai('ai-invoice').value||aiState.slipInfo.soPhieu||aiState.slipInfo.theoHoaDonSo||''; const date=$ai('ai-receive-date').value||new Date().toISOString().slice(0,10); const receiver=$ai('ai-receiver').value||'';
             $ai('ai-receipt-meta').innerHTML=`<div><b>Nhà cung cấp:</b><br>${escAI(supplier||'Chưa khai báo')}</div><div><b>Số phiếu/Hóa đơn:</b><br>${escAI(invoice||'Chưa khai báo')}</div><div><b>Ngày nhận:</b><br>${escAI(date)}</div><div><b>Người giao:</b><br>${escAI(aiState.slipInfo.hoTenNguoiGiao||'')}</div><div><b>Kho nhận:</b><br>${escAI(aiState.slipInfo.nhapTaiKho||'IDECO')}</div><div><b>Người lập:</b><br>${escAI(receiver)}</div>`;
             $ai('ai-receipt-body').innerHTML=aiState.rows.map((r,i)=>{const p=rowWarehouseProduct(r);return `<tr><td>${i+1}</td><td>${escAI(p.code||'')}</td><td><b>${escAI(p.name||r.sourceName)}</b><div style="font-size:.7rem;color:#64748b">Phiếu: ${escAI(r.sourceName)}</div></td><td>${escAI(p.strength||'')}</td><td>${escAI(p.packSpec||'')}</td><td>${escAI(p.unit||r.sourceUnit)}</td><td>${escAI(r.lotNumber)}</td><td>${escAI(r.expiryRaw)}</td><td>${escAI(r.quantity??'')}</td><td>${r.status==='blocked'?'Thiếu điều kiện nhập kho':r.status==='new'?'CHƯA KHỚP TÊN MASTER - KHÔNG NHẬP KHO':r.status==='warning'?'ĐÃ KHỚP MASTER - CÓ THÔNG TIN THAM KHẢO':'ĐÃ KHỚP TÊN MASTER'}</td></tr>`;}).join('');
+            renderReceiptSignatures();
         }
         async function saveReceiptPDF(){ const el=$ai('ai-receipt'); if(!el||!aiState.rows.length)return; try{setAIProgress('Đang tạo PDF Biên bản nhận hàng...',true); const canvas=await html2canvas(el,{scale:1.7,useCORS:true,backgroundColor:'#fff'}); const {jsPDF}=window.jspdf; const pdf=new jsPDF({orientation:'l',unit:'mm',format:'a4'}),pw=pdf.internal.pageSize.getWidth(),ph=pdf.internal.pageSize.getHeight(),ratio=Math.min(pw/canvas.width,ph/canvas.height),w=canvas.width*ratio,h=canvas.height*ratio; pdf.addImage(canvas.toDataURL('image/png'),'PNG',(pw-w)/2,5,w,h); pdf.save(`IDECO_BienBan_NhanHang_${new Date().toISOString().slice(0,10)}.pdf`); setAIProgress('Đã tạo PDF Biên bản nhận hàng.',true); setTimeout(()=>setAIProgress('',false),2500);}catch(e){aiNotice('Lỗi tạo PDF: '+e.message,'error');} }
 
@@ -3463,28 +3636,32 @@ YÊU CẦU BẮT BUỘC:
             }else{
                 setAIProgress(`⛔ Chưa có dòng nào đủ điều kiện load Nhập kho. Cần Tên khớp Master + Quy cách + Lô + HSD + Số lượng. Chưa khớp tên: ${unmatched}; cảnh báo tham khảo: ${warn}; thiếu bắt buộc: ${bad}.`,true);
             }
-        }catch(e){const msg=e?.message||String(e);aiState.lastError=msg;console.warn('Chi tiết tuyến AI:',msg);aiNotice('Huyền chưa phân tích được phiếu. Bạn kiểm tra kết nối/API trong Cài đặt hoặc mở NHẬP THỦ CÔNG DỰ PHÒNG để tiếp tục.','error');const tr=$ai('ai-test-result');if(tr)tr.innerHTML=`<span style="color:#b91c1c"><b>❌ Huyền chưa phân tích được phiếu.</b> Mở Cài đặt → Kiểm tra AI để xem chi tiết kỹ thuật.</span>`;const fb=$ai('manual-fallback-details');if(fb)fb.open=true;}finally{aiState.busy=false;stopAIProcessing();$ai('ai-analyze-btn').disabled=false;} }
-        function clearAI(){ stopAIProcessing(); aiState.busy=false;aiState.files=[];aiState.rawItems=[];aiState.rows=[];aiState.slipInfo={};aiState.currentStage='';renderAIFiles();$ai('ai-compare-root').innerHTML='<div style="padding:45px;text-align:center;color:#94a3b8">Tải phiếu NCC và bấm AI PHÂN TÍCH.</div>';$ai('ai-match-summary').innerHTML='<span class="ai-pill ai-info">Chưa có dữ liệu</span>';$ai('ai-block-note').style.display='none';$ai('ai-receipt').style.display='none';$ai('ai-rematch-btn').disabled=true;$ai('ai-to-warehouse-btn').disabled=true;$ai('ai-receipt-pdf-btn').disabled=true;setAIProgress('',false);}
+        }catch(e){const msg=e?.message||String(e);aiState.lastError=msg;console.warn('Chi tiết tuyến AI:',msg);aiNotice('Huyền chưa phân tích được phiếu. Bạn kiểm tra kết nối/API trong Cài đặt hoặc mở NHẬP THỦ CÔNG DỰ PHÒNG để tiếp tục.','error');const tr=$ai('ai-test-result');if(tr){const tech=[...(aiState.attempts||[])].slice(-5).map(escAI).join('<br>');tr.innerHTML=`<div style="color:#b91c1c"><b>❌ Huyền chưa phân tích được phiếu.</b> Mở Cài đặt → Kiểm tra AI.</div>${tech?`<details style="margin-top:6px"><summary>Chi tiết tuyến kỹ thuật</summary><div style="font-size:.72rem;margin-top:5px;color:#64748b">${tech}</div></details>`:''}`;}const fb=$ai('manual-fallback-details');if(fb)fb.open=true;}finally{aiState.busy=false;stopAIProcessing();$ai('ai-analyze-btn').disabled=false;} }
+        function clearAI(){ stopAIProcessing(); aiState.busy=false;aiState.files=[];aiState.rawItems=[];aiState.rows=[];aiState.slipInfo={};aiState.currentStage='';renderAIFiles();$ai('ai-compare-root').innerHTML='<div style="padding:45px;text-align:center;color:#94a3b8">Tải phiếu NCC và bấm AI PHÂN TÍCH.</div>';$ai('ai-match-summary').innerHTML='<span class="ai-pill ai-info">Chưa có dữ liệu</span>';$ai('ai-block-note').style.display='none';$ai('ai-receipt').style.display='none';$ai('ai-rematch-btn').disabled=true;if($ai('ai-sync-master-btn'))$ai('ai-sync-master-btn').disabled=true;$ai('ai-to-warehouse-btn').disabled=true;$ai('ai-receipt-pdf-btn').disabled=true;setAIProgress('',false);}
         function fillAISettings(){
             const s=aiState.settings;
             [1,2,3].forEach((n,i)=>$ai('ai-key-'+n).value=s.keys?.[i]||'');
             $ai('ai-bai-key').value=s.baiKey||'';
             $ai('ai-bai-endpoint').value=s.baiEndpoint||AI_DEFAULT.baiEndpoint;
+            if($ai('ai-bai-vision-model'))$ai('ai-bai-vision-model').value=s.baiVisionModel||'deepseek-v4-flash';
             $ai('ai-primary-model').value=s.primaryModel||AI_DEFAULT.primaryModel;
             $ai('ai-fallback-model').value=s.fallbackModel||AI_DEFAULT.fallbackModel;
             if($ai('ai-analysis-mode'))$ai('ai-analysis-mode').value=s.analysisMode||'fast';
             if($ai('ai-bai-vision'))$ai('ai-bai-vision').checked=s.baiVision!==false;
             const g=currentAIKeys().length;
-            $ai('ai-settings-status').textContent=(g?`${g} Gemini key · `:'0 Gemini key · ')+(s.baiKey?`B.AI đã có key · Vision ${s.baiVision!==false?'BẬT':'TẮT'}`:'B.AI chưa có key');
+            $ai('ai-settings-status').textContent=(g?`${g} Gemini key · `:'0 Gemini key · ')+(s.baiKey?`B.AI đã có key · Vision ${s.baiVision!==false?'BẬT':'TẮT'} · ${s.baiVisionModel||'deepseek-v4-flash'}`:'B.AI chưa có key');
+            updateAIRouteUI();
         }
         function collectAISettings(){
             aiState.settings.keys=[1,2,3].map(n=>$ai('ai-key-'+n).value.trim());
             aiState.settings.baiKey=$ai('ai-bai-key').value.trim();
             aiState.settings.baiEndpoint=$ai('ai-bai-endpoint').value.trim()||AI_DEFAULT.baiEndpoint;
+            if($ai('ai-bai-vision-model'))aiState.settings.baiVisionModel=$ai('ai-bai-vision-model').value.trim()||'deepseek-v4-flash';
             aiState.settings.primaryModel=$ai('ai-primary-model').value;
             aiState.settings.fallbackModel=$ai('ai-fallback-model').value;
             if($ai('ai-analysis-mode'))aiState.settings.analysisMode=$ai('ai-analysis-mode').value||'fast';
             if($ai('ai-bai-vision'))aiState.settings.baiVision=!!$ai('ai-bai-vision').checked;
+            baiVisionRejectedModels.clear();
             saveAISettings(); fillAISettings(); aiNotice('Đã lưu cài đặt AI trên trình duyệt này.');
         }
         function restoreLegacyAISettings(){
@@ -3513,8 +3690,10 @@ YÊU CẦU BẮT BUỘC:
                     try{
                         const tf=await makeBaiVisionTestFile();
                         const r=await baiVisionAI(tf,'Đọc chính xác dòng chữ trong ảnh. Nếu thấy IDECO VISION TEST 2026 thì chỉ trả đúng: VISION_OK',{plainText:true,purpose:'Kiểm tra B.AI Vision'});
-                        if(/VISION_OK/i.test(r.text)||/IDECO\s+VISION\s+TEST\s+2026/i.test(r.text))results.push('✅ B.AI Vision hoạt động');
-                        else results.push('⚠️ B.AI Vision có phản hồi nhưng chưa đọc đúng ảnh thử');
+                        if(/VISION_OK/i.test(r.text)||/IDECO\s+VISION\s+TEST\s+2026/i.test(r.text)){
+                            results.push(`✅ B.AI Vision hoạt động (${r.model} · ${r.visionProtocol||'Vision'})`);
+                            if(r.visionBridge)results.push('ℹ️ DeepSeek runtime chưa nhận ảnh ở lượt thử; ứng dụng đã dùng B.AI multimodal Vision dự phòng bằng cùng B.AI key.');
+                        }else results.push('⚠️ B.AI Vision có phản hồi nhưng chưa đọc đúng ảnh thử');
                     }catch(e){results.push(`❌ B.AI Vision: ${e.message}`)}
                 }else results.push('⚠️ B.AI Vision: đang tắt trong Cài đặt');
             }else results.push('⚠️ B.AI: chưa có key');
@@ -3544,8 +3723,12 @@ YÊU CẦU BẮT BUỘC:
             $ai('ai-analyze-btn').onclick=analyzeFiles;
             $ai('ai-clear-btn').onclick=clearAI;
             $ai('ai-rematch-btn').onclick=async()=>{setAIProgress('Đang soi chiếu lại Master mới nhất tại máy...',true);await rematchAll(false);setAIProgress('Đã soi chiếu lại Master tại máy.',true);};
+            if($ai('ai-sync-master-btn'))$ai('ai-sync-master-btn').onclick=syncSelectedRowsFromMaster;
             $ai('ai-to-warehouse-btn').onclick=goWarehouse;
             $ai('ai-receipt-pdf-btn').onclick=saveReceiptPDF;
+            loadReceiptSignerData();
+            ['ai-sign-warehouse-accounting','ai-sign-preparer','ai-sign-professional'].forEach(id=>$ai(id)?.addEventListener('input',saveReceiptSignerData));
+            ['ai-signed-warehouse-accounting','ai-signed-preparer','ai-signed-professional'].forEach(id=>$ai(id)?.addEventListener('change',saveReceiptSignerData));
             ['ai-supplier','ai-invoice','ai-receive-date','ai-receiver'].forEach(id=>$ai(id).oninput=renderReceipt);
         }
         // Keep AI rows updated if Master changes in realtime.
@@ -3571,8 +3754,21 @@ QUY TẮC CỰC KỲ QUAN TRỌNG:
                 return extractAIJson(rr.text);
             }finally{ stopAIProcessing(); }
         };
+        // API AI dùng chung phải được export NGAY TRONG scope này. Trước đây đặt ở IIFE Xuất kho
+        // làm phát sinh ReferenceError và chặn luôn bind chọn PDF của Xuất kho.
+        window.IDECO_SHARED_AI={
+            fileRequest:aiFileRequest,
+            textRequest:aiTextRequest,
+            getState:()=>aiState,
+            getRoute:activeAIRoute,
+            setRoute:setAIRoute,
+            masterNameCompatibility,
+            masterCandidates:(name,code='')=>getMasterCandidates({tenHang:name||'',maSP:code||''})
+        };
+        window.IDECOAIRoute={set:setAIRoute,get:activeAIRoute,refresh:updateAIRouteUI};
 
         bindAI();
+        updateAIRouteUI();
     })();
     </script>
 
@@ -3593,8 +3789,27 @@ QUY TẮC CỰC KỲ QUAN TRỌNG:
         function setSaveStatus(msg,type='info'){const e=$('xk-voucher-save-status');if(!e)return;e.textContent=msg;e.style.color=type==='error'?'#b91c1c':type==='ok'?'#166534':'#64748b'}
         function loadLogo(){try{S.logo=localStorage.getItem('ideco_export_logo_v1')||''}catch{};if($('xk-logo-status'))$('xk-logo-status').textContent=S.logo?'✅ Đã lưu logo trên máy.':'Chưa chọn logo.'}
         function saveLogo(file){if(!file)return;const r=new FileReader();r.onload=()=>{S.logo=String(r.result||'');try{localStorage.setItem('ideco_export_logo_v1',S.logo)}catch{};$('xk-logo-status').textContent='✅ Đã lưu logo trên máy.';renderVoucher();};r.readAsDataURL(file)}
-        function masterFor(req){const code=norm(req.maSP),name=norm(req.tenSP);let m=null;if(code)m=(masterData||[]).find(x=>norm(x.code||x.productCode)===code);if(!m&&name)m=(masterData||[]).find(x=>norm(x.name||x.productName)===name);return m||null}
-        function stockFor(req){const code=norm(req.maSP),name=norm(req.tenSP);let arr=[];if(code)arr=(stockData||[]).filter(x=>norm(x.productCode)===code);if(!arr.length&&name)arr=(stockData||[]).filter(x=>norm(x.productName)===name);return arr}
+        function exportMasterCandidates(req){const shared=window.IDECO_SHARED_AI;if(shared&&typeof shared.masterCandidates==='function')return shared.masterCandidates(req.tenSP||'',req.maSP||'').map(x=>x.m||x).filter(Boolean);const name=norm(req.tenSP);return (masterData||[]).filter(m=>name&&norm(m.name||m.productName).includes(name)).slice(0,5)}
+        function masterFor(req){
+            const code=norm(req.maSP),name=norm(req.tenSP),shared=window.IDECO_SHARED_AI;
+            let byCode=code?(masterData||[]).find(x=>norm(x.code||x.productCode)===code):null;
+            if(byCode){
+                const cp=shared?.masterNameCompatibility?.(req.tenSP,byCode.name||byCode.productName);
+                if(!name||cp?.accepted||norm(byCode.name||byCode.productName)===name)return byCode;
+                // Mã trùng nhưng tên khác đáng kể: không được tự coi là cùng thuốc. Người dùng phải Đồng bộ Master có chủ đích.
+                return null;
+            }
+            let m=name?(masterData||[]).find(x=>norm(x.name||x.productName)===name):null;
+            if(!m&&name){for(const c of exportMasterCandidates(req)){const cp=shared?.masterNameCompatibility?.(req.tenSP,c.name||c.productName);if(cp?.accepted){m=c;break}}}
+            return m||null
+        }
+        function stockFor(req,master=null){
+            const m=master||masterFor(req); if(!m)return [];
+            const code=norm(m.code||m.productCode),name=norm(m.name||m.productName);let arr=[];
+            if(code)arr=(stockData||[]).filter(x=>norm(x.productCode)===code);
+            if(!arr.length&&name)arr=(stockData||[]).filter(x=>norm(x.productName)===name);
+            return arr
+        }
         function smallestConversion(packSpec,unitHint){
             const raw=String(packSpec||unitHint||'').trim(),s=norm(raw);
             let m=s.match(/(\d+(?:\.\d+)?)\s*vi\s*(?:x|\*)\s*(\d+(?:\.\d+)?)\s*vien/i);
@@ -3608,18 +3823,23 @@ QUY TẮC CỰC KỲ QUAN TRỌNG:
         function evaluate(){
             S.compare=[];S.allocations=[];
             for(const req of S.requests){
-                const matches=stockFor(req),master=masterFor(req),boxes=n(req.soLuong),total=matches.reduce((a,x)=>a+n(x.quantity),0),pack=(master?.packSpec||master?.['Quy Cách']||matches[0]?.packSpec||req.dvt||''),conv=smallestConversion(pack,req.dvt);
+                const master=masterFor(req),matches=master?stockFor(req,master):[],boxes=n(req.soLuong),total=matches.reduce((a,x)=>a+n(x.quantity),0),pack=(master?.packSpec||master?.['Quy Cách']||matches[0]?.packSpec||req.dvt||''),conv=smallestConversion(pack,req.dvt);
                 let status='ok',msg='Đủ tồn';
-                if(!matches.length||total<=0){status='zero';msg='Tồn kho = 0'}else if(total<boxes){status='short';msg=`Thiếu ${fmt(boxes-total)} hộp`}else if(!conv.factor){status='conversion';msg='Cần xác nhận quy đổi'};
-                const row={...req,boxes,total,packSpec:pack,conversion:conv,status,msg};S.compare.push(row);
+                if(!master){status='master';msg='Chưa khớp Master · hãy chọn đúng Master và Đồng bộ'}
+                else if(!matches.length||total<=0){status='zero';msg='Tồn kho = 0'}else if(total<boxes){status='short';msg=`Thiếu ${fmt(boxes-total)} hộp`}else if(!conv.factor){status='conversion';msg='Cần xác nhận quy đổi'};
+                const row={...req,boxes,total,masterCode:master?.code||'',masterName:master?.name||'',packSpec:pack,conversion:conv,status,msg};S.compare.push(row);
                 if(status==='ok'){const a=allocateLots(matches,boxes,conv.factor,conv.unit);S.allocations.push(...a.rows)}
             }
             renderCompare();renderAlloc();renderSummary();showStockWarnings();
             $('xk-confirm-btn').disabled=!!(S.loadedVoucherStatus==='CONFIRMED')||!(S.compare.length&&S.compare.every(x=>x.status==='ok')&&S.allocations.length);
         }
-        function renderCompare(){const tb=$('xk-compare-body');if(!tb)return;tb.innerHTML=S.compare.map((r,i)=>`<tr class="${r.status==='ok'?'xk-row-ok':r.status==='zero'?'xk-row-zero':r.status==='short'?'xk-row-short':'xk-row-unmatched'}"><td>${i+1}</td><td>${esc(r.maSP||'')}</td><td><b>${esc(r.tenSP||'')}</b></td><td>${esc(r.dvt||'')}</td><td style="text-align:center;font-weight:800">${fmt(r.boxes??r.soLuong)}</td><td style="text-align:center;font-weight:800">${fmt(r.total)}</td><td>${esc(r.packSpec||'')}</td><td><b>${esc(r.conversion?.unit||'—')}</b></td><td style="text-align:right;font-weight:800">${r.conversion?.factor?fmt((r.boxes??r.soLuong)*r.conversion.factor):'—'}</td><td><b>${esc(r.msg||'')}</b></td></tr>`).join('')||'<tr><td colspan="10" style="text-align:center">Chưa có dữ liệu.</td></tr>'}
+        function renderCompare(){const tb=$('xk-compare-body');if(!tb)return;tb.innerHTML=S.compare.map((r,i)=>{const req=S.requests[i]||r,cands=exportMasterCandidates(req).slice(0,5),opts=['<option value="">-- Chọn Master để đồng bộ --</option>',...cands.map(m=>`<option value="${esc(m.code||'NAME:'+m.name)}" ${(req._masterChoice&&(norm(req._masterChoice)===norm(m.code)||req._masterChoice==='NAME:'+m.name))?'selected':''}>${esc(m.code||'--')} · ${esc(m.name||'')}</option>`)].join('');return `<tr class="${r.status==='ok'?'xk-row-ok':r.status==='zero'?'xk-row-zero':r.status==='short'?'xk-row-short':'xk-row-unmatched'}"><td>${i+1}</td><td><input data-xk-edit="code" data-row="${i}" value="${esc(req.maSP||'')}" style="min-width:110px"></td><td><input data-xk-edit="name" data-row="${i}" value="${esc(req.tenSP||'')}" style="min-width:220px;font-weight:800"></td><td><input data-xk-edit="unit" data-row="${i}" value="${esc(req.dvt||'')}" style="min-width:120px"></td><td><input type="number" min="0" data-xk-edit="qty" data-row="${i}" value="${esc(req.soLuong||0)}" style="width:90px;text-align:right;font-weight:800"></td><td style="text-align:center;font-weight:800">${fmt(r.total)}</td><td>${esc(r.packSpec||'')}</td><td><b>${esc(r.conversion?.unit||'—')}</b></td><td style="text-align:right;font-weight:800">${r.conversion?.factor?fmt((r.boxes??r.soLuong)*r.conversion.factor):'—'}</td><td><b>${esc(r.msg||'')}</b><div style="margin-top:6px"><select data-xk-master-choice="${i}" style="max-width:250px">${opts}</select><button type="button" class="btn btn-primary" data-xk-sync="${i}" style="padding:5px 7px;margin-top:4px">🔄 Đồng bộ Master</button></div></td></tr>`}).join('')||'<tr><td colspan="10" style="text-align:center">Chưa có dữ liệu.</td></tr>';
+            tb.querySelectorAll('[data-xk-edit]').forEach(inp=>inp.onchange=()=>{const i=Number(inp.dataset.row),q=S.requests[i];if(!q)return;const k=inp.dataset.xkEdit;if(k==='code')q.maSP=inp.value.trim();if(k==='name')q.tenSP=inp.value.trim();if(k==='unit')q.dvt=inp.value.trim();if(k==='qty')q.soLuong=n(inp.value);q._masterChoice='';evaluate()});
+            tb.querySelectorAll('[data-xk-master-choice]').forEach(sel=>sel.onchange=()=>{const q=S.requests[Number(sel.dataset.xkMasterChoice)];if(q)q._masterChoice=sel.value});
+            tb.querySelectorAll('[data-xk-sync]').forEach(btn=>btn.onclick=()=>{const i=Number(btn.dataset.xkSync),q=S.requests[i];if(!q)return;const val=q._masterChoice;if(!val)return showToast('Hãy chọn Master đúng cho dòng này.','error');const m=(masterData||[]).find(x=>x.code&&norm(x.code)===norm(val))||(masterData||[]).find(x=>'NAME:'+x.name===val);if(!m)return showToast('Không tìm thấy Master đã chọn.','error');if(!confirm(`Đồng bộ dòng phiếu “${q.tenSP}” theo MASTER “${m.name}”?\nMã/Tên/ĐVT sẽ lấy từ Master; số lượng trên phiếu giữ nguyên.`))return;q._originalName=q._originalName||q.tenSP;q.maSP=m.code||q.maSP;q.tenSP=m.name||q.tenSP;q.dvt=m.unit||q.dvt;q._masterChoice='';evaluate();showToast('Đã đồng bộ dòng phiếu xuất theo Master.','success')});
+        }
         function renderAlloc(){const tb=$('xk-allocation-body');if(!tb)return;tb.innerHTML=S.allocations.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.productCode)}</td><td><b>${esc(r.productName)}</b></td><td>${esc(r.smallUnit)}</td><td><b>${esc(r.lotNumber)}</b></td><td>${esc(r.expiryDate)}</td><td style="text-align:right;font-weight:800">${fmt(r.smallQty)}</td><td style="text-align:right">${fmt(r.boxesTake)}</td></tr>`).join('')||'<tr><td colspan="8" style="text-align:center;color:#64748b">Chưa có dòng đủ điều kiện để phân lô FEFO.</td></tr>'}
-        function renderSummary(){if(!$('xk-summary'))return;const z=S.compare.filter(x=>x.status==='zero').length,sh=S.compare.filter(x=>x.status==='short').length,cv=S.compare.filter(x=>x.status==='conversion').length,ok=S.compare.filter(x=>x.status==='ok').length,total=S.compare.reduce((a,x)=>a+n(x.boxes??x.soLuong),0);$('xk-summary').innerHTML=`<span class="xk-pill xk-info">Phiếu: ${S.compare.length} SP · ${fmt(total)} hộp/đv đóng gói</span><span class="xk-pill xk-ok">Đủ: ${ok}</span>${sh?`<span class="xk-pill xk-warn">Thiếu: ${sh}</span>`:''}${z?`<span class="xk-pill xk-bad">Tồn 0: ${z}</span>`:''}${cv?`<span class="xk-pill xk-warn">Chưa rõ quy đổi: ${cv}</span>`:''}`}
+        function renderSummary(){if(!$('xk-summary'))return;const z=S.compare.filter(x=>x.status==='zero').length,sh=S.compare.filter(x=>x.status==='short').length,cv=S.compare.filter(x=>x.status==='conversion').length,mm=S.compare.filter(x=>x.status==='master').length,ok=S.compare.filter(x=>x.status==='ok').length,total=S.compare.reduce((a,x)=>a+n(x.boxes??x.soLuong),0);$('xk-summary').innerHTML=`<span class="xk-pill xk-info">Phiếu: ${S.compare.length} SP · ${fmt(total)} hộp/đv đóng gói</span><span class="xk-pill xk-ok">Đủ: ${ok}</span>${mm?`<span class="xk-pill xk-bad">Chưa khớp Master: ${mm}</span>`:''}${sh?`<span class="xk-pill xk-warn">Thiếu: ${sh}</span>`:''}${z?`<span class="xk-pill xk-bad">Tồn 0: ${z}</span>`:''}${cv?`<span class="xk-pill xk-warn">Chưa rõ quy đổi: ${cv}</span>`:''}`}
         function showStockWarnings(){const zero=S.compare.filter(x=>x.status==='zero'),short=S.compare.filter(x=>x.status==='short');if(!zero.length&&!short.length)return;let h='';if(zero.length)h+=`<div class="xk-warning-box zero"><b>⛔ TỒN KHO = 0</b><br>${zero.map(x=>`• ${esc(x.tenSP)} — Phiếu cần ${fmt(x.boxes??x.soLuong)}`).join('<br>')}<hr style="margin:8px 0;border:0;border-top:1px solid #fecaca"><b>Bạn ơi kiểm lại kho ERP xem nếu cũng không có thì báo kế toán đặt hàng ngay và nhớ báo kinh doanh biết luôn nhé</b></div>`;if(short.length)h+=`<div class="xk-warning-box short"><b>⚠️ KHO ĐANG THIẾU</b><br>${short.map(x=>`• ${esc(x.tenSP)} — Cần ${fmt(x.boxes??x.soLuong)}, kho có ${fmt(x.total)}, thiếu ${fmt((x.boxes??x.soLuong)-x.total)}`).join('<br>')}<hr style="margin:8px 0;border:0;border-top:1px solid #fed7aa"><b>Số lượng sản phẩm này còn thiếu- bạn liên hệ đặt hàng nhanh bổ sung- nhắc với kinh doanh thông tin khách hàng biết nhé</b></div>`;$('xk-warning-body').innerHTML=h;$('xk-warning-modal').style.display='flex'}
         window.closeExportStockWarning=()=>{$('xk-warning-modal').style.display='none'};
 
@@ -3632,7 +3852,7 @@ QUY TẮC CỰC KỲ QUAN TRỌNG:
         window.analyzeExportSlipAI=async()=>{
             if(S.busy)return;const f=S.file||$('xk-ai-file').files?.[0];if(!f)return showToast('Vui lòng chọn Phiếu xuất kho PDF/ảnh.','error');if(typeof window.IDECO_AI_EXPORT_ANALYZE!=='function')return showToast('Module AI chưa sẵn sàng. Hãy tải lại ứng dụng.','error');
             S.busy=true;S.sourceType='AI_PDF';S.loadedVoucherId=null;S.loadedVoucherStatus='';S.voucherCreatedAt=null;$('xk-analyze-btn').disabled=true;setProg('Huyền đang tổng hợp phiếu xuất... bạn ráng chờ chút nhé',true);
-            try{const data=await window.IDECO_AI_EXPORT_ANALYZE(f);S.parsed=data;S.requests=(data?.items||data?.data||[]).map((x,i)=>({stt:x.stt||i+1,maSP:x.maSP||x.ma_sp||x.code||'',tenSP:x.tenSP||x.tenSp||x.tenHang||x.name||'',dvt:x.dvt||x.donVi||x.unit||'',soLuong:n(x.soLuong??x.quantity)})).filter(x=>x.tenSP&&x.soLuong>0);if(!S.requests.length)throw new Error('Không tìm thấy dòng hàng hợp lệ trên phiếu.');fillMeta(data?.slipInfo||data?.info||{});$('xk-voucher-name').value=suggestVoucherName();evaluate();$('xk-result-area').style.display='block';setProg(`✅ Huyền đã đọc ${S.requests.length} sản phẩm và soi tồn kho xong.`,true);setTimeout(()=>setProg('',false),4500);$('xk-result-area').scrollIntoView({behavior:'smooth',block:'start'})}catch(e){console.error(e);setProg('',false);showToast('Huyền chưa phân tích được phiếu xuất. Kiểm tra API/kết nối hoặc dùng Xuất kho thủ công.','error')}finally{S.busy=false;$('xk-analyze-btn').disabled=false}
+            try{const data=await window.IDECO_AI_EXPORT_ANALYZE(f);S.parsed=data;S.requests=(data?.items||data?.data||[]).map((x,i)=>({stt:x.stt||i+1,maSP:x.maSP||x.ma_sp||x.code||'',tenSP:x.tenSP||x.tenSp||x.tenHang||x.name||'',dvt:x.dvt||x.donVi||x.unit||'',soLuong:n(x.soLuong??x.quantity)})).filter(x=>x.tenSP&&x.soLuong>0);if(!S.requests.length)throw new Error('Không tìm thấy dòng hàng hợp lệ trên phiếu.');fillMeta(data?.slipInfo||data?.info||{});$('xk-voucher-name').value=suggestVoucherName();evaluate();$('xk-result-area').style.display='block';setProg(`✅ Huyền đã đọc ${S.requests.length} sản phẩm và soi tồn kho xong.`,true);setTimeout(()=>setProg('',false),4500);$('xk-result-area').scrollIntoView({behavior:'smooth',block:'start'})}catch(e){console.error(e);setProg('',false);const msg=e?.message||String(e);showToast('Huyền chưa phân tích được phiếu xuất: '+msg,'error')}finally{S.busy=false;$('xk-analyze-btn').disabled=false}
         };
 
         window.IDECO_EXPORT_ADD_MANUAL_REQUEST=(req,meta={})=>{
@@ -3712,11 +3932,12 @@ QUY TẮC CỰC KỲ QUAN TRỌNG:
                     if(!data)return;
                     const rows=Object.keys(data).map(id=>({id,...data[id]})),fresh=[];
                     for(const req of S.requests){
-                        const code=norm(req.maSP),name=norm(req.tenSP);let matches=[];
+                        const master=masterFor(req); if(!master)return;
+                        const code=norm(master.code||master.productCode),name=norm(master.name||master.productName);let matches=[];
                         if(code)matches=rows.filter(x=>norm(x.productCode)===code);
                         if(!matches.length&&name)matches=rows.filter(x=>norm(x.productName)===name);
                         matches=matches.filter(x=>n(x.quantity)>0).sort(fefoFifoCompare);
-                        const master=masterFor(req),pack=(master?.packSpec||master?.['Quy Cách']||matches[0]?.packSpec||req.dvt||''),conv=smallestConversion(pack,req.dvt);if(!conv.factor)return;
+                        const pack=(master?.packSpec||master?.['Quy Cách']||matches[0]?.packSpec||req.dvt||''),conv=smallestConversion(pack,req.dvt);if(!conv.factor)return;
                         let left=n(req.soLuong);
                         for(const lot of matches){if(left<=0)break;const take=Math.min(n(lot.quantity),left);if(take<=0)continue;fresh.push({relatedId:lot.id,productCode:lot.productCode||'',productName:lot.productName||'',lotNumber:lot.lotNumber||'',expiryDate:lot.expiryDate||'',boxesTake:take,smallUnit:conv.unit,smallQty:take*conv.factor,packSpec:lot.packSpec||pack||'',unit:lot.unit||'',importDate:lot.importDate||'',createdAt:lot.createdAt||''});left-=take;}
                         if(left>0)return;
@@ -3733,12 +3954,20 @@ QUY TẮC CỰC KỲ QUAN TRỌNG:
         };
 
         function bind(){
-            const drop=$('xk-drop'),inp=$('xk-ai-file');if(drop&&inp){drop.onclick=()=>inp.click();drop.ondragover=e=>{e.preventDefault();drop.style.background='#dbeafe'};drop.ondragleave=()=>drop.style.background='';drop.ondrop=e=>{e.preventDefault();drop.style.background='';const f=e.dataTransfer.files?.[0];if(f){S.file=f;$('xk-file-name').textContent=`📄 ${f.name} · ${(f.size/1024).toFixed(1)} KB`}};inp.onchange=()=>{const f=inp.files?.[0];S.file=f||null;$('xk-file-name').textContent=f?`📄 ${f.name} · ${(f.size/1024).toFixed(1)} KB`:'Chưa chọn file.'}}
+            const drop=$('xk-drop'),inp=$('xk-ai-file'),pick=$('xk-pick-file-btn'),analyzeBtn=$('xk-analyze-btn');if(drop&&inp){
+                const acceptFile=f=>{if(!f)return false;const ok=f.type==='application/pdf'||String(f.type||'').startsWith('image/')||/\.(pdf|png|jpe?g|webp)$/i.test(f.name||'');if(!ok){showToast('Chỉ nhận PDF, PNG, JPG/JPEG hoặc WEBP.','error');return false}S.file=f;$('xk-file-name').textContent=`📄 ${f.name} · ${(f.size/1024).toFixed(1)} KB`;return true};
+                drop.onclick=e=>{if(e.target===inp)return;e.preventDefault();inp.click()};
+                inp.onclick=e=>e.stopPropagation();
+                drop.ondragover=e=>{e.preventDefault();drop.style.background='#dbeafe'};drop.ondragleave=()=>drop.style.background='';
+                drop.ondrop=e=>{e.preventDefault();e.stopPropagation();drop.style.background='';acceptFile(e.dataTransfer.files?.[0])};
+                inp.onchange=()=>{const f=inp.files?.[0];if(!f){S.file=null;$('xk-file-name').textContent='Chưa chọn file.';return}if(!acceptFile(f)){inp.value='';S.file=null}};
+                if(pick)pick.onclick=e=>{e.preventDefault();e.stopPropagation();inp.click()};
+            }
+            if(analyzeBtn)analyzeBtn.onclick=window.analyzeExportSlipAI;
             if($('xk-logo-file'))$('xk-logo-file').onchange=()=>saveLogo($('xk-logo-file').files?.[0]);loadLogo();$('xk-export-date').value=today();$('xk-invoice-date').value=today();
             try{refs.exportVouchers.on('value',snap=>{const d=snap.val();S.archive=d?Object.keys(d).map(k=>({id:k,...d[k]})):[];renderVoucherArchive()})}catch(e){console.warn('Không nghe được exportVouchers',e);if($('xk-voucher-list'))$('xk-voucher-list').innerHTML='<div style="padding:12px;color:#b91c1c">Chưa kết nối được danh sách phiếu Firebase.</div>'}
         }
         window.guideGoExportAI=()=>{closeUserGuide();const tab=document.getElementById('btn-tab2');if(tab)tab.click();setTimeout(()=>$('xk-ai-card')?.scrollIntoView({behavior:'smooth',block:'start'}),100)};
-        window.IDECO_SHARED_AI={fileRequest:aiFileRequest,textRequest:aiTextRequest,getState:()=>aiState};
         bind();
     })();
     </script>
@@ -3894,7 +4123,9 @@ async function savePacking(){if(!requireDb())return;const orderId=$('kpi-pack-or
 function editPacking(key){const p=state.packings.find(x=>x.key===key);if(!p)return;$('kpi-pack-order').value=p.orderId||'';$('kpi-pack-customer').value=p.customerName||'';$('kpi-pack-address').value=p.address||'';$('kpi-pack-date').value=p.packingDate||today();$('kpi-pack-notes').value=p.notes||'';state.editingPackingKey=key;$('kpi-pack-save').textContent='✏️ Cập nhật đơn hàng';$('kpi-pack-save').className='kpi-btn warning kpi-wide';$('kpi-pack-cancel-edit').style.display='flex';switchInnerTab('packing');$('kpi-pack-order').scrollIntoView({behavior:'smooth',block:'center'})}
 async function deletePacking(key){if(!requireDb())return;if(confirm('Bạn có chắc chắn muốn xóa đơn đóng hàng này?'))try{await refs.packings.child(key).remove();notify('Đã xóa đơn đóng hàng.','success')}catch(e){notify(e.message,'error')}}
 function showLabel(p){state.currentLabel=p;$('kpi-label-preview').innerHTML=`<div class="ttl">PHIẾU ĐÓNG HÀNG</div><div style="margin-bottom:10px"><small><b>MÃ ĐƠN HÀNG:</b></small><div style="font-size:1.65rem;font-weight:900">${esc(p.orderId)}</div></div><div style="margin-bottom:9px"><small><b>KHÁCH HÀNG:</b></small><div style="font-size:1.05rem;font-weight:800">${esc(p.customerName)}</div></div><div style="margin-bottom:9px"><small><b>ĐỊA CHỈ:</b></small><div>${esc(p.address)}</div></div><div style="margin-bottom:9px"><small><b>NGÀY ĐÓNG:</b></small><div>${esc(p.packingDate)}</div></div>${p.notes?`<div><small><b>GHI CHÚ:</b></small><div><i>${esc(p.notes)}</i></div></div>`:''}<div style="margin-top:20px;border-top:1px dashed #aaa;padding-top:8px;text-align:center;font-size:.7rem;color:#64748b">Hệ thống Quản lý Đóng hàng & Giao hàng</div>`;openModal('kpi-label-modal')}
-function printLabel(){const p=state.currentLabel;if(!p)return;const w=window.open('','_blank');if(!w)return;w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Phiếu đóng hàng - ${esc(p.orderId)}</title><style>body{font-family:Arial;padding:20px}.box{border:2px solid #111;padding:20px;width:420px;margin:auto}.ttl{text-align:center;font-size:24px;font-weight:bold;border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:15px}.f{margin:10px 0}.l{font-weight:bold;font-size:13px}.v{font-size:18px}</style></head><body><div class="box"><div class="ttl">PHIẾU ĐÓNG HÀNG</div><div class="f"><div class="l">MÃ ĐƠN HÀNG:</div><div class="v" style="font-size:28px;font-weight:bold">${esc(p.orderId)}</div></div><div class="f"><div class="l">KHÁCH HÀNG:</div><div class="v">${esc(p.customerName)}</div></div><div class="f"><div class="l">ĐỊA CHỈ:</div><div class="v">${esc(p.address)}</div></div><div class="f"><div class="l">NGÀY ĐÓNG:</div><div class="v">${esc(p.packingDate)}</div></div>${p.notes?`<div class="f"><div class="l">GHI CHÚ:</div><div class="v">${esc(p.notes)}</div></div>`:''}<div style="margin-top:20px;border-top:1px dashed #bbb;padding-top:8px;text-align:center;font-size:12px">Hệ thống Quản lý Đóng hàng & Giao hàng</div></div><script>window.onload=()=>window.print()<\/script></body></html>`);w.document.close()}
+function printLabel(){const p=state.currentLabel;if(!p)return;const w=window.open('','_blank');if(!w)return;w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Phiếu đóng hàng - ${esc(p.orderId)}</title><style>body{font-family:Arial;padding:20px}.box{border:2px solid #111;padding:20px;width:420px;margin:auto}.ttl{text-align:center;font-size:24px;font-weight:bold;border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:15px}.f{margin:10px 0}.l{font-weight:bold;font-size:13px}.v{font-size:18px}</style></head><body><div class="box"><div class="ttl">PHIẾU ĐÓNG HÀNG</div><div class="f"><div class="l">MÃ ĐƠN HÀNG:</div><div class="v" style="font-size:28px;font-weight:bold">${esc(p.orderId)}</div></div><div class="f"><div class="l">KHÁCH HÀNG:</div><div class="v">${esc(p.customerName)}</div></div><div class="f"><div class="l">ĐỊA CHỈ:</div><div class="v">${esc(p.address)}</div></div><div class="f"><div class="l">NGÀY ĐÓNG:</div><div class="v">${esc(p.packingDate)}</div></div>${p.notes?`<div class="f"><div class="l">GHI CHÚ:</div><div class="v">${esc(p.notes)}</div></div>`:''}<div style="margin-top:20px;border-top:1px dashed #bbb;padding-top:8px;text-align:center;font-size:12px">Hệ thống Quản lý Đóng hàng & Giao hàng</div></div><script>window.onload=()=>window.print()<\/script>
+
+</body></html>`);w.document.close()}
 
 function resetDelivery(){state.editingDeliveryKey=null;state.signature='';state.uploadedFile=null;$('kpi-delivery-order').value='';$('kpi-delivery-customer').value='';$('kpi-delivery-address').value='';$('kpi-delivery-date').value=today();$('kpi-delivery-deliverer').value='';$('kpi-delivery-notes').value='';$('kpi-direct-delivery').checked=false;$('kpi-delivery-file').value='';$('kpi-delivery-file-label').textContent='📎 Tải lên PDF/Ảnh';$('kpi-ai-check').style.display='none';$('kpi-sign-preview-wrap').style.display='none';$('kpi-delivery-save').textContent='🚚 Cho phép giao hàng';$('kpi-delivery-save').className='kpi-btn primary kpi-wide';$('kpi-delivery-cancel-edit').style.display='none'}
 function prepareSaveDelivery(){const orderId=$('kpi-delivery-order').value.trim().toUpperCase(),customerName=$('kpi-delivery-customer').value.trim(),delivererName=$('kpi-delivery-deliverer').value.trim();if(!orderId||!customerName||!delivererName)return notify('Vui lòng điền đầy đủ thông tin!','error');state.transferCallback=commitDelivery;openModal('kpi-transfer-modal')}
@@ -3966,8 +4197,8 @@ window.IDECOKPI={state,switchInnerTab,renderAll,savePacking,editPacking,editDeli
 const root=document.getElementById('invcheck-app'); if(!root)return;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-const state={activeTab:'analysis',stockData:[],loadingStock:true,file:null,isAnalyzing:false,statusMessage:'',analysisResults:null,historyList:[],archiveList:[],connected:false,stockSearch:''};
-const FIREBASE_CONFIG={apiKey:'AIzaSyB54vAqmLmkMPq-L0X69oRS2DdVxxtrLPc',authDomain:'quanlykho-5c64f.firebaseapp.com',databaseURL:'https://quanlykho-5c64f-default-rtdb.firebaseio.com',projectId:'quanlykho-5c64f',storageBucket:'quanlykho-5c64f.firebasestorage.app',messagingSenderId:'106024120320',appId:'1:106024120320:web:ede1dae16cb6cccd42e8e5'};
+const state={activeTab:'analysis',stockData:[],masterData:[],loadingStock:true,file:null,isAnalyzing:false,statusMessage:'',analysisResults:null,historyList:[],archiveList:[],connected:false,stockSearch:'',lastSyncAt:0};
+const FIREBASE_CONFIG={apiKey:'AIzaSyArwL_z1HJgoF1VSI2cUy7dDum_kmWuuCc',authDomain:'thunghiem-eeb1f.firebaseapp.com',databaseURL:'https://thunghiem-eeb1f-default-rtdb.firebaseio.com',projectId:'thunghiem-eeb1f',storageBucket:'thunghiem-eeb1f.firebasestorage.app',messagingSenderId:'136411195211',appId:'1:136411195211:web:553beff72c3988eb39eace'};
 let app=null,db=null,storage=null,refs={};
 function notify(msg,type='info'){try{if(typeof showToast==='function')return showToast(msg,type==='error'?'error':'success')}catch{};alert(msg)}
 function setFbStatus(msg,kind=''){const el=$('ic-firebase-status');if(!el)return;el.textContent=msg;el.className='ic-fb-status'+(kind?' '+kind:'')}
@@ -3977,43 +4208,122 @@ function toStandardDate(input){if(!input)return null;const clean=String(input).t
 function areDatesEqual(a,b){const x=toStandardDate(a),y=toStandardDate(b);return x&&y?x===y:normalizeString(a)===normalizeString(b)}
 function numberVal(v){if(v===null||v===undefined||v==='')return 0;if(typeof v==='number')return Number.isFinite(v)?v:0;let s=String(v).trim().replace(/\s/g,'');if(/^[-+]?\d{1,3}(\.\d{3})+(,\d+)?$/.test(s))s=s.replace(/\./g,'').replace(',','.');else if(/^[-+]?\d+(,\d+)$/.test(s))s=s.replace(',','.');else s=s.replace(/,/g,'');const n=Number(s);return Number.isFinite(n)?n:0}
 function dateObj(v){const d=v?new Date(v):null;return d&&!Number.isNaN(d.getTime())?d:null}
+function normKey(v){return String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/đ/g,'d').replace(/[^a-z0-9]+/g,' ').trim()}
+function cleanCodeLocal(v){return String(v??'').toUpperCase().replace(/[^A-Z0-9]/g,'')}
+function masterColumn(row,names){if(!row||typeof row!=='object')return '';const keys=Object.keys(row);for(const n of names){const k=keys.find(x=>normKey(x)===normKey(n));if(k!==undefined&&row[k]!==undefined&&row[k]!==null)return row[k]}return ''}
+function invoiceMasterRecord(row){if(!row)return {code:'',name:'',unit:'',strength:'',packSpec:''};return {
+  code:String(row.code??masterColumn(row,['Mã SP','Mã Sản Phẩm','Mã','Code','SKU'])??'').trim(),
+  name:String(row.name??masterColumn(row,['Tên SP','Tên Sản Phẩm','Tên Hàng Hóa','Tên','Product Name','Product'])??'').trim(),
+  unit:String(row.unit??masterColumn(row,['Đơn Vị','Đơn Vị Tính','ĐVT','Unit'])??'').trim(),
+  strength:String(row.strength??masterColumn(row,['Hàm Lượng / Nồng Độ','Hàm Lượng','Hàm lượng','Nồng Độ','Nồng độ','Strength','Concentration'])??'').trim(),
+  packSpec:String(row.packSpec??masterColumn(row,['Quy Cách','Quy cách','Quy Cách Đóng Gói','Quy cách đóng gói','Pack','Packaging'])??'').trim()
+}}
+function flattenMasterFiles(raw){const map=new Map();Object.entries(raw||{}).forEach(([fileId,f])=>{const data=f?.data;if(!data)return;(Array.isArray(data)?data:Object.values(data)).forEach(row=>{const m=invoiceMasterRecord(row);if(!m.name)return;const isSample=cleanCodeLocal(m.code)==='THVIDU01'&&normKey(m.name).includes('ten san pham mau');if(isSample)return;const id=m.code?`C:${cleanCodeLocal(m.code)}`:`N:${normKey(m.name)}`;map.set(id,{...m,searchKey:normKey(m.name),sourceFile:f?.fileName||fileId})})});return [...map.values()]}
+function masterCompatibility(sourceName,masterName){const shared=window.IDECO_SHARED_AI;if(shared&&typeof shared.masterNameCompatibility==='function'){try{return shared.masterNameCompatibility(sourceName,masterName)}catch{}}const a=normKey(sourceName),b=normKey(masterName);if(a&&b&&a===b)return {accepted:true,level:'exact',score:1,reason:'Tên trùng chuẩn hóa'};const at=a.split(' ').filter(x=>x.length>2),bt=b.split(' ').filter(x=>x.length>2),same=at.filter(x=>bt.includes(x)).length,score=Math.max(at.length,bt.length)?same/Math.max(at.length,bt.length):0;return {accepted:score>=.6,level:score>=.8?'safe':score>=.6?'near':'bad',score,reason:'So tên cục bộ'}}
+function findMasterForInvoice(inv){const code=cleanCodeLocal(inv.productCode||'');if(code){const byCode=state.masterData.filter(m=>cleanCodeLocal(m.code)===code);if(byCode.length===1){const compat=masterCompatibility(inv.productName,byCode[0].name);if(!inv.productName||compat.accepted)return {master:byCode[0],type:'code',compat};return {master:null,type:'conflict',compat,candidates:byCode,reason:`Mã ${inv.productCode} có trong Master nhưng tên hóa đơn không phù hợp với ${byCode[0].name}`}}}
+  const name=normKey(inv.productName);if(!name)return {master:null,type:'none',candidates:[]};const exact=state.masterData.filter(m=>m.searchKey===name);if(exact.length===1)return {master:exact[0],type:'exact_name',compat:{accepted:true,level:'exact',score:1}};
+  const scored=state.masterData.map(m=>({m,c:masterCompatibility(inv.productName,m.name)})).filter(x=>x.c?.accepted).sort((a,b)=>(b.c.score||0)-(a.c.score||0));if(!scored.length)return {master:null,type:'none',candidates:[]};if(scored.length===1||((scored[0].c.score||0)-(scored[1].c.score||0)>=.12))return {master:scored[0].m,type:'safe_name',compat:scored[0].c,candidates:scored.slice(0,5).map(x=>x.m)};return {master:null,type:'ambiguous',compat:scored[0].c,candidates:scored.slice(0,5).map(x=>x.m),reason:'Tên hóa đơn gần nhiều sản phẩm Master, cần kiểm tra thủ công.'}}
 function keyFor(code,lot,exp){return `${code||''}|${lot||''}|${exp||''}`}
 function processInventoryLogic(rawStockData,rawExportData){const today=new Date(),startDate=new Date(today.getFullYear(),today.getMonth(),1),endDate=new Date();startDate.setHours(0,0,0,0);endDate.setHours(23,59,59,999);const batchMap={};
   (rawStockData||[]).forEach(item=>{const key=keyFor(item.productCode,item.lotNumber,item.expiryDate);if(!batchMap[key])batchMap[key]={code:item.productCode||'',name:item.productName||'',unit:item.unit||'',lot:item.lotNumber||'',exp:item.expiryDate||'',importDate:item.importDate?dateObj(item.importDate):null,currentQty:0,historyList:[]};batchMap[key].currentQty+=numberVal(item.quantity)});
   (rawExportData||[]).forEach(exp=>{const key=keyFor(exp.productCode,exp.lotNumber,exp.expiryDate);if(!batchMap[key])batchMap[key]={code:exp.productCode||'',name:exp.productName||'',unit:exp.unit||'',lot:exp.lotNumber||'',exp:exp.expiryDate||'',importDate:null,currentQty:0,historyList:[]};const d=dateObj(exp.exportDate);batchMap[key].historyList.push({date:d||new Date(0),qty:numberVal(exp.quantity)})});
   const out=Object.values(batchMap).map(batch=>{const totalLifetimeExport=batch.historyList.reduce((s,h)=>s+h.qty,0),originalImportQty=batch.currentQty+totalLifetimeExport;let open=0,input=0,output=0;output=batch.historyList.filter(h=>h.date>=startDate&&h.date<=endDate).reduce((s,h)=>s+h.qty,0);if(batch.importDate&&batch.importDate>=startDate&&batch.importDate<=endDate)input=originalImportQty;const exportsBeforeStart=batch.historyList.filter(h=>h.date<startDate).reduce((s,h)=>s+h.qty,0);const isImportedBeforeStart=!(batch.importDate&&batch.importDate>=startDate);if(isImportedBeforeStart)open=originalImportQty-exportsBeforeStart;const close=open+input-output;return {...batch,open,input,output,close}});out.sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'vi')||String(a.lot||'').localeCompare(String(b.lot||''),'vi'));return out}
-function findBestMatch(invItem,stockList){const invLot=normalizeString(invItem.lotNumber),invName=normalizeString(invItem.productName);const lotMatches=stockList.filter(s=>normalizeString(s.lot)===invLot);if(lotMatches.length){const both=lotMatches.find(s=>normalizeString(s.name).includes(invName)||invName.includes(normalizeString(s.name)));if(both)return {type:'exact_lot_name',item:both};return {type:'lot_only',item:lotMatches[0]}}const nameMatch=stockList.find(s=>normalizeString(s.name)===invName||(normalizeString(s.name).includes(invName)&&invName.length>5));if(nameMatch)return {type:'name_only',item:nameMatch};return {type:'none',item:undefined}}
-function validateItems(items){return (items||[]).map(inv=>{const m=findBestMatch(inv,state.stockData);if(!m.item)return {status:'not_found',invoiceItem:inv,message:'Sản phẩm chưa có trong dữ liệu báo cáo tồn kho (Không tìm thấy Tên hoặc Số lô).'};const s=m.item;if(m.type==='name_only')return {status:'error',invoiceItem:inv,matchedStockItem:s,message:`Sai Số Lô! HĐ: ${inv.lotNumber||''} - Kho đang có lô: ${s.lot||''}`};if(!areDatesEqual(inv.expiryDate,s.exp))return {status:'error',invoiceItem:inv,matchedStockItem:s,message:`Sai Hạn Sử Dụng! HĐ: ${inv.expiryDate||''} vs Kho: ${s.exp||''}`};return {status:'ok',invoiceItem:inv,matchedStockItem:s,message:m.type==='lot_only'?`Khớp mã lô & hạn dùng. (Tên kho: ${s.name})`:'Thông tin khớp hoàn toàn.'}})}
+function stockRowsForMaster(master){if(!master)return [];const code=cleanCodeLocal(master.code||''),name=normKey(master.name||'');if(code){const byCode=state.stockData.filter(x=>cleanCodeLocal(x.code||'')===code);if(byCode.length)return byCode;}return state.stockData.filter(x=>name&&normKey(x.name||'')===name)}
+function validateItems(items){return (items||[]).map(inv=>{const mm=findMasterForInvoice(inv);if(!mm.master){const label=mm.type==='conflict'?'MÃ/TÊN XUNG ĐỘT MASTER':mm.type==='ambiguous'?'TÊN MASTER CHƯA RÕ':'CHƯA CÓ MASTER';return {status:mm.type==='none'?'not_found':'warning',invoiceItem:inv,masterMatch:mm,message:`${label}. ${mm.reason||'Hãy kiểm tra dữ liệu Master trước khi kết luận lô/HSD.'}`}};
+  const master=mm.master,productStock=stockRowsForMaster(master);if(!productStock.length)return {status:'warning',invoiceItem:inv,matchedMaster:master,masterMatch:mm,message:`Đã khớp Master: ${master.name}, nhưng sản phẩm hiện chưa có dòng tồn kho để soi Lô/HSD.`};
+  const invLot=normalizeString(inv.lotNumber);const lotRows=productStock.filter(s=>normalizeString(s.lot)===invLot);if(!lotRows.length){const lots=[...new Set(productStock.map(s=>s.lot).filter(Boolean))].slice(0,8).join(', ');return {status:'error',invoiceItem:inv,matchedMaster:master,masterMatch:mm,matchedStockItem:productStock[0],message:`Sai/không có Số lô trong kho. HĐ: ${inv.lotNumber||'—'} · Kho đang có: ${lots||'—'}`}};
+  const exactDate=lotRows.find(s=>areDatesEqual(inv.expiryDate,s.exp));if(!exactDate){const hsds=[...new Set(lotRows.map(s=>s.exp).filter(Boolean))].slice(0,6).join(', ');return {status:'error',invoiceItem:inv,matchedMaster:master,masterMatch:mm,matchedStockItem:lotRows[0],message:`Sai Hạn sử dụng. HĐ: ${inv.expiryDate||'—'} · Master đã xác định đúng sản phẩm · Kho lô ${inv.lotNumber||'—'} có HSD: ${hsds||'—'}`}};
+  return {status:'ok',invoiceItem:{...inv,canonicalProductCode:master.code||'',canonicalProductName:master.name||''},matchedMaster:master,masterMatch:mm,matchedStockItem:exactDate,message:mm.type==='exact_name'||mm.type==='code'?'Khớp Master + Lô + HSD.':'Tên hóa đơn đã được chuẩn hóa về Master, sau đó khớp Lô + HSD.'}})}
 function formatNum(n){return Number(n)===0?'-':Number(n||0).toLocaleString('vi-VN')}
 function formatBytes(bytes){if(!bytes)return '0 Bytes';const k=1024,sizes=['Bytes','KB','MB','GB'],i=Math.floor(Math.log(bytes)/Math.log(k));return `${parseFloat((bytes/Math.pow(k,i)).toFixed(2))} ${sizes[i]}`}
 function parseJSON(text){let s=String(text||'').trim();const fence=s.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);if(fence)s=fence[1].trim();try{return JSON.parse(s)}catch{}const a=s.indexOf('['),b=s.lastIndexOf(']');if(a>=0&&b>a)return JSON.parse(s.slice(a,b+1));const c=s.indexOf('{'),d=s.lastIndexOf('}');if(c>=0&&d>c)return JSON.parse(s.slice(c,d+1));throw new Error('AI không trả JSON hợp lệ')}
-function normalizeInvoiceItems(x){let arr=Array.isArray(x)?x:(Array.isArray(x?.items)?x.items:[]);return arr.map((r,i)=>({stt:r.stt??i+1,productName:String(r.productName??r.tenHang??r.tenSP??'').trim(),lotNumber:String(r.lotNumber??r.soLo??'').trim(),expiryDate:String(r.expiryDate??r.hanDung??'').trim(),unit:String(r.unit??r.donVi??r.dvt??'').trim(),quantity:numberVal(r.quantity??r.soLuong),unitPrice:numberVal(r.unitPrice??r.donGia),amount:numberVal(r.amount??r.thanhTien),vatRate:String(r.vatRate??r.thueGTGT??'').trim(),vatAmount:numberVal(r.vatAmount??r.tienThue)})).filter(r=>r.productName||r.lotNumber||r.expiryDate)}
-const INVOICE_SCHEMA={type:'ARRAY',items:{type:'OBJECT',properties:{stt:{type:'STRING'},productName:{type:'STRING'},lotNumber:{type:'STRING'},expiryDate:{type:'STRING'},unit:{type:'STRING'},quantity:{type:'NUMBER'},unitPrice:{type:'NUMBER'},amount:{type:'NUMBER'},vatRate:{type:'STRING'},vatAmount:{type:'NUMBER'}},required:['productName','lotNumber','expiryDate']}};
-function invoicePrompt(){const unique=[...new Set(state.stockData.map(s=>s.name).filter(Boolean))];return `Analyze this pharmaceutical invoice. Extract the table data into a JSON array.\n\nCONTEXT - INVENTORY PRODUCT LIST:\n${JSON.stringify(unique)}\n\nIMPORTANT INSTRUCTION FOR PRODUCT NAMING:\nFor each item found in the invoice, check if it exists in the INVENTORY PRODUCT LIST above. If you find a match, even with minor differences like case, spaces, or common abbreviations, use the EXACT NAME from inventory as productName. If definitely new, use the name exactly as it appears on the invoice.\n\nExtract every invoice row with: stt, productName, lotNumber, expiryDate, unit, quantity, unitPrice, amount, vatRate, vatAmount. Convert expiryDate strictly to DD/MM/YYYY. Vietnamese formatted numbers such as 1.000 mean 1000. Missing field = empty string or 0. Do not omit pharmaceutical rows. Return JSON only.`}
+function normalizeInvoiceItems(x){let arr=Array.isArray(x)?x:(Array.isArray(x?.items)?x.items:[]);return arr.map((r,i)=>({stt:r.stt??i+1,productCode:String(r.productCode??r.maSP??r.maHang??'').trim(),productName:String(r.productName??r.tenHang??r.tenSP??'').trim(),strength:String(r.strength??r.hamLuong??r.nongDo??'').trim(),lotNumber:String(r.lotNumber??r.soLo??'').trim(),expiryDate:String(r.expiryDate??r.hanDung??'').trim(),unit:String(r.unit??r.donVi??r.dvt??'').trim(),quantity:numberVal(r.quantity??r.soLuong),unitPrice:numberVal(r.unitPrice??r.donGia),amount:numberVal(r.amount??r.thanhTien),vatRate:String(r.vatRate??r.thueGTGT??'').trim(),vatAmount:numberVal(r.vatAmount??r.tienThue)})).filter(r=>r.productName||r.productCode||r.lotNumber||r.expiryDate)}
+const INVOICE_SCHEMA={type:'ARRAY',items:{type:'OBJECT',properties:{stt:{type:'STRING'},productCode:{type:'STRING'},productName:{type:'STRING'},strength:{type:'STRING'},lotNumber:{type:'STRING'},expiryDate:{type:'STRING'},unit:{type:'STRING'},quantity:{type:'NUMBER'},unitPrice:{type:'NUMBER'},amount:{type:'NUMBER'},vatRate:{type:'STRING'},vatAmount:{type:'NUMBER'}},required:['productName','lotNumber','expiryDate']}};
+function invoicePrompt(){const masterList=state.masterData.map(m=>({code:m.code||'',name:m.name||'',strength:m.strength||''}));return `Bạn đang đọc HÓA ĐƠN THUỐC để đối chiếu kho GDP. Hãy trích toàn bộ dòng hàng thành JSON array.
+
+MASTER CHÍNH THỨC CỦA KHO (chỉ dùng để nhận diện, không được bịa Lô/HSD):
+${JSON.stringify(masterList)}
+
+QUY TẮC:
+1) Trích: stt, productCode nếu hóa đơn có, productName đúng nội dung hóa đơn, strength nếu có, lotNumber, expiryDate, unit, quantity, unitPrice, amount, vatRate, vatAmount.
+2) KHÔNG tự sửa productName theo Master và KHÔNG tự bịa mã. Hệ thống sẽ soi Master bằng thuật toán sau khi AI đọc xong.
+3) Số lô và HSD phải lấy đúng từ hóa đơn. expiryDate chuẩn DD/MM/YYYY.
+4) Không bỏ sót dòng thuốc. Số Việt Nam 1.000 = 1000 khi là định dạng hàng nghìn.
+5) Thiếu trường thì để chuỗi rỗng/0. Chỉ trả JSON hợp lệ.`}
 async function uploadInvoiceFile(file){if(!storage||!refs.archive)throw new Error('Firebase Storage chưa sẵn sàng');const timestamp=Date.now(),filePath=`archives/${timestamp}_${file.name}`,fileRef=storage.ref(filePath),snap=await fileRef.put(file),downloadUrl=await snap.ref.getDownloadURL(),newRef=refs.archive.push();await newRef.set({fileName:file.name,downloadUrl,storagePath:filePath,timestamp,size:file.size})}
 async function saveInvoiceResult(fileName,results){if(!refs.history)return;const ok=results.filter(r=>r.status==='ok').length,error=results.filter(r=>r.status==='error').length,warning=results.filter(r=>r.status==='warning'||r.status==='not_found').length;try{await refs.history.push({fileName,timestamp:Date.now(),results,summary:{ok,error,warning}})}catch(e){console.warn('Invoice history save',e)}}
 async function cleanupOldHistory(){if(!refs.history)return;const cutoff=Date.now()-5*24*60*60*1000;try{const snap=await refs.history.once('value');if(!snap.exists())return;const updates={};snap.forEach(ch=>{const d=ch.val();if(d?.timestamp&&d.timestamp<cutoff)updates[ch.key]=null});if(Object.keys(updates).length)await refs.history.update(updates)}catch(e){console.warn('Cleanup invoice history',e)}}
 async function cleanupOldArchives(){if(!refs.archive||!storage)return;const cutoff=Date.now()-10*24*60*60*1000;try{const snap=await refs.archive.once('value');if(!snap.exists())return;const updates={},deletes=[];snap.forEach(ch=>{const d=ch.val();if(d?.timestamp&&d.timestamp<cutoff){updates[ch.key]=null;if(d.storagePath)deletes.push(storage.ref(d.storagePath).delete().catch(er=>console.warn('Archive storage delete',er)))}});if(Object.keys(updates).length){await Promise.all(deletes);await refs.archive.update(updates)}}catch(e){console.warn('Cleanup archives',e)}}
 async function deleteHistory(id){if(!id||!refs.history)return;if(!confirm('Bạn có chắc chắn muốn xóa bản ghi này không?'))return;try{await refs.history.child(id).remove()}catch(e){notify('Lỗi khi xóa bản ghi.','error')}}
 async function fetchInventoryData(){if(!refs.stock||!refs.exports)throw new Error('Firebase chưa sẵn sàng');const [a,b]=await Promise.all([refs.stock.once('value'),refs.exports.once('value')]);return processInventoryLogic(Object.values(a.val()||{}),Object.values(b.val()||{}))}
-async function runAnalysis(){if(!state.file||state.isAnalyzing)return;state.isAnalyzing=true;setStatus('Đang tải lên kho (tối đa 10s)...',true);try{const up=uploadInvoiceFile(state.file),timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error('Upload timed out')),10000));try{await Promise.race([up,timeout])}catch(e){console.warn('Upload skipped/failed',e);setStatus(e?.message==='Upload timed out'?'Mạng chậm, bỏ qua lưu trữ...':'Lỗi lưu trữ, đang phân tích...',true);await new Promise(r=>setTimeout(r,700))}setStatus('Đang đọc dữ liệu hóa đơn...',true);const shared=window.IDECO_SHARED_AI;if(!shared||typeof shared.fileRequest!=='function')throw new Error('Module AI chung chưa sẵn sàng. Vui lòng kiểm tra Cài đặt AI.');setStatus('AI đang phân tích...',true);const rr=await shared.fileRequest(state.file,invoicePrompt(),{jsonSchema:INVOICE_SCHEMA,purpose:'Kiểm tra hóa đơn thuốc'});const invoiceItems=normalizeInvoiceItems(parseJSON(rr.text));if(!invoiceItems.length)throw new Error('AI không đọc được dòng hàng nào trong hóa đơn.');setStatus('Đang so sánh dữ liệu...',true);const results=validateItems(invoiceItems);state.analysisResults=results;renderResults();await saveInvoiceResult(state.file.name,results)}catch(e){console.error('Invoice analysis',e);notify('Lỗi khi phân tích hóa đơn: '+(e?.message||'Unknown Error'),'error')}finally{state.isAnalyzing=false;setStatus('',false)}}
+async function fetchMasterData(){if(!refs.master)throw new Error('Master Firebase chưa sẵn sàng');const snap=await refs.master.once('value');return flattenMasterFiles(snap.val()||{})}
+let sharedRefreshTimer=null;
+function scheduleSharedRefresh(){clearTimeout(sharedRefreshTimer);sharedRefreshTimer=setTimeout(()=>refreshSharedData(false),180)}
+async function refreshSharedData(showBusy=true){if(showBusy)state.loadingStock=true;try{const [stock,master]=await Promise.all([fetchInventoryData(),fetchMasterData()]);state.stockData=stock;state.masterData=master;state.lastSyncAt=Date.now();state.connected=true;setFbStatus(`🟢 FIREBASE TEST CHUNG · Master ${master.length} SP · Kho ${stock.length} lô`,'ok')}catch(e){console.error('Invoice shared refresh',e);setFbStatus('🔴 Firebase TEST chung lỗi đồng bộ','bad');if(showBusy)notify('Không đồng bộ được Master/Tồn kho: '+e.message,'error')}finally{state.loadingStock=false;renderStock()}}
+async function runAnalysis(){if(!state.file||state.isAnalyzing)return;state.isAnalyzing=true;setStatus('Đang đồng bộ Master + Tồn kho mới nhất...',true);try{const syncPromise=refreshSharedData(false);const up=uploadInvoiceFile(state.file),timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error('Upload timed out')),10000));try{await Promise.race([up,timeout])}catch(e){console.warn('Upload skipped/failed',e);setStatus(e?.message==='Upload timed out'?'Storage chậm, bỏ qua lưu file...':'Storage chưa sẵn sàng, vẫn tiếp tục phân tích...',true)}await syncPromise;if(!state.masterData.length)throw new Error('Firebase TEST chưa có MASTER. Hãy nạp Dữ liệu Gốc trước khi soi hóa đơn.');setStatus('AI đang đọc hóa đơn...',true);const shared=window.IDECO_SHARED_AI;if(!shared||typeof shared.fileRequest!=='function')throw new Error('Module AI chung chưa sẵn sàng. Vui lòng kiểm tra Cài đặt AI.');const rr=await shared.fileRequest(state.file,invoicePrompt(),{jsonSchema:INVOICE_SCHEMA,purpose:'Kiểm tra hóa đơn thuốc'});const invoiceItems=normalizeInvoiceItems(parseJSON(rr.text));if(!invoiceItems.length)throw new Error('AI không đọc được dòng hàng nào trong hóa đơn.');setStatus('Đang soi MASTER → Lô → HSD trên Firebase TEST...',true);const results=validateItems(invoiceItems);state.analysisResults=results;renderResults();await saveInvoiceResult(state.file.name,results)}catch(e){console.error('Invoice analysis',e);notify('Lỗi khi phân tích hóa đơn: '+(e?.message||'Unknown Error'),'error')}finally{state.isAnalyzing=false;setStatus('',false)}}
 function showHistory(){state.analysisResults=null;$('ic-results-container').style.display='none';$('ic-history-container').style.display='flex'}
-function renderResults(){const results=state.analysisResults;if(!results){showHistory();return}$('ic-history-container').style.display='none';$('ic-results-container').style.display='flex';const errors=results.filter(r=>r.status==='error').length,warnings=results.filter(r=>r.status==='warning').length,ok=results.filter(r=>r.status==='ok').length;$('ic-result-summary').innerHTML=`<span class="ic-mini ok">Hợp lệ: ${ok}</span><span class="ic-mini err">Lỗi: ${errors}</span><span class="ic-mini warn">Cảnh báo: ${warnings}</span>`;$('ic-results-list').innerHTML=results.length?results.map((r,i)=>{const inv=r.invoiceItem||{},s=r.matchedStockItem;return `<div class="ic-result ${esc(r.status)}"><div class="ic-result-top"><div class="ic-result-title">${esc(inv.productName||'')}</div><span class="ic-status-badge">${r.status==='not_found'?'SP Mới':esc(r.status)}</span></div><div class="ic-compare"><div><small>Hóa Đơn</small>Lô: <b class="ic-lot">${esc(inv.lotNumber||'')}</b><br>Hạn: <b class="ic-lot">${esc(inv.expiryDate||'')}</b></div><div>${s?`<small>Kho Dữ Liệu (Trùng Tên)</small>Lô: <b class="ic-lot">${esc(s.lot||'')}</b><br>Hạn: <b class="ic-lot">${esc(s.exp||'')}</b>`:'<span class="ic-muted"><i>Không tìm thấy dữ liệu cũ</i></span>'}</div></div>${r.status!=='ok'?`<div class="ic-message">⚠️ ${esc(r.message||'')}</div>`:''}</div>`}).join(''):'<div class="ic-empty">Chưa có kết quả phân tích.</div>'}
+function renderResults(){const results=state.analysisResults;if(!results){showHistory();return}$('ic-history-container').style.display='none';$('ic-results-container').style.display='flex';const errors=results.filter(r=>r.status==='error').length,warnings=results.filter(r=>r.status==='warning'||r.status==='not_found').length,ok=results.filter(r=>r.status==='ok').length;$('ic-result-summary').innerHTML=`<span class="ic-mini ok">Hợp lệ: ${ok}</span><span class="ic-mini err">Lỗi: ${errors}</span><span class="ic-mini warn">Cảnh báo: ${warnings}</span>`;$('ic-results-list').innerHTML=results.length?results.map((r,i)=>{const inv=r.invoiceItem||{},m=r.matchedMaster,s=r.matchedStockItem;const badge=r.status==='not_found'?'CHƯA CÓ MASTER':r.status==='warning'?'CẦN KIỂM TRA':r.status;return `<div class="ic-result ${esc(r.status)}"><div class="ic-result-top"><div class="ic-result-title">${esc(inv.productName||'')}</div><span class="ic-status-badge">${esc(badge)}</span></div><div class="ic-compare"><div><small>1 · HÓA ĐƠN AI ĐỌC</small>${inv.productCode?`Mã: <b>${esc(inv.productCode)}</b><br>`:''}Tên: <b>${esc(inv.productName||'')}</b><br>Lô: <b class="ic-lot">${esc(inv.lotNumber||'')}</b><br>HSD: <b class="ic-lot">${esc(inv.expiryDate||'')}</b></div><div>${m?`<small>2 · MASTER CHÍNH THỨC</small>Mã: <b>${esc(m.code||'—')}</b><br>Tên chuẩn: <b>${esc(m.name||'')}</b><br>${m.strength?`Hàm lượng/NĐ: ${esc(m.strength)}<br>`:''}${m.packSpec?`Quy cách: ${esc(m.packSpec)}<br>`:''}${s?`<small style="margin-top:6px">3 · LÔ TỒN KHO KHỚP</small>Lô: <b class="ic-lot">${esc(s.lot||'')}</b><br>HSD: <b class="ic-lot">${esc(s.exp||'')}</b><br>Tồn: <b>${formatNum(s.close)}</b>`:'<span class="ic-muted">Chưa xác định được lô tồn khớp.</span>'}`:'<span class="ic-muted"><i>Chưa quy được về Master chính thức.</i></span>'}</div></div><div class="ic-message" style="color:${r.status==='ok'?'#166534':'#b91c1c'}">${r.status==='ok'?'✅':'⚠️'} ${esc(r.message||'')}</div></div>`}).join(''):'<div class="ic-empty">Chưa có kết quả phân tích.</div>'}
 function renderHistory(){const list=state.historyList;$('ic-history-count').textContent=list.length;$('ic-history-list').innerHTML=list.length?list.map(x=>`<div class="ic-history-item"><div style="min-width:0;flex:1"><div class="ic-history-name" title="${esc(x.fileName)}">${esc(x.fileName)}</div><div class="ic-muted">${new Date(x.timestamp).toLocaleString('vi-VN')}</div><div class="ic-summary">${Number(x.summary?.error)>0?`<span class="ic-mini err">${Number(x.summary.error)} lỗi</span>`:''}${Number(x.summary?.warning)>0?`<span class="ic-mini warn">${Number(x.summary.warning)} cảnh báo</span>`:''}<span class="ic-mini ok">${Number(x.summary?.ok)||0} ok</span></div></div><div class="ic-actions"><button class="ic-btn primary" type="button" data-ic-history-view="${esc(x.id)}">Xem</button><button class="ic-btn danger" type="button" data-ic-history-delete="${esc(x.id)}">🗑</button></div></div>`).join(''):'<div class="ic-empty">Chưa có lịch sử kiểm tra.</div>'}
 function renderStock(){const q=normalizeString(state.stockSearch),rows=q?state.stockData.filter(x=>normalizeString(x.name).includes(q)||normalizeString(x.code).includes(q)||normalizeString(x.lot).includes(q)):state.stockData;$('ic-stock-count').textContent=`${rows.length} dòng`;if(state.loadingStock){$('ic-stock-loading').style.display='block';$('ic-stock-loading').textContent='⏳ Đang tải dữ liệu kho...';$('ic-stock-table-wrap').style.display='none';return}if(!state.stockData.length){$('ic-stock-loading').style.display='block';$('ic-stock-loading').textContent='Không có dữ liệu tồn kho.';$('ic-stock-table-wrap').style.display='none';return}$('ic-stock-loading').style.display='none';$('ic-stock-table-wrap').style.display='block';$('ic-stock-tbody').innerHTML=rows.length?rows.map((r,i)=>`<tr><td style="text-align:center;color:#64748b">${i+1}</td><td class="ic-code">${esc(r.code||'')}</td><td><b>${esc(r.name||'')}</b></td><td class="ic-lot">${esc(r.lot||'')}</td><td>${esc(r.exp||'')}</td><td class="ic-qty">${formatNum(r.close)}</td></tr>`).join(''):`<tr><td colspan="6" class="ic-empty">Không tìm thấy kết quả phù hợp “${esc(state.stockSearch)}”</td></tr>`}
 function renderArchive(){const list=state.archiveList;$('ic-archive-count').textContent=`Tổng file: ${list.length}`;$('ic-archive-grid').innerHTML=list.length?list.map(f=>`<div class="ic-file-card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:start"><div class="ic-file-icon">📄</div><span class="ic-bubble">${esc(formatBytes(Number(f.size)||0))}</span></div><div class="ic-file-name" title="${esc(f.fileName)}">${esc(f.fileName)}</div><div class="ic-muted" style="margin-top:5px">Ngày tạo: ${new Date(f.timestamp).toLocaleDateString('vi-VN')}<br>${new Date(f.timestamp).toLocaleTimeString('vi-VN')}</div><a class="ic-download" href="${esc(f.downloadUrl||'#')}" target="_blank" rel="noopener noreferrer">⬇️ Tải Hóa Đơn</a></div>`).join(''):'<div class="ic-empty" style="grid-column:1/-1">📂<br><br>Chưa có hóa đơn nào được lưu trữ.</div>'}
 function switchInnerTab(name){state.activeTab=name;root.querySelectorAll('.ic-tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.icTab===name));root.querySelectorAll('.ic-panel').forEach(p=>p.classList.remove('active'));$('ic-panel-'+name)?.classList.add('active')}
-function bindRealtime(){refs.history.on('value',snap=>{const v=snap.val();state.historyList=v?Object.entries(v).map(([id,x])=>({id,...x})).sort((a,b)=>b.timestamp-a.timestamp):[];renderHistory()},e=>console.warn('History realtime',e));refs.archive.on('value',snap=>{const v=snap.val();state.archiveList=v?Object.entries(v).map(([id,x])=>({id,...x})).sort((a,b)=>b.timestamp-a.timestamp):[];renderArchive()},e=>console.warn('Archive realtime',e))}
-async function initFirebase(){setFbStatus('⏳ Đang kết nối dữ liệu hóa đơn...');try{try{app=firebase.app('IDECO_INVOICE_CHECK_APP')}catch{app=firebase.initializeApp(FIREBASE_CONFIG,'IDECO_INVOICE_CHECK_APP')}db=firebase.database(app);if(typeof firebase.storage!=='function')throw new Error('Firebase Storage SDK chưa tải.');storage=firebase.storage(app);refs={stock:db.ref('pharmaceuticals'),exports:db.ref('exports'),history:db.ref('invoice_checks'),archive:db.ref('archived_files')};bindRealtime();cleanupOldHistory();cleanupOldArchives();state.stockData=await fetchInventoryData();state.connected=true;setFbStatus('🟢 Hóa đơn Firebase đã kết nối','ok')}catch(e){console.error('Invoice Firebase',e);setFbStatus('🔴 Firebase hóa đơn lỗi kết nối','bad');notify('Không thể tải dữ liệu kho của ứng dụng Kiểm tra hóa đơn từ Firebase: '+e.message,'error')}finally{state.loadingStock=false;renderStock()}}
+function bindRealtime(){refs.history.on('value',snap=>{const v=snap.val();state.historyList=v?Object.entries(v).map(([id,x])=>({id,...x})).sort((a,b)=>b.timestamp-a.timestamp):[];renderHistory()},e=>console.warn('History realtime',e));refs.archive.on('value',snap=>{const v=snap.val();state.archiveList=v?Object.entries(v).map(([id,x])=>({id,...x})).sort((a,b)=>b.timestamp-a.timestamp):[];renderArchive()},e=>console.warn('Archive realtime',e));refs.stock.on('value',scheduleSharedRefresh,e=>console.warn('Stock realtime',e));refs.exports.on('value',scheduleSharedRefresh,e=>console.warn('Exports realtime',e));refs.master.on('value',scheduleSharedRefresh,e=>console.warn('Master realtime',e))}
+async function initFirebase(){setFbStatus('⏳ Đang nối Firebase TEST chung...');try{try{app=firebase.app()}catch{app=firebase.initializeApp(FIREBASE_CONFIG)}db=firebase.database(app);storage=typeof firebase.storage==='function'?firebase.storage(app):null;refs={stock:db.ref('pharmaceuticals'),exports:db.ref('exports'),master:db.ref('excelFiles'),history:db.ref('invoice_checks'),archive:db.ref('archived_files')};bindRealtime();cleanupOldHistory();if(storage)cleanupOldArchives();await refreshSharedData(true);const suffix=storage?'':' · Storage chưa bật';setFbStatus(`🟢 FIREBASE TEST CHUNG · Master ${state.masterData.length} SP · Kho ${state.stockData.length} lô${suffix}`,'ok')}catch(e){console.error('Invoice Firebase',e);setFbStatus('🔴 Firebase TEST chung lỗi kết nối','bad');notify('Không thể tải Master/Tồn kho Firebase TEST: '+e.message,'error')}finally{state.loadingStock=false;renderStock()}}
 root.querySelectorAll('.ic-tab-btn').forEach(b=>b.addEventListener('click',()=>switchInnerTab(b.dataset.icTab)));
 $('ic-file-input').addEventListener('change',e=>{const f=e.target.files?.[0]||null;if(f&&f.type&&f.type!=='application/pdf'&&!String(f.name).toLowerCase().endsWith('.pdf')){notify('Ứng dụng gốc chỉ nhận file hóa đơn PDF.','error');e.target.value='';state.file=null}else state.file=f;state.analysisResults=null;showHistory();$('ic-analyze-btn').disabled=!state.file});
 $('ic-analyze-btn').onclick=runAnalysis;$('ic-back-history').onclick=showHistory;$('ic-reset-results').onclick=showHistory;$('ic-stock-search').addEventListener('input',e=>{state.stockSearch=e.target.value;renderStock()});
 $('ic-history-list').addEventListener('click',e=>{const view=e.target.closest('[data-ic-history-view]'),del=e.target.closest('[data-ic-history-delete]');if(view){const x=state.historyList.find(y=>y.id===view.dataset.icHistoryView);if(x){state.analysisResults=x.results||[];renderResults();switchInnerTab('analysis')}}else if(del)deleteHistory(del.dataset.icHistoryDelete)});
 window.guideGoInvoiceChecker=()=>{try{if(typeof closeUserGuide==='function')closeUserGuide()}catch{};document.getElementById('btn-tab5')?.click();setTimeout(()=>root.scrollIntoView({behavior:'smooth',block:'start'}),80)};
-window.IDECOInvoiceChecker={state,runAnalysis,renderStock,renderHistory,renderArchive,switchInnerTab,fetchInventoryData};
+window.IDECOInvoiceChecker={state,runAnalysis,renderStock,renderHistory,renderArchive,switchInnerTab,fetchInventoryData,fetchMasterData,refreshSharedData};
 initFirebase();renderHistory();renderArchive();
 })();
 </script>
 
+<script>
+(function(){
+  function applyToggle(buttonId, shellId, collapsedText, expandedText){
+    const btn=document.getElementById(buttonId); const shell=document.getElementById(shellId);
+    if(!btn || !shell) return;
+    const key='ideco_'+buttonId+'_collapsed';
+    const setState=(collapsed)=>{
+      shell.classList.toggle('is-collapsed', collapsed);
+      btn.textContent = collapsed ? collapsedText : expandedText;
+      btn.setAttribute('aria-expanded', String(!collapsed));
+      try{ localStorage.setItem(key, collapsed ? '1' : '0'); }catch(e){}
+    };
+    btn.addEventListener('click', ()=> setState(!shell.classList.contains('is-collapsed')));
+    let collapsed=false; try{ collapsed = localStorage.getItem(key)==='1'; }catch(e){}
+    setState(collapsed);
+  }
+  function init(){
+    applyToggle('toggle-ai-left-panel','ai-grid-shell','↔ Hiện menu trái · Thu hẹp bảng','↔ Ẩn menu trái · Mở rộng bảng');
+    applyToggle('toggle-xk-upload-panel','xk-ai-top-shell','↔ Hiện khung tải phiếu','↔ Ẩn khung tải phiếu · Mở rộng bảng');
+    applyToggle('toggle-xk-manual-left-panel','xk-manual-grid-shell','↔ Hiện menu trái trang xuất kho','↔ Ẩn menu trái trang xuất kho');
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>
+
+
+<script>
+async function openIDECOSettingsPanel(){
+    try{
+        const tabBtn=document.getElementById('btn-tab3');
+        if(tabBtn) tabBtn.click();
+        const shell=document.getElementById('ai-grid-shell');
+        if(shell && shell.classList.contains('is-collapsed')){
+            shell.classList.remove('is-collapsed');
+            try{localStorage.setItem('ideco_toggle-ai-left-panel_collapsed','0')}catch(e){}
+            const b=document.getElementById('toggle-ai-left-panel');
+            if(b){b.textContent='↔ Ẩn menu trái · Mở rộng bảng';b.setAttribute('aria-expanded','true')}
+        }
+        const details=document.getElementById('ai-settings-details');
+        if(!details) return;
+        let ok=true;
+        if(typeof requestAISettingsAccess==='function') ok=await requestAISettingsAccess();
+        if(ok){details.open=true;setTimeout(()=>details.scrollIntoView({behavior:'smooth',block:'center'}),80)}
+    }catch(e){console.error('Open settings error',e);alert('Không mở được Cài đặt: '+(e?.message||e))}
+}
+</script>
 </body>
 </html>

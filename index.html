@@ -313,6 +313,79 @@
         @media(max-width:700px){.app-login-box{padding:19px}.header-actions .btn{font-size:.75rem;padding:6px 8px}}
 
     </style>
+
+<style id="kpi-ecosystem-styles">
+/* ===== TAB 4 · QUẢN LÝ ĐÓNG HÀNG & GIAO HÀNG KPI · SCOPED ===== */
+.nav-tabs{overflow-x:auto}.nav-tab{white-space:nowrap;flex:0 0 auto}
+#tab4{background:#f5f7fa;padding:0!important;min-height:700px}
+#kpi-app{--kpi-primary:#3498db;--kpi-secondary:#2980b9;--kpi-success:#2ecc71;--kpi-warning:#f39c12;--kpi-danger:#e74c3c;--kpi-dark:#2c3e50;color:#333;font-family:Inter,Arial,sans-serif;line-height:1.45}
+#kpi-app *{box-sizing:border-box}
+#kpi-app .kpi-header{background:var(--kpi-primary);color:#fff;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;box-shadow:0 2px 6px #0002}
+#kpi-app .kpi-title{font-size:1.15rem;font-weight:900;display:flex;align-items:center;gap:8px}
+#kpi-app .kpi-status{font-size:.73rem;background:#ffffff1f;border:1px solid #ffffff55;padding:4px 8px;border-radius:999px;font-weight:700}
+#kpi-app .kpi-shell{padding:16px;max-width:1500px;margin:auto}
+#kpi-app .kpi-tabs{display:flex;overflow-x:auto;border-bottom:1px solid #dfe4ea;background:#fff;border-radius:10px 10px 0 0;position:sticky;top:0;z-index:10}
+#kpi-app .kpi-tab-btn{border:0;border-bottom:3px solid transparent;background:#fff;padding:12px 18px;white-space:nowrap;font-weight:700;color:#64748b;cursor:pointer}
+#kpi-app .kpi-tab-btn.active{color:var(--kpi-primary);border-bottom-color:var(--kpi-primary)}
+#kpi-app .kpi-panel{display:none;padding-top:16px}
+#kpi-app .kpi-panel.active{display:block}
+#kpi-app .kpi-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:18px;box-shadow:0 1px 3px #0000000d;margin-bottom:16px}
+#kpi-app .kpi-card h2,#kpi-app .kpi-card h3{margin:0 0 14px;color:#1f2937}
+#kpi-app .kpi-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+#kpi-app .kpi-grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+#kpi-app .kpi-field{position:relative}
+#kpi-app .kpi-field.full{grid-column:1/-1}
+#kpi-app label{display:block;font-size:.82rem;font-weight:800;margin:0 0 5px;color:#334155}
+#kpi-app input,#kpi-app textarea,#kpi-app select{width:100%;border:1px solid #cbd5e1;border-radius:7px;padding:9px 10px;background:#fff;font:inherit;outline:none}
+#kpi-app input:focus,#kpi-app textarea:focus,#kpi-app select:focus{border-color:var(--kpi-primary);box-shadow:0 0 0 2px #3498db20}
+#kpi-app textarea{min-height:78px;resize:vertical}
+#kpi-app .kpi-input-row{display:flex;gap:7px;align-items:stretch}
+#kpi-app .kpi-input-row input{flex:1}
+#kpi-app .kpi-btn{border:0;border-radius:7px;padding:9px 13px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:.15s}
+#kpi-app .kpi-btn:hover{filter:brightness(.96)}
+#kpi-app .kpi-btn:disabled{opacity:.55;cursor:not-allowed}
+#kpi-app .primary{background:var(--kpi-primary);color:#fff}.kpi-btn.secondary{background:#64748b;color:#fff}.kpi-btn.success{background:#16a34a;color:#fff}.kpi-btn.warning{background:#d97706;color:#fff}.kpi-btn.danger{background:#dc2626;color:#fff}.kpi-btn.purple{background:#7c3aed;color:#fff}.kpi-btn.cyan{background:#0891b2;color:#fff}.kpi-btn.green{background:#16a34a;color:#fff}
+#kpi-app .kpi-wide{width:100%;padding:11px 14px;font-size:.92rem}
+#kpi-app .kpi-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:16px}
+#kpi-app .kpi-stat{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:15px;text-align:center}
+#kpi-app .kpi-stat small{color:#64748b;font-weight:700}.kpi-stat strong{display:block;font-size:1.8rem;margin:5px 0}
+#kpi-app .blue{color:#2563eb}.kpi-stat .red{color:#dc2626}.kpi-stat .green{color:#16a34a}
+#kpi-app .kpi-table-wrap{overflow:auto;max-width:100%}
+#kpi-app table{width:100%;border-collapse:collapse;font-size:.82rem}
+#kpi-app th{background:#f8fafc;color:#475569;text-align:left;padding:9px;border-bottom:1px solid #e2e8f0;white-space:nowrap}
+#kpi-app td{padding:9px;border-bottom:1px solid #eef2f7;vertical-align:top}
+#kpi-app tr:hover td{background:#fafcff}
+#kpi-app .kpi-badge{display:inline-block;border-radius:999px;padding:3px 8px;font-size:.7rem;font-weight:900;color:#fff}.kpi-badge.ok{background:#16a34a}.kpi-badge.bad{background:#dc2626}.kpi-badge.warn{background:#d97706}
+#kpi-app .kpi-actions{display:flex;gap:5px;flex-wrap:wrap}
+#kpi-app .kpi-icon-btn{border:0;background:#f1f5f9;border-radius:6px;padding:6px 8px;cursor:pointer}.kpi-icon-btn.edit{color:#b45309}.kpi-icon-btn.del{color:#dc2626}
+#kpi-app .kpi-autocomplete{position:absolute;left:0;right:0;top:100%;z-index:30;max-height:220px;overflow:auto;border:1px solid #d4d4d4;box-shadow:0 8px 18px #0002;background:#fff}
+#kpi-app .kpi-suggestion{padding:9px 10px;border-bottom:1px solid #e5e7eb;cursor:pointer}.kpi-suggestion:hover{background:#eef6ff}
+#kpi-app .kpi-voice-status{font-size:.72rem;color:#7c3aed;margin-top:4px}.kpi-listening{background:#ef4444!important;animation:kpiPulse 1s infinite}
+@keyframes kpiPulse{50%{transform:scale(1.06)}}
+#kpi-app .kpi-upload-line{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+#kpi-app .kpi-file-label{background:#eff6ff;color:#2563eb;padding:7px 10px;border-radius:7px;font-size:.76rem;font-weight:800;cursor:pointer;border:1px solid #dbeafe;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#kpi-app .kpi-direct{display:flex;align-items:center;gap:8px;background:#eff6ff;border:1px solid #dbeafe;padding:9px;border-radius:8px}.kpi-direct input{width:18px;height:18px}
+#kpi-app .kpi-drop{border:2px dashed #cbd5e1;border-radius:10px;background:#f8fafc;padding:26px;text-align:center}
+#kpi-app .kpi-inline{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.kpi-inline>*{flex:1;min-width:150px}
+#kpi-app .kpi-modal{display:none;position:fixed;inset:0;z-index:100000;background:#0008;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(2px)}
+#kpi-app .kpi-modal.show{display:flex}
+#kpi-app .kpi-modal-box{background:#fff;border-radius:12px;box-shadow:0 18px 50px #0005;width:min(760px,96vw);max-height:92vh;overflow:auto}
+#kpi-app .kpi-modal-box.wide{width:min(1100px,98vw)}
+#kpi-app .kpi-modal-head{padding:14px 16px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;gap:10px;align-items:center;position:sticky;top:0;background:#fff;z-index:2}
+#kpi-app .kpi-modal-body{padding:16px}.kpi-modal-foot{padding:12px 16px;border-top:1px solid #e5e7eb;display:flex;justify-content:flex-end;gap:8px;background:#f8fafc}
+#kpi-app .kpi-close{border:0;background:#f1f5f9;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:18px}
+#kpi-app #kpi-signature-canvas{width:100%;height:260px;background:#fff;border:1px solid #cbd5e1;border-radius:8px;touch-action:none}
+#kpi-app .kpi-sign-preview{max-height:65px;border:1px solid #e5e7eb;background:#fff;padding:3px}
+#kpi-app .kpi-label-preview{border:2px solid #111;padding:18px;background:#fff;max-width:440px;margin:auto}.kpi-label-preview .ttl{text-align:center;border-bottom:2px solid #111;padding-bottom:8px;margin-bottom:12px;font-size:1.3rem;font-weight:900}
+#kpi-app .kpi-help-section{margin-bottom:18px}.kpi-help-section h3{color:var(--kpi-primary);margin-bottom:6px}.kpi-help-section li{margin:5px 0;color:#475569}
+#kpi-app .kpi-ai-good{background:#f0fdf4;border:1px solid #bbf7d0;padding:12px;border-radius:8px;color:#166534}.kpi-ai-bad{background:#fef2f2;border:1px solid #fecaca;padding:12px;border-radius:8px;color:#991b1b}
+#kpi-app .kpi-crop-stage{background:#e5e7eb;min-height:300px;display:flex;align-items:center;justify-content:center;overflow:auto;padding:16px}.kpi-crop-wrap{position:relative;display:inline-block;cursor:crosshair;user-select:none}.kpi-crop-wrap img{max-width:100%;max-height:65vh;display:block}.kpi-crop-rect{position:absolute;border:2px dashed #2563eb;background:#3b82f633;pointer-events:none}
+#kpi-app .kpi-search{display:flex;gap:8px}.kpi-search input{flex:1}
+#kpi-app .kpi-muted{font-size:.76rem;color:#64748b}.kpi-danger-note{background:#fff1f2;border:1px solid #fecdd3;color:#9f1239;padding:12px;border-radius:8px;line-height:1.55}
+#kpi-app .kpi-firebase-note{font-size:.73rem;color:#475569;margin-top:5px}
+@media(max-width:800px){#kpi-app .kpi-grid,#kpi-app .kpi-grid-3,#kpi-app .kpi-stats{grid-template-columns:1fr}#kpi-app .kpi-field.full{grid-column:auto}#kpi-app .kpi-header{align-items:flex-start;flex-direction:column}#kpi-app .kpi-upload-line{justify-content:flex-start}#kpi-app .kpi-tabs{position:static}}
+</style>
+
 </head>
 <body>
     <div id="app-login-overlay" class="app-login-overlay" aria-modal="true" role="dialog" aria-labelledby="app-login-title">
@@ -337,7 +410,7 @@
     <div class="container">
         <header>
             <div style="min-width:0">
-                <h1>AI AGENT QUẢN LÝ KHO DƯỢC GDP - IDECO ĐƯỢC PHÁT TRIỂN BỞI : MTRIET</h1>
+                <h1>QUẢN LÝ KHO DƯỢC GDP - IDECO</h1>
                 <div style="margin-top:5px;display:inline-flex;align-items:center;gap:6px;background:#fef3c7;color:#92400e;border:1px solid #f59e0b;border-radius:999px;padding:4px 9px;font-size:.75rem;font-weight:800;letter-spacing:.2px">🧪 FIREBASE TEST · thunghiem-eeb1f</div>
             </div>
             <div class="header-actions">
@@ -348,9 +421,10 @@
         </header>
 
         <div class="nav-tabs">
-            <div class="nav-tab active" onclick="switchTab('tab3', this)" id="btn-tab3">1. NHẬP PHIẾU NCC </div>
+            <div class="nav-tab active" onclick="switchTab('tab3', this)" id="btn-tab3">1. NHẬP PHIẾU NCC - AI</div>
             <div class="nav-tab" onclick="switchTab('tab1', this)">2. NHẬP KHO & TỒN KHO</div>
             <div class="nav-tab" onclick="switchTab('tab2', this)" id="btn-tab2">3. XUẤT KHO & BÁO CÁO</div>
+            <div class="nav-tab" onclick="switchTab('tab4', this)" id="btn-tab4">4. ĐÓNG HÀNG & GIAO HÀNG KPI</div>
         </div>
 
         <div id="tab1" class="tab-content">
@@ -728,6 +802,100 @@
 
 
 
+
+        <div id="tab4" class="tab-content">
+          <div id="kpi-app">
+            <div class="kpi-header">
+              <div>
+                <div class="kpi-title">📦🚚 Quản lý Đóng hàng & Giao hàng KPI</div>
+                <div class="kpi-firebase-note" style="color:#eaf6ff">Module chuyển nguyên chức năng từ ứng dụng gốc · Firebase riêng: quanlykho-21f95</div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <span id="kpi-firebase-status" class="kpi-status">⏳ Đang kết nối dữ liệu KPI...</span>
+                <button id="kpi-help-btn" class="kpi-btn secondary" type="button">❓ Hướng dẫn</button>
+              </div>
+            </div>
+            <div class="kpi-shell">
+              <div class="kpi-tabs">
+                <button class="kpi-tab-btn active" data-kpi-tab="packing">📦 Đóng hàng</button>
+                <button class="kpi-tab-btn" data-kpi-tab="delivery">🚚 Giao hàng</button>
+                <button class="kpi-tab-btn" data-kpi-tab="reports">📄 Báo cáo</button>
+                <button class="kpi-tab-btn" data-kpi-tab="evaluation">📊 Đánh giá</button>
+                <button class="kpi-tab-btn" data-kpi-tab="management">⚙️ Quản lý</button>
+                <button class="kpi-tab-btn" data-kpi-tab="customers">👥 Dữ liệu KH</button>
+              </div>
+
+              <section id="kpi-panel-packing" class="kpi-panel active">
+                <div class="kpi-card">
+                  <h2>➕ Nhập thông tin đóng hàng</h2>
+                  <div class="kpi-grid">
+                    <div class="kpi-field"><label>Mã đơn hàng:</label><input id="kpi-pack-order" placeholder="Nhập mã đơn..."></div>
+                    <div class="kpi-field"><label>Tên khách hàng:</label><div class="kpi-input-row"><input id="kpi-pack-customer" placeholder="Tên khách hàng..."><button class="kpi-btn purple" id="kpi-pack-customer-mic" type="button">🎙</button></div><div id="kpi-pack-customer-suggest" class="kpi-autocomplete" style="display:none"></div><div id="kpi-pack-customer-voice" class="kpi-voice-status"></div></div>
+                    <div class="kpi-field full"><label>Địa chỉ giao:</label><div class="kpi-input-row"><input id="kpi-pack-address" placeholder="Địa chỉ giao hàng..."><button class="kpi-btn green" id="kpi-pack-map" type="button">📍</button><button class="kpi-btn purple" id="kpi-pack-address-mic" type="button">🎙</button></div><div id="kpi-pack-address-voice" class="kpi-voice-status"></div></div>
+                    <div class="kpi-field"><label>Ngày đóng hàng:</label><input id="kpi-pack-date" type="date"></div>
+                    <div class="kpi-field full"><label>Ghi chú:</label><textarea id="kpi-pack-notes" placeholder="Ghi chú quy cách đóng gói..."></textarea></div>
+                  </div>
+                  <button id="kpi-pack-save" class="kpi-btn primary kpi-wide" type="button">💾 Xác nhận đơn đã đóng hàng xong</button>
+                  <button id="kpi-pack-cancel-edit" class="kpi-btn secondary kpi-wide" type="button" style="margin-top:7px;display:none">Hủy chỉnh sửa</button>
+                </div>
+                <div class="kpi-stats"><div class="kpi-stat"><small>Hôm nay</small><strong class="blue" id="kpi-stat-today-packed">0</strong><span class="kpi-muted">đơn đã đóng hàng</span></div><div class="kpi-stat"><small>Chờ giao</small><strong class="red" id="kpi-stat-waiting">0</strong><span class="kpi-muted">đơn sẵn sàng giao</span></div><div class="kpi-stat"><small>Đã kết thúc</small><strong class="green" id="kpi-stat-delivered">0</strong><span class="kpi-muted">đơn đã giao xong</span></div></div>
+                <div class="kpi-card"><h3>Danh sách đơn hàng đã đóng hôm nay</h3><div class="kpi-table-wrap"><table><thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Địa chỉ</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody id="kpi-pack-tbody"></tbody></table></div></div>
+              </section>
+
+              <section id="kpi-panel-delivery" class="kpi-panel">
+                <div class="kpi-card">
+                  <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px"><h2 style="margin:0">🚚 Nhập thông tin giao hàng</h2><div class="kpi-upload-line"><input type="file" id="kpi-delivery-file" accept="application/pdf,image/*" hidden><label class="kpi-file-label" for="kpi-delivery-file" id="kpi-delivery-file-label">📎 Tải lên PDF/Ảnh</label><button class="kpi-btn secondary" id="kpi-screen-capture" type="button">🖥 Chụp màn hình</button><button class="kpi-btn purple" id="kpi-ai-check" type="button" style="display:none">🔎 Kiểm tra AI</button></div></div>
+                  <div class="kpi-grid">
+                    <div class="kpi-field"><label>Tên khách hàng (Chọn đơn chờ giao):</label><div class="kpi-input-row"><input id="kpi-delivery-customer" placeholder="Gõ để tìm đơn chờ giao..."><button class="kpi-btn purple" id="kpi-delivery-customer-mic" type="button">🎙</button></div><div id="kpi-delivery-customer-suggest" class="kpi-autocomplete" style="display:none"></div><div id="kpi-delivery-customer-voice" class="kpi-voice-status"></div></div>
+                    <div class="kpi-field"><label>Mã đơn hàng:</label><input id="kpi-delivery-order" placeholder="Mã đơn hàng..."></div>
+                    <div class="kpi-field"><label>Tên người giao:</label><div class="kpi-input-row"><input id="kpi-delivery-deliverer" placeholder="Tên người giao..."><button class="kpi-btn cyan" id="kpi-sign-open" type="button">✍️</button></div><div id="kpi-sign-preview-wrap" style="display:none;margin-top:6px"><span class="kpi-muted">Xem trước chữ ký:</span><br><img id="kpi-sign-preview" class="kpi-sign-preview" alt="Chữ ký"></div></div>
+                    <div class="kpi-field"><label>Ngày giao hàng:</label><input id="kpi-delivery-date" type="date"></div>
+                    <div class="kpi-field full"><label>Địa chỉ giao:</label><div class="kpi-input-row"><input id="kpi-delivery-address" placeholder="Địa chỉ giao hàng..."><button class="kpi-btn green" id="kpi-delivery-map" type="button">📍</button></div></div>
+                    <div class="kpi-field full"><label>Ghi chú giao hàng:</label><textarea id="kpi-delivery-notes" placeholder="Ghi chú quá trình giao hàng..."></textarea></div>
+                    <div class="kpi-field full"><div class="kpi-direct"><input id="kpi-direct-delivery" type="checkbox"><label for="kpi-direct-delivery" style="margin:0;color:#1e40af">Giao trực tiếp (Không cần đối soát PDF/Ảnh)</label></div></div>
+                  </div>
+                  <button id="kpi-delivery-save" class="kpi-btn primary kpi-wide" type="button">🚚 Cho phép giao hàng</button>
+                  <button id="kpi-delivery-cancel-edit" class="kpi-btn secondary kpi-wide" type="button" style="margin-top:7px;display:none">Hủy chỉnh sửa</button>
+                </div>
+                <div class="kpi-card"><h3>Danh sách giao hàng hôm nay</h3><div class="kpi-table-wrap"><table><thead><tr><th>Mã đơn</th><th>Người giao</th><th>Khách hàng</th><th>Địa chỉ</th><th>Thao tác</th></tr></thead><tbody id="kpi-delivery-tbody"></tbody></table></div></div>
+              </section>
+
+              <section id="kpi-panel-reports" class="kpi-panel">
+                <div class="kpi-card"><h2>📄 Báo cáo giao hàng</h2><div class="kpi-inline"><div><label>Từ ngày:</label><input id="kpi-report-start" type="date"></div><div><label>Đến ngày:</label><input id="kpi-report-end" type="date"></div><button id="kpi-report-run" class="kpi-btn primary" type="button">🔎 Tạo báo cáo</button><button id="kpi-report-excel" class="kpi-btn success" type="button">📊 Xuất Excel</button></div></div>
+                <div class="kpi-card"><div class="kpi-table-wrap"><table><thead><tr><th>STT</th><th>Mã đơn</th><th>Ngày giao</th><th>Người giao</th><th>Khách hàng</th><th>Địa chỉ</th><th>Ghi chú</th></tr></thead><tbody id="kpi-report-tbody"></tbody></table></div></div>
+              </section>
+
+              <section id="kpi-panel-evaluation" class="kpi-panel">
+                <div class="kpi-card"><h2>📊 Đánh giá hiệu suất giao hàng</h2><div class="kpi-inline"><div><label>Ngày đánh giá:</label><input id="kpi-eval-date" type="date"></div><button id="kpi-eval-run" class="kpi-btn primary" type="button">🔄 Chạy đánh giá ngày</button><button id="kpi-eval-month" class="kpi-btn success" type="button">✅ Đánh giá tháng này</button></div></div>
+                <div class="kpi-stats"><div class="kpi-stat"><small>Đơn chờ giao</small><strong class="blue" id="kpi-eval-waiting">0</strong></div><div class="kpi-stat"><small>Lỗi hôm nay</small><strong class="red" id="kpi-eval-errors">0</strong></div><div class="kpi-stat"><small>Điểm KPI TB</small><strong class="green" id="kpi-eval-avg">100</strong></div></div>
+                <div class="kpi-card"><h3>⚠️ Danh sách lỗi giao chậm</h3><div class="kpi-table-wrap"><table><thead><tr><th>Ngày</th><th>Số đơn chờ</th><th>Trạng thái</th><th>KPI</th><th>Nhân viên</th></tr></thead><tbody id="kpi-eval-tbody"></tbody></table></div></div>
+              </section>
+
+              <section id="kpi-panel-management" class="kpi-panel">
+                <div class="kpi-card"><h2>⚙️ Quản lý đơn hàng</h2><div class="kpi-search"><input id="kpi-management-search" placeholder="Tìm kiếm mã đơn hoặc tên khách hàng..."><button id="kpi-management-clear" class="kpi-btn secondary" type="button">Xóa lọc</button></div></div>
+                <div class="kpi-card"><div class="kpi-table-wrap"><table><thead><tr><th>Mã đơn</th><th>Ngày giao</th><th>Người giao</th><th>Khách hàng</th><th>Thao tác</th></tr></thead><tbody id="kpi-management-tbody"></tbody></table></div></div>
+              </section>
+
+              <section id="kpi-panel-customers" class="kpi-panel">
+                <div class="kpi-card"><h2>👥 Quản lý dữ liệu khách hàng</h2><div class="kpi-drop"><div style="font-size:2.5rem">📥</div><p>Tải lên file Excel chứa dữ liệu khách hàng<br><small>(Cột: <b>TênKhachHang</b>, <b>DiaChi</b>)</small></p><input type="file" id="kpi-customer-excel" accept=".xlsx,.xls" hidden><label for="kpi-customer-excel" class="kpi-btn primary">Chọn file Excel</label></div></div>
+                <div class="kpi-card"><div class="kpi-table-wrap" style="max-height:430px"><table><thead><tr><th>STT</th><th>Tên khách hàng</th><th>Địa chỉ</th><th>Thao tác</th></tr></thead><tbody id="kpi-customer-tbody"></tbody></table></div></div>
+              </section>
+            </div>
+
+            <div id="kpi-help-modal" class="kpi-modal"><div class="kpi-modal-box"><div class="kpi-modal-head"><b>❓ Hướng dẫn sử dụng</b><button class="kpi-close" data-kpi-close="kpi-help-modal">×</button></div><div class="kpi-modal-body"><div class="kpi-help-section"><h3>1. Đóng hàng</h3><ul><li>Khai báo ngay sau khi đóng xong đơn hàng.</li><li>Nhập chính xác mã đơn từ ERP.</li><li>Sử dụng micro để nhập liệu nhanh bằng giọng nói.</li><li>Trạng thái “Chờ giao” là đơn chưa được xuất/giao.</li></ul></div><div class="kpi-help-section"><h3>2. Giao hàng</h3><ul><li>Chọn nhanh khách hàng từ danh sách chờ giao.</li><li>Ký tên trực tiếp trên ứng dụng để xác nhận.</li><li>Có thể tải PDF/ảnh hoặc chụp màn hình rồi dùng AI đối soát địa chỉ.</li><li>Chỉ xác nhận giao khi đã kiểm tra đủ chứng từ, kiện hàng và lộ trình.</li></ul></div><div class="kpi-help-section"><h3>3. Đánh giá KPI</h3><ul><li>Lỗi giao chậm được tính khi còn trên 2 đơn chưa giao trong ngày đánh giá.</li><li>KPI ngày = 100 điểm; từ đơn chờ thứ 3 trở đi trừ 10 điểm/đơn, tối thiểu 0.</li><li>Dữ liệu đánh giá lưu Firebase Realtime.</li></ul></div><div class="kpi-danger-note"><b>Lưu ý vận hành:</b> Module này giữ Firebase riêng của ứng dụng Đóng/Giao hàng để không trộn với tồn kho GDP. Toàn bộ vẫn nằm trong cùng một HTML và được bảo vệ bởi đăng nhập chung của hệ sinh thái.</div></div></div></div>
+
+            <div id="kpi-transfer-modal" class="kpi-modal"><div class="kpi-modal-box"><div class="kpi-modal-body"><h2 style="color:#dc2626">EM NÊN ĐỌC NỘI DUNG SAU CẨN THẬN!</h2><p style="white-space:pre-line;line-height:1.7">Em đã sẵn sàng mang đi giao hàng hay đơn vị giao đến nhận ngay chưa? Kiểm tra lại lộ trình chưa? Bao nhiêu kiện cho đơn này?\n\nKhi giao hàng đảm bảo thùng hàng có tem nhãn ghi chính xác không? Có hóa đơn, đơn hàng kèm theo thùng chưa? Phải đảm bảo đầy đủ.\n\nNếu đã bấm chuyển giao hàng thì phải hoàn thành giao hàng ngay tránh đơn hàng khai báo bị trôi tin, sót đơn trên ứng dụng.</p></div><div class="kpi-modal-foot"><button class="kpi-btn secondary" data-kpi-close="kpi-transfer-modal">Hủy</button><button id="kpi-transfer-confirm" class="kpi-btn primary">Đồng ý</button></div></div></div>
+
+            <div id="kpi-sign-modal" class="kpi-modal"><div class="kpi-modal-box"><div class="kpi-modal-head"><b>✍️ Chữ ký người giao hàng</b><button class="kpi-close" data-kpi-close="kpi-sign-modal">×</button></div><div class="kpi-modal-body"><p class="kpi-muted">Ký tên vào khung bên dưới.</p><canvas id="kpi-signature-canvas"></canvas></div><div class="kpi-modal-foot" style="justify-content:space-between"><button id="kpi-sign-clear" class="kpi-btn secondary">Xóa chữ ký</button><div style="display:flex;gap:8px"><button class="kpi-btn secondary" data-kpi-close="kpi-sign-modal">Hủy</button><button id="kpi-sign-save" class="kpi-btn primary">Lưu chữ ký</button></div></div></div></div>
+
+            <div id="kpi-label-modal" class="kpi-modal"><div class="kpi-modal-box"><div class="kpi-modal-head"><b>📄 Phiếu thông tin đóng hàng</b><button class="kpi-close" data-kpi-close="kpi-label-modal">×</button></div><div class="kpi-modal-body" style="background:#f8fafc"><div id="kpi-label-preview" class="kpi-label-preview"></div></div><div class="kpi-modal-foot"><button class="kpi-btn secondary" data-kpi-close="kpi-label-modal">Đóng</button><button id="kpi-label-print" class="kpi-btn primary">🖨 In / Tải phiếu</button></div></div></div>
+
+            <div id="kpi-ai-result-modal" class="kpi-modal"><div class="kpi-modal-box"><div class="kpi-modal-head"><b id="kpi-ai-result-title">🔎 Kết quả AI</b><button class="kpi-close" data-kpi-close="kpi-ai-result-modal">×</button></div><div id="kpi-ai-result-body" class="kpi-modal-body"></div><div class="kpi-modal-foot"><button class="kpi-btn primary" data-kpi-close="kpi-ai-result-modal">Đã hiểu</button></div></div></div>
+
+            <div id="kpi-crop-modal" class="kpi-modal"><div class="kpi-modal-box wide"><div class="kpi-modal-head"><b>🖥 Cắt ảnh từ màn hình</b><button class="kpi-close" data-kpi-close="kpi-crop-modal">×</button></div><div class="kpi-crop-stage"><div id="kpi-crop-wrap" class="kpi-crop-wrap"><img id="kpi-crop-image" alt="Screenshot"><div id="kpi-crop-rect" class="kpi-crop-rect" style="display:none"></div></div></div><div class="kpi-modal-foot"><span class="kpi-muted" style="margin-right:auto">Kéo chuột trên ảnh để chọn vùng cần cắt.</span><button class="kpi-btn secondary" data-kpi-close="kpi-crop-modal">Hủy</button><button id="kpi-crop-apply" class="kpi-btn primary">✂️ Dùng vùng đã chọn</button></div></div></div>
+          </div>
+        </div>
+
         <div id="tab3" class="tab-content active">
             <div class="ai-flow">
                 <div class="ai-step"><b>1. Phiếu Nhà Cung Cấp</b>Ảnh/PDF phiếu giao hàng, phiếu xuất hoặc hóa đơn.</div>
@@ -972,6 +1140,7 @@
                 <button class="btn btn-warning" type="button" onclick="guideGoManualFallback()">🚨 Nhập thủ công dự phòng</button>
                 <button class="btn btn-success" type="button" onclick="guideGoWarehouse()">📦 Đi đến Nhập kho</button>
                 <button class="btn btn-primary" type="button" onclick="guideGoExportAI()">🚚 Đi đến Xuất kho AI</button>
+                <button class="btn btn-primary" type="button" onclick="guideGoKPI()">📦🚚 Đóng hàng & Giao hàng KPI</button>
                 <button class="btn" type="button" onclick="closeUserGuide()" style="background:#64748b">Đóng</button>
             </div>
         </div>
@@ -3584,6 +3753,120 @@ QUY TẮC CỰC KỲ QUAN TRỌNG:
             <span>⚠️ Do cần kiểm tra kỹ nên thời gian Huyền phân tích khoảng 3 phút nhé - Bạn nên cẩn thận kiểm tra lại khi hoàn thành - Luôn thực hiện đúng SOP - Nhiệt độ kho luôn set lại dữ liệu kiểm tra - Kho thuốc nên xử lý tốt hạn dụng - Khi có thuốc mới phải báo kiểm tra danh mục KSĐB và liên thông ngay - Phiếu, biên bản lưu và in định kỳ cẩn thận - Phối hợp kế toán kiểm tra hóa đơn, phiếu xuất kho nhé - Bạn giúp làm tốt là giúp IDECO mình phát triển - BGĐ cám ơn bạn nhiều !</span>
         </div>
     </div>
+
+
+<script id="kpi-ecosystem-script">
+(function(){
+'use strict';
+const root=document.getElementById('kpi-app'); if(!root)return;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const today=()=>{const d=new Date(),o=d.getTimezoneOffset();return new Date(d.getTime()-o*60000).toISOString().slice(0,10)};
+const notify=(msg,type='info')=>{try{if(typeof showToast==='function')return showToast(msg,type==='error'?'error':type==='success'?'success':'info')}catch{} alert(msg)};
+const openModal=id=>$(id)?.classList.add('show');
+const closeModal=id=>$(id)?.classList.remove('show');
+const state={packings:[],deliveries:[],customers:[],deliverers:[],evaluations:[],editingPackingKey:null,editingDeliveryKey:null,currentLabel:null,uploadedFile:null,signature:'',transferCallback:null,reportFiltered:null,managementSearch:'',crop:{start:null,rect:null,dragging:false},connected:false};
+
+// Firebase giữ đúng project gốc của ứng dụng Đóng/Giao hàng, tách khỏi Firebase kho GDP TEST.
+const KPI_FIREBASE_CONFIG={apiKey:'AIzaSyA2Xa3zF8CCOccQhq7nvqooUTabnq5N4qM',authDomain:'quanlykho-21f95.firebaseapp.com',projectId:'quanlykho-21f95',storageBucket:'quanlykho-21f95.appspot.com',messagingSenderId:'1082567127195',appId:'1:1082567127195:web:dfec69dab7d492c095563e',measurementId:'G-RCXEM8VP68'};
+let kpiDb=null,refs={};
+function initFirebase(){
+  const st=$('kpi-firebase-status');
+  try{
+    let app; try{app=firebase.app('IDECO_KPI_APP')}catch{app=firebase.initializeApp(KPI_FIREBASE_CONFIG,'IDECO_KPI_APP')}
+    kpiDb=firebase.database(app);
+    refs={packings:kpiDb.ref('packings'),deliveries:kpiDb.ref('deliveries'),customers:kpiDb.ref('customers'),deliverers:kpiDb.ref('deliverers'),evaluations:kpiDb.ref('evaluations')};
+    const bind=(ref,key,reverse=false)=>ref.on('value',snap=>{const v=snap.val();let arr=v?Object.keys(v).map(k=>({...v[k],key:k})):[];if(reverse)arr.reverse();state[key]=arr;state.connected=true;if(st)st.textContent='🟢 KPI Firebase đã kết nối';renderAll()},err=>{console.error('KPI Firebase',key,err);if(st)st.textContent='🔴 KPI Firebase lỗi kết nối'});
+    bind(refs.packings,'packings',true);bind(refs.deliveries,'deliveries',true);bind(refs.customers,'customers');bind(refs.deliverers,'deliverers');bind(refs.evaluations,'evaluations',true);
+    try{kpiDb.ref('.info/connected').on('value',s=>{state.connected=s.val()===true;if(st)st.textContent=state.connected?'🟢 KPI Firebase đã kết nối':'🟠 KPI Firebase đang ngoại tuyến'})}catch{}
+  }catch(e){console.error(e);if(st)st.textContent='🔴 Không khởi tạo được KPI Firebase';notify('Không khởi tạo được Firebase của ứng dụng Đóng/Giao hàng: '+e.message,'error')}
+}
+function requireDb(){if(!kpiDb||!state.connected){notify('Firebase Đóng/Giao hàng chưa sẵn sàng. Vui lòng kiểm tra Internet/Firebase.','error');return false}return true}
+
+function switchInnerTab(name){root.querySelectorAll('.kpi-tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.kpiTab===name));root.querySelectorAll('.kpi-panel').forEach(p=>p.classList.toggle('active',p.id==='kpi-panel-'+name));if(name==='reports')renderReports();if(name==='management')renderManagement();}
+root.querySelectorAll('.kpi-tab-btn').forEach(b=>b.addEventListener('click',()=>switchInnerTab(b.dataset.kpiTab)));
+root.querySelectorAll('[data-kpi-close]').forEach(b=>b.addEventListener('click',()=>closeModal(b.dataset.kpiClose)));
+root.querySelectorAll('.kpi-modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id)}));
+
+function renderAll(){renderStats();renderPackings();renderDeliveries();renderCustomers();renderReports();renderEvaluations();renderManagement()}
+function renderStats(){const t=today();const packed=state.packings.filter(p=>p.packingDate===t).length;const waiting=state.packings.filter(p=>!p.isDelivered).length;const delivered=state.packings.filter(p=>p.isDelivered).length;$('kpi-stat-today-packed').textContent=packed;$('kpi-stat-waiting').textContent=waiting;$('kpi-stat-delivered').textContent=delivered;$('kpi-eval-waiting').textContent=waiting;const todayEval=state.evaluations.filter(e=>e.evaluationDate===t);$('kpi-eval-errors').textContent=todayEval.filter(e=>e.hasError).length;const avg=state.evaluations.length?Math.round(state.evaluations.reduce((s,e)=>s+(Number(e.kpiScore)||0),0)/state.evaluations.length):100;$('kpi-eval-avg').textContent=avg}
+function renderPackings(){const rows=state.packings.filter(p=>p.packingDate===today());$('kpi-pack-tbody').innerHTML=rows.length?rows.map(p=>`<tr><td><b>${esc(p.orderId)}</b></td><td>${esc(p.customerName)}</td><td>${esc(p.address)}</td><td><span class="kpi-badge ${p.isDelivered?'ok':'bad'}">${p.isDelivered?'Đã kết thúc':'Chờ giao'}</span></td><td><div class="kpi-actions"><button class="kpi-icon-btn edit" data-pack-edit="${esc(p.key)}">✏️</button><button class="kpi-icon-btn del" data-pack-del="${esc(p.key)}">🗑</button></div></td></tr>`).join(''):'<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:25px">Chưa có đơn hàng nào hôm nay</td></tr>';}
+function renderDeliveries(){const rows=state.deliveries.filter(d=>d.deliveryDate===today());$('kpi-delivery-tbody').innerHTML=rows.length?rows.map(d=>`<tr><td><b>${esc(d.orderId)}</b></td><td>${esc(d.delivererName)}</td><td>${esc(d.customerName)}</td><td>${esc(d.deliveryAddress)}</td><td><div class="kpi-actions"><button class="kpi-icon-btn edit" data-delivery-edit="${esc(d.key)}">✏️</button><button class="kpi-icon-btn del" data-delivery-del="${esc(d.key)}">🗑</button></div></td></tr>`).join(''):'<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:25px">Chưa có đơn giao hàng nào hôm nay</td></tr>';}
+function renderCustomers(){$('kpi-customer-tbody').innerHTML=state.customers.length?state.customers.map((c,i)=>`<tr><td>${i+1}</td><td><b>${esc(c.name)}</b></td><td>${esc(c.address)}</td><td><button class="kpi-icon-btn del" data-customer-del="${esc(c.key)}">🗑</button></td></tr>`).join(''):'<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:25px">Chưa có dữ liệu khách hàng</td></tr>';}
+function currentReportRows(){if(Array.isArray(state.reportFiltered))return state.reportFiltered;const a=$('kpi-report-start').value,b=$('kpi-report-end').value;if(a&&b)return state.deliveries.filter(d=>d.deliveryDate>=a&&d.deliveryDate<=b);return state.deliveries}
+function renderReports(){const rows=currentReportRows();$('kpi-report-tbody').innerHTML=rows.length?rows.map((d,i)=>`<tr><td>${i+1}</td><td><b>${esc(d.orderId)}</b></td><td>${esc(d.deliveryDate)}</td><td>${esc(d.delivererName)}</td><td>${esc(d.customerName)}</td><td>${esc(d.deliveryAddress)}</td><td>${esc(d.deliveryNotes||'')}</td></tr>`).join(''):'<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:25px">Không có dữ liệu trong khoảng chọn</td></tr>';}
+function renderEvaluations(){$('kpi-eval-tbody').innerHTML=state.evaluations.length?state.evaluations.map(e=>`<tr><td>${esc(e.evaluationDate)}</td><td>${Number(e.pendingOrderCount)||0}</td><td><span class="kpi-badge ${e.hasError?'bad':'ok'}">${e.hasError?'LỖI':'ĐẠT'}</span></td><td><b>${Number(e.kpiScore)||0}</b></td><td>${esc(e.responsibleEmployee||'')}</td></tr>`).join(''):'<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:25px">Chưa có dữ liệu đánh giá</td></tr>';}
+function renderManagement(){const q=String(state.managementSearch||'').trim().toLowerCase();const rows=state.deliveries.filter(d=>!q||String(d.orderId||'').toLowerCase().includes(q)||String(d.customerName||'').toLowerCase().includes(q)||String(d.delivererName||'').toLowerCase().includes(q));$('kpi-management-tbody').innerHTML=rows.length?rows.map(d=>`<tr><td><b>${esc(d.orderId)}</b></td><td>${esc(d.deliveryDate)}</td><td>${esc(d.delivererName)}</td><td>${esc(d.customerName)}</td><td><div class="kpi-actions"><button class="kpi-icon-btn edit" data-delivery-edit="${esc(d.key)}">✏️</button><button class="kpi-icon-btn del" data-delivery-del="${esc(d.key)}">🗑</button></div></td></tr>`).join(''):'<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:25px">Không tìm thấy đơn phù hợp</td></tr>';}
+
+function resetPacking(){state.editingPackingKey=null;$('kpi-pack-order').value='';$('kpi-pack-customer').value='';$('kpi-pack-address').value='';$('kpi-pack-date').value=today();$('kpi-pack-notes').value='';$('kpi-pack-save').textContent='💾 Xác nhận đơn đã đóng hàng xong';$('kpi-pack-save').className='kpi-btn primary kpi-wide';$('kpi-pack-cancel-edit').style.display='none'}
+async function savePacking(){if(!requireDb())return;const orderId=$('kpi-pack-order').value.trim().toUpperCase(),customerName=$('kpi-pack-customer').value.trim(),address=$('kpi-pack-address').value.trim(),packingDate=$('kpi-pack-date').value,notes=$('kpi-pack-notes').value.trim();if(!orderId||!customerName||!address)return notify('Vui lòng điền đầy đủ thông tin!','error');try{if(state.editingPackingKey){const old=state.packings.find(p=>p.key===state.editingPackingKey)||{};await refs.packings.child(state.editingPackingKey).update({orderId,customerName,address,packingDate,notes,isDelivered:!!old.isDelivered,timestamp:new Date().toISOString()});notify('Đã cập nhật thông tin đóng hàng!','success');resetPacking()}else{const data={orderId,customerName,address,packingDate,notes,isDelivered:false,timestamp:new Date().toISOString()};await refs.packings.push(data);state.currentLabel=data;showLabel(data);resetPacking()}}catch(e){notify('Không lưu được đóng hàng: '+e.message,'error')}}
+function editPacking(key){const p=state.packings.find(x=>x.key===key);if(!p)return;$('kpi-pack-order').value=p.orderId||'';$('kpi-pack-customer').value=p.customerName||'';$('kpi-pack-address').value=p.address||'';$('kpi-pack-date').value=p.packingDate||today();$('kpi-pack-notes').value=p.notes||'';state.editingPackingKey=key;$('kpi-pack-save').textContent='✏️ Cập nhật đơn hàng';$('kpi-pack-save').className='kpi-btn warning kpi-wide';$('kpi-pack-cancel-edit').style.display='flex';switchInnerTab('packing');$('kpi-pack-order').scrollIntoView({behavior:'smooth',block:'center'})}
+async function deletePacking(key){if(!requireDb())return;if(confirm('Bạn có chắc chắn muốn xóa đơn đóng hàng này?'))try{await refs.packings.child(key).remove();notify('Đã xóa đơn đóng hàng.','success')}catch(e){notify(e.message,'error')}}
+function showLabel(p){state.currentLabel=p;$('kpi-label-preview').innerHTML=`<div class="ttl">PHIẾU ĐÓNG HÀNG</div><div style="margin-bottom:10px"><small><b>MÃ ĐƠN HÀNG:</b></small><div style="font-size:1.65rem;font-weight:900">${esc(p.orderId)}</div></div><div style="margin-bottom:9px"><small><b>KHÁCH HÀNG:</b></small><div style="font-size:1.05rem;font-weight:800">${esc(p.customerName)}</div></div><div style="margin-bottom:9px"><small><b>ĐỊA CHỈ:</b></small><div>${esc(p.address)}</div></div><div style="margin-bottom:9px"><small><b>NGÀY ĐÓNG:</b></small><div>${esc(p.packingDate)}</div></div>${p.notes?`<div><small><b>GHI CHÚ:</b></small><div><i>${esc(p.notes)}</i></div></div>`:''}<div style="margin-top:20px;border-top:1px dashed #aaa;padding-top:8px;text-align:center;font-size:.7rem;color:#64748b">Hệ thống Quản lý Đóng hàng & Giao hàng</div>`;openModal('kpi-label-modal')}
+function printLabel(){const p=state.currentLabel;if(!p)return;const w=window.open('','_blank');if(!w)return;w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Phiếu đóng hàng - ${esc(p.orderId)}</title><style>body{font-family:Arial;padding:20px}.box{border:2px solid #111;padding:20px;width:420px;margin:auto}.ttl{text-align:center;font-size:24px;font-weight:bold;border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:15px}.f{margin:10px 0}.l{font-weight:bold;font-size:13px}.v{font-size:18px}</style></head><body><div class="box"><div class="ttl">PHIẾU ĐÓNG HÀNG</div><div class="f"><div class="l">MÃ ĐƠN HÀNG:</div><div class="v" style="font-size:28px;font-weight:bold">${esc(p.orderId)}</div></div><div class="f"><div class="l">KHÁCH HÀNG:</div><div class="v">${esc(p.customerName)}</div></div><div class="f"><div class="l">ĐỊA CHỈ:</div><div class="v">${esc(p.address)}</div></div><div class="f"><div class="l">NGÀY ĐÓNG:</div><div class="v">${esc(p.packingDate)}</div></div>${p.notes?`<div class="f"><div class="l">GHI CHÚ:</div><div class="v">${esc(p.notes)}</div></div>`:''}<div style="margin-top:20px;border-top:1px dashed #bbb;padding-top:8px;text-align:center;font-size:12px">Hệ thống Quản lý Đóng hàng & Giao hàng</div></div><script>window.onload=()=>window.print()<\/script></body></html>`);w.document.close()}
+
+function resetDelivery(){state.editingDeliveryKey=null;state.signature='';state.uploadedFile=null;$('kpi-delivery-order').value='';$('kpi-delivery-customer').value='';$('kpi-delivery-address').value='';$('kpi-delivery-date').value=today();$('kpi-delivery-deliverer').value='';$('kpi-delivery-notes').value='';$('kpi-direct-delivery').checked=false;$('kpi-delivery-file').value='';$('kpi-delivery-file-label').textContent='📎 Tải lên PDF/Ảnh';$('kpi-ai-check').style.display='none';$('kpi-sign-preview-wrap').style.display='none';$('kpi-delivery-save').textContent='🚚 Cho phép giao hàng';$('kpi-delivery-save').className='kpi-btn primary kpi-wide';$('kpi-delivery-cancel-edit').style.display='none'}
+function prepareSaveDelivery(){const orderId=$('kpi-delivery-order').value.trim().toUpperCase(),customerName=$('kpi-delivery-customer').value.trim(),delivererName=$('kpi-delivery-deliverer').value.trim();if(!orderId||!customerName||!delivererName)return notify('Vui lòng điền đầy đủ thông tin!','error');state.transferCallback=commitDelivery;openModal('kpi-transfer-modal')}
+async function commitDelivery(){closeModal('kpi-transfer-modal');if(!requireDb())return;const data={orderId:$('kpi-delivery-order').value.trim().toUpperCase(),deliveryDate:$('kpi-delivery-date').value,delivererName:$('kpi-delivery-deliverer').value.trim(),customerName:$('kpi-delivery-customer').value.trim(),deliveryAddress:$('kpi-delivery-address').value.trim(),deliveryNotes:$('kpi-delivery-notes').value.trim(),delivererSignature:state.signature||null,timestamp:new Date().toISOString()};try{if(state.editingDeliveryKey){await refs.deliveries.child(state.editingDeliveryKey).update(data);notify('Đã cập nhật thông tin giao hàng!','success');resetDelivery()}else{await refs.deliveries.push(data);const snap=await refs.packings.orderByChild('orderId').equalTo(data.orderId).once('value');const v=snap.val()||{};const jobs=[];Object.keys(v).forEach(k=>{if(v[k].customerName===data.customerName)jobs.push(refs.packings.child(k).update({isDelivered:true}))});await Promise.all(jobs);notify('Đã lưu thông tin giao hàng!','success');resetDelivery()}}catch(e){notify('Không lưu được giao hàng: '+e.message,'error')}}
+function editDelivery(key){const d=state.deliveries.find(x=>x.key===key);if(!d)return;$('kpi-delivery-order').value=d.orderId||'';$('kpi-delivery-customer').value=d.customerName||'';$('kpi-delivery-address').value=d.deliveryAddress||'';$('kpi-delivery-date').value=d.deliveryDate||today();$('kpi-delivery-deliverer').value=d.delivererName||'';$('kpi-delivery-notes').value=d.deliveryNotes||'';state.signature=d.delivererSignature||'';if(state.signature){$('kpi-sign-preview').src=state.signature;$('kpi-sign-preview-wrap').style.display='block'}state.editingDeliveryKey=key;$('kpi-delivery-save').textContent='✏️ Cập nhật giao hàng';$('kpi-delivery-save').className='kpi-btn warning kpi-wide';$('kpi-delivery-cancel-edit').style.display='flex';switchInnerTab('delivery');$('kpi-delivery-customer').scrollIntoView({behavior:'smooth',block:'center'})}
+async function deleteDelivery(key){if(!requireDb())return;if(confirm('Bạn có chắc chắn muốn xóa thông tin giao hàng này?'))try{await refs.deliveries.child(key).remove();notify('Đã xóa thông tin giao hàng!','success')}catch(e){notify(e.message,'error')}}
+
+function showSuggestions(boxId,items,renderer,onPick){const box=$(boxId);if(!items.length){box.style.display='none';box.innerHTML='';return}box.innerHTML=items.slice(0,30).map((x,i)=>`<div class="kpi-suggestion" data-idx="${i}">${renderer(x)}</div>`).join('');box.style.display='block';box.onclick=e=>{const el=e.target.closest('[data-idx]');if(!el)return;const x=items[Number(el.dataset.idx)];onPick(x);box.style.display='none'}}
+$('kpi-pack-customer').addEventListener('input',e=>{const v=e.target.value.toLowerCase();const items=state.customers.filter(c=>String(c.name||'').toLowerCase().includes(v));showSuggestions('kpi-pack-customer-suggest',items,c=>`<b>${esc(c.name)}</b> - ${esc(c.address)}`,c=>{$('kpi-pack-customer').value=c.name;$('kpi-pack-address').value=c.address})});
+$('kpi-delivery-customer').addEventListener('input',e=>{const v=e.target.value.toLowerCase();const items=state.packings.filter(p=>!p.isDelivered&&String(p.customerName||'').toLowerCase().includes(v));showSuggestions('kpi-delivery-customer-suggest',items,p=>`<b>${esc(p.customerName)}</b> (Đơn: ${esc(p.orderId)})<br><small>${esc(p.address)}</small>`,p=>{$('kpi-delivery-customer').value=p.customerName;$('kpi-delivery-order').value=p.orderId;$('kpi-delivery-address').value=p.address})});
+
+function startVoice(fieldId,statusId,btn){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return notify('Trình duyệt không hỗ trợ nhận dạng giọng nói.','error');const rec=new SR();rec.lang='vi-VN';rec.interimResults=false;btn.classList.add('kpi-listening');$(statusId).textContent='Đang lắng nghe...';rec.onresult=e=>{let t=e.results[0][0].transcript;t=t.charAt(0).toUpperCase()+t.slice(1);$(fieldId).value=t;$(statusId).textContent='Đã nhập: '+t};rec.onerror=e=>{$(statusId).textContent='Lỗi: '+e.error};rec.onend=()=>{btn.classList.remove('kpi-listening');setTimeout(()=>{$(statusId).textContent=''},3000)};try{rec.start()}catch(e){notify(e.message,'error')}}
+
+// Chữ ký số vẽ trực tiếp, không phụ thuộc React/SignaturePad.
+let signCtx=null,signDrawing=false,signHasInk=false;
+function setupSignatureCanvas(){const c=$('kpi-signature-canvas'),rect=c.getBoundingClientRect(),ratio=Math.max(window.devicePixelRatio||1,1);c.width=Math.max(300,rect.width)*ratio;c.height=260*ratio;signCtx=c.getContext('2d');signCtx.setTransform(ratio,0,0,ratio,0,0);signCtx.fillStyle='#fff';signCtx.fillRect(0,0,rect.width,260);signCtx.lineWidth=2;signCtx.lineCap='round';signCtx.strokeStyle='#111';signHasInk=false}
+function signPos(e){const c=$('kpi-signature-canvas'),r=c.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
+$('kpi-signature-canvas').addEventListener('pointerdown',e=>{if(!signCtx)return;signDrawing=true;signHasInk=true;const p=signPos(e);signCtx.beginPath();signCtx.moveTo(p.x,p.y);$('kpi-signature-canvas').setPointerCapture?.(e.pointerId)});
+$('kpi-signature-canvas').addEventListener('pointermove',e=>{if(!signDrawing||!signCtx)return;const p=signPos(e);signCtx.lineTo(p.x,p.y);signCtx.stroke()});
+['pointerup','pointercancel','pointerleave'].forEach(ev=>$('kpi-signature-canvas').addEventListener(ev,()=>signDrawing=false));
+
+async function startScreenCapture(){try{if(!navigator.mediaDevices?.getDisplayMedia)throw new Error('Trình duyệt không hỗ trợ chụp màn hình.');const stream=await navigator.mediaDevices.getDisplayMedia({video:true});const v=document.createElement('video');v.autoplay=true;v.muted=true;v.playsInline=true;v.srcObject=stream;await new Promise(res=>v.onloadedmetadata=()=>v.play().then(()=>res()).catch(()=>res()));await new Promise(r=>setTimeout(r,500));const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);stream.getTracks().forEach(t=>t.stop());$('kpi-crop-image').src=c.toDataURL('image/png');state.crop.rect=null;$('kpi-crop-rect').style.display='none';openModal('kpi-crop-modal')}catch(e){notify(e.name==='NotAllowedError'?'Trình duyệt chặn quyền chụp màn hình. Hãy mở ứng dụng ở tab trình duyệt đầy đủ/HTTPS rồi thử lại.':'Không thể chụp màn hình: '+e.message,'error')}}
+function cropPoint(e){const img=$('kpi-crop-image'),r=img.getBoundingClientRect();return{x:Math.max(0,Math.min(e.clientX-r.left,r.width)),y:Math.max(0,Math.min(e.clientY-r.top,r.height)),w:r.width,h:r.height}}
+$('kpi-crop-wrap').addEventListener('pointerdown',e=>{const p=cropPoint(e);state.crop.start=p;state.crop.dragging=true;state.crop.rect={x:p.x,y:p.y,width:0,height:0};$('kpi-crop-wrap').setPointerCapture?.(e.pointerId)});
+$('kpi-crop-wrap').addEventListener('pointermove',e=>{if(!state.crop.dragging||!state.crop.start)return;const p=cropPoint(e),s=state.crop.start;state.crop.rect={x:Math.min(s.x,p.x),y:Math.min(s.y,p.y),width:Math.abs(p.x-s.x),height:Math.abs(p.y-s.y)};const r=state.crop.rect,el=$('kpi-crop-rect');Object.assign(el.style,{display:'block',left:r.x+'px',top:r.y+'px',width:r.width+'px',height:r.height+'px'})});
+$('kpi-crop-wrap').addEventListener('pointerup',()=>state.crop.dragging=false);
+function applyCrop(){const r=state.crop.rect,img=$('kpi-crop-image');if(!r||r.width<3||r.height<3)return notify('Vui lòng kéo chuột để chọn vùng cần cắt.','error');const sx=img.naturalWidth/img.width,sy=img.naturalHeight/img.height,c=document.createElement('canvas');c.width=Math.round(r.width*sx);c.height=Math.round(r.height*sy);c.getContext('2d').drawImage(img,r.x*sx,r.y*sy,r.width*sx,r.height*sy,0,0,c.width,c.height);c.toBlob(blob=>{if(!blob)return;state.uploadedFile=new File([blob],'screenshot.png',{type:'image/png',lastModified:Date.now()});$('kpi-delivery-file-label').textContent='📎 screenshot.png';$('kpi-ai-check').style.display='inline-flex';closeModal('kpi-crop-modal')},'image/png')}
+
+function extractJSON(text){let s=String(text||'').trim().replace(/^```(?:json)?/i,'').replace(/```$/,'').trim();try{return JSON.parse(s)}catch{}const a=s.indexOf('{'),b=s.lastIndexOf('}');if(a>=0&&b>a)return JSON.parse(s.slice(a,b+1));throw new Error('AI không trả JSON hợp lệ')}
+async function analyzeDeliveryFile(){const f=state.uploadedFile;if(!f)return notify('Vui lòng tải lên file trước.','error');const address=$('kpi-delivery-address').value.trim();if(!address)return notify('Vui lòng nhập hoặc chọn địa chỉ giao hàng trước khi đối soát.','error');const btn=$('kpi-ai-check'),old=btn.textContent;btn.disabled=true;btn.textContent='⏳ Đang phân tích...';try{if(typeof aiFileRequest!=='function')throw new Error('Module AI chung chưa sẵn sàng.');const prompt=`Phân tích phiếu giao hàng này. Tìm địa chỉ người nhận và so sánh với địa chỉ mục tiêu sau: "${address}".\nViệc so sánh cần thông minh: bỏ qua chữ hoa/thường, khoảng trắng dư thừa, dấu câu, và các sai sót nhỏ về chính tả hoặc cách viết tắt (ví dụ: Q. vs Quận, TP vs Thành phố).\nChỉ trả JSON hợp lệ dạng: {"extractedAddress":"địa chỉ tìm thấy trên phiếu","isMatch":true,"reason":"giải thích ngắn gọn nếu không khớp"}`;const r=await aiFileRequest(f,prompt,{plainText:true,purpose:'KPI Đối soát địa chỉ · '+address});const x=extractJSON(r.text);$('kpi-ai-result-title').textContent=x.isMatch?'✅ Địa chỉ khớp!':'⚠️ Địa chỉ không khớp!';$('kpi-ai-result-body').innerHTML=x.isMatch?`<div class="kpi-ai-good"><b>Địa chỉ trên phiếu giao hàng khớp với địa chỉ đã nhập.</b><br><br>Địa chỉ AI đọc được: ${esc(x.extractedAddress||'')}</div>`:`<div class="kpi-ai-bad"><b>Vui lòng kiểm tra lại thông tin cẩn thận!</b><br><br><b>Địa chỉ tìm thấy trên phiếu:</b><br>${esc(x.extractedAddress||'')}<br><br><b>Lý do:</b><br>${esc(x.reason||'Không rõ lý do')}</div>`;openModal('kpi-ai-result-modal')}catch(e){notify('Không thể phân tích file này: '+e.message,'error')}finally{try{if(typeof setAIProgress==='function')setAIProgress('',false)}catch{}btn.disabled=false;btn.textContent=old}}
+
+async function runEvaluation(){if(!requireDb())return;const date=$('kpi-eval-date').value||today(),target=state.packings.filter(p=>p.packingDate===date),pending=target.filter(p=>!p.isDelivered),count=pending.length,has=count>2,score=has?Math.max(0,100-(count-2)*10):100;const data={evaluationDate:date,checkTime:new Date().toLocaleTimeString(),pendingOrderCount:count,hasError:has,errorType:has?'Giao chậm':'Không',pendingOrders:pending,responsibleEmployee:'Tổ giao nhận',kpiScore:score,notes:`Đánh giá tự động: ${count} đơn chờ trong ngày ${date}.`,timestamp:new Date().toISOString()};try{await refs.evaluations.push(data);notify(`Đã chạy đánh giá cho ngày ${date}. KPI: ${score}`,'success')}catch(e){notify(e.message,'error')}}
+function monthlyEvaluation(){const ym=today().slice(0,7),list=state.evaluations.filter(e=>String(e.evaluationDate||'').startsWith(ym));if(!list.length)return notify('Tháng này chưa có dữ liệu đánh giá ngày. Hãy chạy đánh giá từng ngày cần kiểm tra.','info');const avg=Math.round(list.reduce((s,e)=>s+(Number(e.kpiScore)||0),0)/list.length),bad=list.filter(e=>e.hasError).length;alert(`ĐÁNH GIÁ THÁNG ${ym}\nSố lượt đánh giá: ${list.length}\nSố lượt lỗi: ${bad}\nKPI trung bình: ${avg}`)}
+
+async function uploadCustomerExcel(file){if(!file||!requireDb())return;try{const buf=await file.arrayBuffer(),wb=XLSX.read(buf,{type:'array'}),ws=wb.Sheets[wb.SheetNames[0]],data=XLSX.utils.sheet_to_json(ws,{defval:''});let count=0;for(const item of data){if(item.TênKhachHang&&item.DiaChi){await refs.customers.push({name:String(item.TênKhachHang).trim(),address:String(item.DiaChi).trim()});count++}}notify(`Đã tải lên ${count} khách hàng.`,'success')}catch(e){notify('Không đọc/lưu được Excel khách hàng: '+e.message,'error')}}
+function exportReportExcel(){if(typeof XLSX==='undefined')return notify('Thư viện Excel chưa sẵn sàng.','error');const rows=currentReportRows();const ws=XLSX.utils.json_to_sheet(rows),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Deliveries');XLSX.writeFile(wb,'bao_cao_giao_hang.xlsx')}
+
+// Event bindings
+$('kpi-help-btn').onclick=()=>openModal('kpi-help-modal');
+$('kpi-pack-save').onclick=savePacking;$('kpi-pack-cancel-edit').onclick=resetPacking;$('kpi-pack-map').onclick=()=>window.open('https://www.google.com/maps?q='+encodeURIComponent($('kpi-pack-address').value),'_blank');
+$('kpi-pack-customer-mic').onclick=function(){startVoice('kpi-pack-customer','kpi-pack-customer-voice',this)};$('kpi-pack-address-mic').onclick=function(){startVoice('kpi-pack-address','kpi-pack-address-voice',this)};
+$('kpi-delivery-customer-mic').onclick=function(){startVoice('kpi-delivery-customer','kpi-delivery-customer-voice',this)};$('kpi-delivery-map').onclick=()=>window.open('https://www.google.com/maps?q='+encodeURIComponent($('kpi-delivery-address').value),'_blank');
+$('kpi-delivery-save').onclick=prepareSaveDelivery;$('kpi-delivery-cancel-edit').onclick=resetDelivery;$('kpi-transfer-confirm').onclick=()=>state.transferCallback?.();
+$('kpi-sign-open').onclick=()=>{openModal('kpi-sign-modal');setTimeout(setupSignatureCanvas,40)};$('kpi-sign-clear').onclick=setupSignatureCanvas;$('kpi-sign-save').onclick=()=>{if(!signHasInk)return notify('Vui lòng ký tên!','error');state.signature=$('kpi-signature-canvas').toDataURL('image/png');$('kpi-sign-preview').src=state.signature;$('kpi-sign-preview-wrap').style.display='block';closeModal('kpi-sign-modal')};
+$('kpi-label-print').onclick=printLabel;
+$('kpi-screen-capture').onclick=startScreenCapture;$('kpi-crop-apply').onclick=applyCrop;
+$('kpi-delivery-file').onchange=e=>{const f=e.target.files?.[0];if(!f)return;if(f.type!=='application/pdf'&&!f.type.startsWith('image/'))return notify('Vui lòng chọn file PDF hoặc ảnh phiếu giao hàng.','error');state.uploadedFile=f;$('kpi-delivery-file-label').textContent='📎 '+f.name;$('kpi-ai-check').style.display='inline-flex'};$('kpi-ai-check').onclick=analyzeDeliveryFile;
+$('kpi-report-run').onclick=()=>{const a=$('kpi-report-start').value,b=$('kpi-report-end').value;if(!a||!b)return notify('Vui lòng chọn từ ngày và đến ngày để lọc báo cáo.','error');if(a>b)return notify('Từ ngày không được sau Đến ngày.','error');state.reportFiltered=state.deliveries.filter(d=>d.deliveryDate>=a&&d.deliveryDate<=b);renderReports()};$('kpi-report-excel').onclick=exportReportExcel;
+$('kpi-eval-run').onclick=runEvaluation;$('kpi-eval-month').onclick=monthlyEvaluation;
+$('kpi-management-search').oninput=e=>{state.managementSearch=e.target.value;renderManagement()};$('kpi-management-clear').onclick=()=>{$('kpi-management-search').value='';state.managementSearch='';renderManagement()};
+$('kpi-customer-excel').onchange=e=>uploadCustomerExcel(e.target.files?.[0]);
+root.addEventListener('click',e=>{const pe=e.target.closest('[data-pack-edit]'),pd=e.target.closest('[data-pack-del]'),de=e.target.closest('[data-delivery-edit]'),dd=e.target.closest('[data-delivery-del]'),cd=e.target.closest('[data-customer-del]');if(pe)editPacking(pe.dataset.packEdit);else if(pd)deletePacking(pd.dataset.packDel);else if(de)editDelivery(de.dataset.deliveryEdit);else if(dd)deleteDelivery(dd.dataset.deliveryDel);else if(cd&&confirm('Bạn có chắc chắn muốn xóa khách hàng này?')){if(requireDb())refs.customers.child(cd.dataset.customerDel).remove().catch(er=>notify(er.message,'error'))}});
+
+document.addEventListener('click',e=>{if(!e.target.closest('#kpi-pack-customer')&&!e.target.closest('#kpi-pack-customer-suggest'))$('kpi-pack-customer-suggest').style.display='none';if(!e.target.closest('#kpi-delivery-customer')&&!e.target.closest('#kpi-delivery-customer-suggest'))$('kpi-delivery-customer-suggest').style.display='none'});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')root.querySelectorAll('.kpi-modal.show').forEach(m=>m.classList.remove('show'))});
+
+$('kpi-pack-order').addEventListener('input',e=>e.target.value=e.target.value.toUpperCase());$('kpi-delivery-order').addEventListener('input',e=>e.target.value=e.target.value.toUpperCase());
+$('kpi-pack-date').value=today();$('kpi-delivery-date').value=today();$('kpi-eval-date').value=today();
+initFirebase();renderAll();
+window.guideGoKPI=()=>{try{if(typeof closeUserGuide==='function')closeUserGuide()}catch{};document.getElementById('btn-tab4')?.click();setTimeout(()=>document.getElementById('kpi-app')?.scrollIntoView({behavior:'smooth',block:'start'}),80)};
+window.IDECOKPI={state,switchInnerTab,renderAll,savePacking,editPacking,editDelivery,analyzeDeliveryFile};
+})();
+</script>
 
 </body>
 </html>

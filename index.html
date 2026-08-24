@@ -226,13 +226,36 @@
         .ai-signature-space { height:46px; display:flex; align-items:center; justify-content:center; color:#15803d; font-weight:900; font-style:italic; font-size:.8rem; }
         .ai-signature-name { font-weight:900; text-transform:uppercase; color:#0f172a; min-height:20px; }
         .ai-receipt-sign-config { margin-top:14px; padding:12px; border:1px solid #bfdbfe; background:#eff6ff; border-radius:10px; }
-        .ai-receipt-sign-config h4 { margin:0 0 8px; color:#1e40af; }
-        .ai-receipt-sign-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
-        .ai-receipt-sign-item { background:#fff; border:1px solid #dbeafe; border-radius:8px; padding:9px; }
-        .ai-receipt-sign-item input[type=text] { margin:4px 0 7px; }
-        .ai-sign-check { display:flex; align-items:center; gap:7px; font-size:.78rem; font-weight:800; color:#166534; }
-        .ai-sign-check input { width:auto; margin:0; }
+        .ai-receipt-sign-config h4 { margin:0; color:#1e40af; }
+        .ai-receipt-sign-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:10px; }
+        .ai-receipt-sign-item { background:#fff; border:1px solid #dbeafe; border-radius:10px; padding:11px; min-width:0; }
+        .receipt-live-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+        .receipt-live-sub{font-size:.78rem;color:#475569;margin-top:4px;line-height:1.45}
+        .receipt-code-box{min-width:190px;background:#fff;border:1px solid #93c5fd;border-radius:9px;padding:8px 10px;text-align:center}
+        .receipt-code-box small{display:block;color:#64748b;font-size:.68rem;font-weight:800}.receipt-code-box b{display:block;color:#1d4ed8;font-size:.93rem;margin-top:2px}
+        .receipt-live-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}.receipt-cloud-status{font-size:.76rem;color:#64748b;line-height:1.45}
+        .receipt-lock-note{margin-top:9px;padding:9px 11px;border:1px solid #fca5a5;border-left:5px solid #dc2626;border-radius:8px;background:#fef2f2;color:#991b1b;font-size:.79rem;font-weight:750}
+        .receipt-role-title{font-weight:900;color:#0f172a}.receipt-role-status{margin-top:6px;font-size:.78rem;font-weight:900;color:#92400e}.receipt-role-status.signed{color:#166534}
+        .receipt-role-name{min-height:36px;margin-top:4px;font-size:.76rem;color:#334155;line-height:1.4}.receipt-role-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+        .receipt-role-actions .btn{font-size:.73rem;padding:6px 8px}
+        .ai-signature-image{max-width:150px;max-height:45px;object-fit:contain;display:block;margin:auto}
+        .receipt-list-card{height:auto!important;margin-top:16px}.receipt-list-filter{display:flex;gap:8px;align-items:center}.receipt-list-filter input{margin:0;flex:1}
+        .receipt-list{margin-top:10px;display:grid;gap:8px}.receipt-list-empty{padding:16px;text-align:center;color:#64748b;border:1px dashed #cbd5e1;border-radius:8px;background:#f8fafc}
+        .receipt-list-item{display:grid;grid-template-columns:minmax(150px,1.1fr) minmax(180px,1.4fr) minmax(120px,.8fr) minmax(210px,1.5fr) auto;gap:10px;align-items:center;border:1px solid #e2e8f0;border-radius:10px;padding:10px;background:#fff}
+        .receipt-list-code{font-weight:900;color:#1d4ed8}.receipt-list-meta{font-size:.75rem;color:#475569;line-height:1.45}.receipt-list-signs{display:flex;gap:5px;flex-wrap:wrap}
+        .receipt-sign-chip{font-size:.68rem;font-weight:850;padding:3px 6px;border-radius:999px;background:#fef3c7;color:#92400e}.receipt-sign-chip.ok{background:#dcfce7;color:#166534}
+        .receipt-list-actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}.receipt-list-actions .btn{font-size:.72rem;padding:6px 8px}
+        .receipt-sign-modal{display:none;position:fixed;inset:0;background:rgba(15,23,42,.78);z-index:30000;align-items:center;justify-content:center;padding:15px;backdrop-filter:blur(3px)}
+        .receipt-sign-modal.show{display:flex}.receipt-sign-dialog{width:min(720px,96vw);background:#fff;border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,.35);overflow:hidden}
+        .receipt-sign-modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:13px 16px;background:#eff6ff;border-bottom:1px solid #bfdbfe;color:#1e3a8a}
+        .receipt-sign-modal-role{font-size:.79rem;margin-top:3px;color:#475569}.receipt-sign-close{border:0;background:transparent;font-size:26px;cursor:pointer;color:#475569}
+        .receipt-sign-modal-body{padding:15px}.receipt-sign-modal-body input{margin-bottom:9px}.receipt-sign-canvas-note{font-size:.76rem;color:#64748b;margin-bottom:6px}
+        #ai-receipt-sign-canvas{width:100%;height:190px;border:2px dashed #94a3b8;border-radius:9px;background:#fff;touch-action:none;cursor:crosshair}
+        .receipt-sign-modal-actions{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:10px}
+        .receipt-edit-locked input,.receipt-edit-locked select,.receipt-edit-locked textarea{pointer-events:none;background:#f1f5f9!important;color:#64748b!important}
+        @media(max-width:1000px){.receipt-list-item{grid-template-columns:1fr 1fr}.receipt-list-actions{justify-content:flex-start}}
         @media(max-width:900px){ .ai-receipt-sign-grid{grid-template-columns:1fr;} }
+        @media(max-width:620px){.receipt-list-item{grid-template-columns:1fr}.receipt-live-actions .btn{width:100%}}
         @media(max-width:900px){ .ai-flow{grid-template-columns:1fr 1fr;} .ai-settings-body{grid-template-columns:1fr;} .ai-receipt-meta{grid-template-columns:1fr;} }
         @media(max-width:560px){ .ai-flow{grid-template-columns:1fr;} }
 
@@ -464,7 +487,7 @@
     <div class="container">
         <header>
             <div style="min-width:0">
-                <h1>AI AGENT HỆ THỐNG QUẢN LÝ KHO PHÁT TRIỂN BỞI: MTRIET</h1>
+                <h1>QUẢN LÝ KHO DƯỢC GDP - IDECO</h1>
                 <div style="margin-top:5px;display:inline-flex;align-items:center;gap:6px;background:#fef3c7;color:#92400e;border:1px solid #f59e0b;border-radius:999px;padding:4px 9px;font-size:.75rem;font-weight:800;letter-spacing:.2px">🧪 FIREBASE TEST · thunghiem-eeb1f</div>
             </div>
             <div class="header-actions">
@@ -1077,14 +1100,39 @@
                 </div>
             </div>
 
-            <div id="ai-receipt-sign-config" class="ai-receipt-sign-config">
-                <h4>✍️ Người phụ trách ký Biên bản nhận hàng</h4>
-                <div class="ai-receipt-sign-grid">
-                    <div class="ai-receipt-sign-item"><label>Bộ phận Kho/Kế toán</label><input id="ai-sign-warehouse-accounting" type="text" placeholder="Nhập họ tên"><label class="ai-sign-check"><input id="ai-signed-warehouse-accounting" type="checkbox"> Đã ký</label></div>
-                    <div class="ai-receipt-sign-item"><label>Người lập biên bản</label><input id="ai-sign-preparer" type="text" placeholder="Nhập họ tên"><label class="ai-sign-check"><input id="ai-signed-preparer" type="checkbox"> Đã ký</label></div>
-                    <div class="ai-receipt-sign-item"><label>Phụ trách chuyên môn</label><input id="ai-sign-professional" type="text" placeholder="Nhập họ tên"><label class="ai-sign-check"><input id="ai-signed-professional" type="checkbox"> Đã ký</label></div>
+            <div id="ai-receipt-sign-config" class="ai-receipt-sign-config receipt-live-config">
+                <div class="receipt-live-head">
+                    <div>
+                        <h4>☁️ BIÊN BẢN NHẬN HÀNG · KÝ REALTIME FIREBASE</h4>
+                        <div class="receipt-live-sub">Ba người có thể ký trên ba máy khác nhau. Chữ ký, họ tên và thời gian ký đồng bộ realtime trên Firebase TEST chung.</div>
+                    </div>
+                    <div class="receipt-code-box"><small>MÃ BIÊN BẢN</small><b id="ai-receipt-cloud-code">CHƯA LƯU</b></div>
                 </div>
-                <div style="font-size:.74rem;color:#475569;margin-top:7px">Tên và trạng thái ký được lưu trên máy. Khi chọn “Đã ký”, chữ <b>ĐÃ KÝ</b> sẽ xuất hiện ngay cạnh chức danh trên biên bản và PDF.</div>
+                <div class="receipt-live-actions">
+                    <button id="ai-receipt-save-cloud" class="btn btn-primary" type="button">☁️ TẠO / LƯU BIÊN BẢN REALTIME</button>
+                    <span id="ai-receipt-cloud-status" class="receipt-cloud-status">Phân tích và kiểm tra Master xong rồi lưu biên bản để các máy khác cùng ký.</span>
+                </div>
+                <div id="ai-receipt-lock-note" class="receipt-lock-note" style="display:none">🔒 Biên bản đã có chữ ký. Nội dung chứng từ bị khóa; muốn chỉnh Mã/Tên/Lô/HSD/Số lượng phải thu hồi chữ ký trước.</div>
+                <div id="ai-receipt-live-signers" class="ai-receipt-sign-grid">
+                    <div class="ai-receipt-sign-item" data-receipt-role-card="warehouseAccounting">
+                        <div class="receipt-role-title">Bộ phận Kho/Kế toán</div>
+                        <div class="receipt-role-status" data-receipt-role-status="warehouseAccounting">⏳ CHƯA KÝ</div>
+                        <div class="receipt-role-name" data-receipt-role-name="warehouseAccounting">—</div>
+                        <div class="receipt-role-actions"><button class="btn btn-success" type="button" data-receipt-sign-role="warehouseAccounting">✍️ KÝ XÁC NHẬN</button><button class="btn btn-warning" type="button" data-receipt-revoke-role="warehouseAccounting" style="display:none">↩ Thu hồi</button></div>
+                    </div>
+                    <div class="ai-receipt-sign-item" data-receipt-role-card="preparer">
+                        <div class="receipt-role-title">Người lập biên bản</div>
+                        <div class="receipt-role-status" data-receipt-role-status="preparer">⏳ CHƯA KÝ</div>
+                        <div class="receipt-role-name" data-receipt-role-name="preparer">—</div>
+                        <div class="receipt-role-actions"><button class="btn btn-success" type="button" data-receipt-sign-role="preparer">✍️ KÝ XÁC NHẬN</button><button class="btn btn-warning" type="button" data-receipt-revoke-role="preparer" style="display:none">↩ Thu hồi</button></div>
+                    </div>
+                    <div class="ai-receipt-sign-item" data-receipt-role-card="professional">
+                        <div class="receipt-role-title">Phụ trách chuyên môn</div>
+                        <div class="receipt-role-status" data-receipt-role-status="professional">⏳ CHƯA KÝ</div>
+                        <div class="receipt-role-name" data-receipt-role-name="professional">—</div>
+                        <div class="receipt-role-actions"><button class="btn btn-success" type="button" data-receipt-sign-role="professional">✍️ KÝ XÁC NHẬN</button><button class="btn btn-warning" type="button" data-receipt-revoke-role="professional" style="display:none">↩ Thu hồi</button></div>
+                    </div>
+                </div>
             </div>
 
             <div id="ai-receipt" class="ai-receipt" style="display:none">
@@ -1096,6 +1144,29 @@
                 <div id="ai-receipt-meta" class="ai-receipt-meta"></div>
                 <div style="overflow:auto"><table><thead><tr><th>STT</th><th>Mã SP</th><th>Tên hàng</th><th>Hàm lượng/NĐ</th><th>Quy cách</th><th>ĐVT</th><th>Số lô</th><th>Hạn dùng</th><th>SL nhận</th><th>Tình trạng</th></tr></thead><tbody id="ai-receipt-body"></tbody></table></div>
                 <div id="ai-receipt-signatures" class="ai-signatures"></div>
+            </div>
+
+            <div class="card receipt-list-card" id="ai-receipt-list-card">
+                <div class="card-header">
+                    <div>📋 DANH SÁCH BIÊN BẢN NHẬN HÀNG · FIREBASE REALTIME</div>
+                    <span id="ai-receipt-list-count" style="font-size:.76rem;color:#64748b">0 biên bản</span>
+                </div>
+                <div class="receipt-list-filter"><input id="ai-receipt-list-search" placeholder="Tìm mã biên bản, NCC, số phiếu..." autocomplete="off"><button id="ai-receipt-list-refresh" class="btn btn-primary" type="button">🔄 Làm mới</button></div>
+                <div id="ai-receipt-list" class="receipt-list"><div class="receipt-list-empty">Đang tải biên bản từ Firebase...</div></div>
+            </div>
+
+            <div id="ai-receipt-sign-modal" class="receipt-sign-modal" aria-hidden="true">
+                <div class="receipt-sign-dialog">
+                    <div class="receipt-sign-modal-head"><div><b>✍️ KÝ XÁC NHẬN BIÊN BẢN</b><div id="ai-receipt-sign-modal-role" class="receipt-sign-modal-role"></div></div><button id="ai-receipt-sign-close" type="button" class="receipt-sign-close">×</button></div>
+                    <div class="receipt-sign-modal-body">
+                        <label>Họ và tên người ký (*)</label>
+                        <input id="ai-receipt-signer-name" type="text" placeholder="Nhập đúng họ tên người ký" autocomplete="name">
+                        <div class="receipt-sign-canvas-note">Ký trực tiếp bằng chuột hoặc cảm ứng trong khung bên dưới.</div>
+                        <canvas id="ai-receipt-sign-canvas" width="620" height="190"></canvas>
+                        <div class="receipt-sign-modal-actions"><button id="ai-receipt-sign-clear" class="btn btn-warning" type="button">🧹 Xóa chữ ký</button><button id="ai-receipt-sign-confirm" class="btn btn-success" type="button">✅ XÁC NHẬN KÝ & LƯU FIREBASE</button></div>
+                        <div id="ai-receipt-sign-modal-status" class="receipt-cloud-status"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -3579,36 +3650,208 @@ YÊU CẦU BẮT BUỘC:
             const tab=document.querySelector('.nav-tab[onclick*="tab1"]'); switchTab('tab1',tab);
             setTimeout(()=>document.getElementById('preview-box')?.scrollIntoView({behavior:'smooth',block:'start'}),100);
         }
-        const AI_RECEIPT_SIGNERS_KEY='ideco_ai_receipt_signers_v1';
-        function getReceiptSignerData(){
-            return [
-                {role:'Bộ phận Kho/Kế toán',name:($ai('ai-sign-warehouse-accounting')?.value||'').trim(),signed:!!$ai('ai-signed-warehouse-accounting')?.checked},
-                {role:'Người lập biên bản',name:($ai('ai-sign-preparer')?.value||'').trim(),signed:!!$ai('ai-signed-preparer')?.checked},
-                {role:'Phụ trách chuyên môn',name:($ai('ai-sign-professional')?.value||'').trim(),signed:!!$ai('ai-signed-professional')?.checked}
-            ];
+        // ===== BIÊN BẢN NHẬN HÀNG · KÝ REALTIME FIREBASE =====
+        const receiptRealtimeRef=db.ref('receivingReceipts');
+        const RECEIPT_ROLE_META={
+            warehouseAccounting:{label:'Bộ phận Kho/Kế toán',short:'Kho/Kế toán'},
+            preparer:{label:'Người lập biên bản',short:'Người lập'},
+            professional:{label:'Phụ trách chuyên môn',short:'Chuyên môn'}
+        };
+        const receiptRT={currentId:'',currentRecord:null,records:[],signingRole:'',canvasDirty:false,deviceId:''};
+        try{receiptRT.deviceId=localStorage.getItem('ideco_receipt_device_id_v1')||('DEV_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8));localStorage.setItem('ideco_receipt_device_id_v1',receiptRT.deviceId)}catch(e){receiptRT.deviceId='DEV_'+Date.now().toString(36)}
+        function receiptServerTimestamp(){try{return firebase.database.ServerValue.TIMESTAMP}catch(e){return Date.now()}}
+        function receiptSignedCount(rec){return Object.values(rec?.signatures||{}).filter(x=>x&&x.signedAt).length}
+        function receiptStatusText(rec){const n=receiptSignedCount(rec);return n>=3?'✅ HOÀN TẤT · 3/3 ĐÃ KÝ':n>0?`✍️ ĐANG KÝ · ${n}/3`:'📝 CHỜ KÝ · 0/3'}
+        function receiptDateText(ts){if(!ts)return '';try{return new Date(Number(ts)).toLocaleString('vi-VN')}catch{return ''}}
+        function receiptCodeNow(){
+            const d=new Date(),pad=n=>String(n).padStart(2,'0');
+            return `BBNH-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}-${Math.random().toString(36).slice(2,5).toUpperCase()}`;
         }
-        function saveReceiptSignerData(){
-            try{ localStorage.setItem(AI_RECEIPT_SIGNERS_KEY,JSON.stringify(getReceiptSignerData())); }catch(e){}
-            if(aiState.rows.length)renderReceipt();
+        function receiptSnapshotRows(){
+            return aiState.rows.map((r,i)=>{const p=rowWarehouseProduct(r);return {
+                stt:i+1,sourceName:r.sourceName||'',sourceCode:r.sourceCode||'',sourceUnit:r.sourceUnit||'',
+                code:p.code||'',name:p.name||r.sourceName||'',strength:p.strength||'',packSpec:p.packSpec||'',unit:p.unit||r.sourceUnit||'',
+                lotNumber:r.lotNumber||'',expiryRaw:r.expiryRaw||'',expiryISO:r.expiryISO||'',quantity:Number(r.quantity||0),status:r.status||''
+            }});
         }
-        function loadReceiptSignerData(){
-            let d=[]; try{d=JSON.parse(localStorage.getItem(AI_RECEIPT_SIGNERS_KEY)||'[]')}catch(e){}
-            const ids=[['ai-sign-warehouse-accounting','ai-signed-warehouse-accounting'],['ai-sign-preparer','ai-signed-preparer'],['ai-sign-professional','ai-signed-professional']];
-            ids.forEach((pair,i)=>{ const x=d[i]||{}; const inp=$ai(pair[0]), chk=$ai(pair[1]); if(inp&&typeof x.name==='string')inp.value=x.name; if(chk)chk.checked=!!x.signed; });
+        function receiptContentHash(obj){
+            const s=JSON.stringify({supplier:obj.supplier||'',invoice:obj.invoice||'',receiveDate:obj.receiveDate||'',receiver:obj.receiver||'',products:(obj.products||[]).map(p=>[p.code,p.name,p.lotNumber,p.expiryRaw,p.quantity,p.unit,p.packSpec])});
+            let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(16);
+        }
+        function buildReceiptCloudPayload(){
+            const supplier=($ai('ai-supplier')?.value||aiState.slipInfo.nhaCungCap||'').trim();
+            const invoice=($ai('ai-invoice')?.value||aiState.slipInfo.soPhieu||aiState.slipInfo.theoHoaDonSo||'').trim();
+            const receiveDate=$ai('ai-receive-date')?.value||new Date().toISOString().slice(0,10);
+            const receiver=($ai('ai-receiver')?.value||'').trim();
+            const payload={
+                code:receiptRT.currentRecord?.code||receiptCodeNow(),supplier,invoice,receiveDate,receiver,
+                deliveredBy:aiState.slipInfo.hoTenNguoiGiao||'',warehouse:aiState.slipInfo.nhapTaiKho||'IDECO',
+                products:receiptSnapshotRows(),updatedAt:receiptServerTimestamp(),source:'AI_NHAP_KHO',status:'draft'
+            };
+            payload.contentHash=receiptContentHash(payload);
+            return payload;
+        }
+        function setReceiptCloudStatus(msg,type='info'){
+            const e=$ai('ai-receipt-cloud-status');if(!e)return;e.textContent=msg;e.style.color=type==='error'?'#b91c1c':type==='ok'?'#166534':'#64748b';
+        }
+        function setReceiptEditLock(locked){
+            const root=$ai('ai-compare-root'); if(root)root.classList.toggle('receipt-edit-locked',!!locked);
+            ['ai-supplier','ai-invoice','ai-receive-date','ai-receiver'].forEach(id=>{const e=$ai(id);if(e)e.disabled=!!locked});
+            ['ai-rematch-btn','ai-sync-master-btn'].forEach(id=>{const e=$ai(id);if(e)e.disabled=!!locked || !aiState.rows.length});
+            const note=$ai('ai-receipt-lock-note');if(note)note.style.display=locked?'block':'none';
+            const save=$ai('ai-receipt-save-cloud');if(save){save.disabled=!!locked;save.textContent=locked?'🔒 BIÊN BẢN ĐÃ KHÓA DO CÓ CHỮ KÝ':'☁️ TẠO / LƯU BIÊN BẢN REALTIME'}
+        }
+        function resetReceiptRealtimeCurrent(){
+            receiptRT.currentId='';receiptRT.currentRecord=null;receiptRT.signingRole='';
+            const c=$ai('ai-receipt-cloud-code');if(c)c.textContent='CHƯA LƯU';
+            setReceiptCloudStatus('Phân tích và kiểm tra Master xong rồi lưu biên bản để các máy khác cùng ký.');
+            setReceiptEditLock(false);renderReceiptSignerCards();renderReceiptSignatures();
+        }
+        async function updateReceiptCloudStatus(id){
+            if(!id)return;try{
+                const snap=await receiptRealtimeRef.child(id).child('signatures').once('value'),sg=snap.val()||{},n=Object.values(sg).filter(x=>x&&x.signedAt).length;
+                await receiptRealtimeRef.child(id).update({status:n>=3?'completed':n>0?'signing':'draft',updatedAt:receiptServerTimestamp()});
+            }catch(e){console.warn('receipt status update',e)}
+        }
+        async function saveCurrentReceiptCloud(){
+            if(!aiState.rows.length)return aiNotice('Chưa có dữ liệu Biên bản nhận hàng để lưu. Hãy phân tích phiếu trước.','error');
+            if(aiState.rows.some(r=>!r.lotNumber||!r.expiryISO||!(Number(r.quantity)>0)))return aiNotice('Biên bản còn dòng thiếu Lô/HSD/Số lượng. Hãy kiểm tra trước khi lưu để ký.','error');
+            if(receiptRT.currentRecord&&receiptSignedCount(receiptRT.currentRecord)>0)return aiNotice('Biên bản đã có chữ ký. Muốn sửa nội dung phải thu hồi toàn bộ chữ ký trước.','error');
+            const payload=buildReceiptCloudPayload();
+            setReceiptCloudStatus('Đang lưu biên bản lên Firebase...');
+            try{
+                if(receiptRT.currentId){
+                    const old=receiptRT.currentRecord||{};
+                    payload.code=old.code||payload.code;payload.createdAt=old.createdAt||receiptServerTimestamp();payload.signatures=old.signatures||{};
+                    await receiptRealtimeRef.child(receiptRT.currentId).update(payload);
+                }else{
+                    const ref=receiptRealtimeRef.push();receiptRT.currentId=ref.key;payload.createdAt=receiptServerTimestamp();payload.signatures={};
+                    await ref.set(payload);
+                }
+                setReceiptCloudStatus(`✅ Đã lưu ${payload.code}. Ba máy có thể mở danh sách và ký realtime.`,'ok');
+            }catch(e){receiptRT.currentId=receiptRT.currentRecord?.id||'';aiNotice('Không lưu được biên bản Firebase: '+e.message,'error');setReceiptCloudStatus('❌ Lưu Firebase thất bại.','error')}
+        }
+        function renderReceiptSignerCards(){
+            const rec=receiptRT.currentRecord,sg=rec?.signatures||{},saved=!!receiptRT.currentId;
+            Object.entries(RECEIPT_ROLE_META).forEach(([key,meta])=>{
+                const s=sg[key],status=document.querySelector(`[data-receipt-role-status="${key}"]`),name=document.querySelector(`[data-receipt-role-name="${key}"]`),signBtn=document.querySelector(`[data-receipt-sign-role="${key}"]`),revBtn=document.querySelector(`[data-receipt-revoke-role="${key}"]`);
+                if(status){status.classList.toggle('signed',!!s?.signedAt);status.textContent=s?.signedAt?`✅ ĐÃ KÝ · ${receiptDateText(s.signedAt)}`:'⏳ CHƯA KÝ'}
+                if(name)name.innerHTML=s?.signedAt?`<b>${escAI(s.name||'')}</b><br><span style="color:#64748b">${escAI(meta.label)}</span>`:'—';
+                if(signBtn){signBtn.style.display=s?.signedAt?'none':'';signBtn.disabled=!saved}
+                if(revBtn)revBtn.style.display=s?.signedAt?'':'none';
+            });
+            const code=$ai('ai-receipt-cloud-code');if(code)code.textContent=rec?.code||(receiptRT.currentId?'ĐANG ĐỒNG BỘ...':'CHƯA LƯU');
+            setReceiptEditLock(!!rec&&receiptSignedCount(rec)>0);
         }
         function renderReceiptSignatures(){
-            const box=$ai('ai-receipt-signatures'); if(!box)return;
-            box.innerHTML=getReceiptSignerData().map(x=>`<div class="ai-signature-box"><div class="ai-signature-role">${escAI(x.role)} ${x.signed?'<span class="ai-signed-mark">ĐÃ KÝ</span>':''}</div><div class="ai-signature-space"></div><div class="ai-signature-name">${escAI(x.name||'................................')}</div><div style="font-size:.7rem;color:#64748b;font-weight:600">(Họ và tên)</div></div>`).join('');
+            const box=$ai('ai-receipt-signatures');if(!box)return;const sg=receiptRT.currentRecord?.signatures||{};
+            box.innerHTML=Object.entries(RECEIPT_ROLE_META).map(([key,meta])=>{const s=sg[key];return `<div class="ai-signature-box"><div class="ai-signature-role">${escAI(meta.label)} ${s?.signedAt?'<span class="ai-signed-mark">ĐÃ KÝ</span>':''}</div><div class="ai-signature-space">${s?.signatureData?`<img class="ai-signature-image" src="${s.signatureData}" alt="Chữ ký">`:''}</div><div class="ai-signature-name">${escAI(s?.name||'................................')}</div><div style="font-size:.7rem;color:#64748b;font-weight:600">${s?.signedAt?escAI(receiptDateText(s.signedAt)):'(Họ và tên)'}</div></div>`}).join('');
+        }
+        function receiptRecordToCurrent(rec){
+            if(!rec)return;receiptRT.currentId=rec.id;receiptRT.currentRecord=rec;
+            if($ai('ai-supplier'))$ai('ai-supplier').value=rec.supplier||'';if($ai('ai-invoice'))$ai('ai-invoice').value=rec.invoice||'';
+            if($ai('ai-receive-date'))$ai('ai-receive-date').value=rec.receiveDate||'';if($ai('ai-receiver'))$ai('ai-receiver').value=rec.receiver||'';
+            aiState.slipInfo={nhaCungCap:rec.supplier||'',soPhieu:rec.invoice||'',hoTenNguoiGiao:rec.deliveredBy||'',nhapTaiKho:rec.warehouse||'IDECO'};
+            aiState.rows=(rec.products||[]).map(p=>({
+                sourceName:p.sourceName||p.name||'',sourceCode:p.sourceCode||p.code||'',sourceUnit:p.sourceUnit||p.unit||'',
+                lotNumber:p.lotNumber||'',expiryRaw:p.expiryRaw||'',expiryISO:p.expiryISO||'',quantity:Number(p.quantity||0),status:p.status||'ok',
+                match:{code:p.code||'',name:p.name||'',strength:p.strength||'',packSpec:p.packSpec||'',unit:p.unit||''},issues:[],referenceWarnings:[],candidates:[],matchScore:1,nameCompatibility:{accepted:true,score:1}
+            }));
+            renderReceipt();renderReceiptSignerCards();setReceiptCloudStatus(receiptStatusText(rec),'ok');
+            $ai('ai-receipt-pdf-btn').disabled=!aiState.rows.length;
+            setTimeout(()=>$ai('ai-receipt')?.scrollIntoView({behavior:'smooth',block:'start'}),80);
+        }
+        function renderReceiptList(){
+            const q=normAI($ai('ai-receipt-list-search')?.value||'');
+            const rows=receiptRT.records.filter(r=>!q||normAI([r.code,r.supplier,r.invoice,r.receiver].join(' ')).includes(q));
+            const count=$ai('ai-receipt-list-count');if(count)count.textContent=`${rows.length} biên bản`;
+            const root=$ai('ai-receipt-list');if(!root)return;
+            root.innerHTML=rows.length?rows.map(r=>{
+                const sg=r.signatures||{},n=receiptSignedCount(r),done=n>=3;
+                return `<div class="receipt-list-item">
+                    <div><div class="receipt-list-code">${escAI(r.code||r.id)}</div><div class="receipt-list-meta">${escAI(r.receiveDate||'')}<br>${escAI(r.invoice||'')}</div></div>
+                    <div><b>${escAI(r.supplier||'Chưa khai NCC')}</b><div class="receipt-list-meta">Người lập: ${escAI(r.receiver||'—')}</div></div>
+                    <div><b style="color:${done?'#166534':n?'#92400e':'#64748b'}">${escAI(receiptStatusText(r))}</b></div>
+                    <div class="receipt-list-signs">${Object.entries(RECEIPT_ROLE_META).map(([k,m])=>`<span class="receipt-sign-chip ${sg[k]?.signedAt?'ok':''}">${sg[k]?.signedAt?'✓':'○'} ${escAI(m.short)}</span>`).join('')}</div>
+                    <div class="receipt-list-actions"><button class="btn btn-primary" type="button" data-receipt-view="${escAI(r.id)}">👁 Xem/Ký</button><button class="btn btn-success" type="button" data-receipt-pdf="${escAI(r.id)}">PDF</button><button class="btn btn-danger" type="button" data-receipt-delete="${escAI(r.id)}" ${n?'disabled title="Biên bản đã có chữ ký không được xóa"':''}>🗑</button></div>
+                </div>`}).join(''):'<div class="receipt-list-empty">Chưa có biên bản nhận hàng phù hợp.</div>';
+        }
+        async function deleteReceiptRecord(id){
+            const rec=receiptRT.records.find(x=>x.id===id);if(!rec)return;if(receiptSignedCount(rec)>0)return aiNotice('Biên bản đã có chữ ký nên không được xóa. Hãy thu hồi chữ ký trước nếu thực sự cần xử lý.','error');
+            if(!confirm(`Xóa biên bản ${rec.code||id}?`))return;try{await receiptRealtimeRef.child(id).remove();if(receiptRT.currentId===id)resetReceiptRealtimeCurrent()}catch(e){aiNotice('Lỗi xóa biên bản: '+e.message,'error')}
+        }
+        function openReceiptSignModal(role){
+            if(!receiptRT.currentId||!receiptRT.currentRecord)return aiNotice('Hãy lưu hoặc mở một biên bản Firebase trước khi ký.','error');
+            if(receiptRT.currentRecord.signatures?.[role]?.signedAt)return;
+            receiptRT.signingRole=role;receiptRT.canvasDirty=false;
+            const meta=RECEIPT_ROLE_META[role];$ai('ai-receipt-sign-modal-role').textContent=`${meta?.label||role} · ${receiptRT.currentRecord.code||''}`;
+            let saved='';try{saved=localStorage.getItem('ideco_receipt_signer_name_'+role)||''}catch(e){};$ai('ai-receipt-signer-name').value=saved;
+            clearReceiptSignatureCanvas();$ai('ai-receipt-sign-modal-status').textContent='';const m=$ai('ai-receipt-sign-modal');m.classList.add('show');m.setAttribute('aria-hidden','false');
+        }
+        function closeReceiptSignModal(){const m=$ai('ai-receipt-sign-modal');if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true')}receiptRT.signingRole=''}
+        function clearReceiptSignatureCanvas(){
+            const c=$ai('ai-receipt-sign-canvas');if(!c)return;const ctx=c.getContext('2d');ctx.save();ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);ctx.restore();receiptRT.canvasDirty=false;
+        }
+        function initReceiptSignatureCanvas(){
+            const c=$ai('ai-receipt-sign-canvas');if(!c||c.dataset.bound)return;c.dataset.bound='1';const ctx=c.getContext('2d');ctx.lineWidth=2.3;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#0f172a';let drawing=false;
+            const pos=e=>{const r=c.getBoundingClientRect(),p=e.touches?.[0]||e;return {x:(p.clientX-r.left)*(c.width/r.width),y:(p.clientY-r.top)*(c.height/r.height)}};
+            const start=e=>{e.preventDefault();drawing=true;receiptRT.canvasDirty=true;const p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y)};
+            const move=e=>{if(!drawing)return;e.preventDefault();const p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke()};
+            const end=e=>{if(!drawing)return;e.preventDefault();drawing=false;ctx.closePath()};
+            c.addEventListener('pointerdown',start);c.addEventListener('pointermove',move);window.addEventListener('pointerup',end);clearReceiptSignatureCanvas();
+        }
+        async function confirmReceiptSignature(){
+            const role=receiptRT.signingRole,name=($ai('ai-receipt-signer-name')?.value||'').trim();if(!role||!receiptRT.currentId)return;
+            if(!name)return aiNotice('Vui lòng nhập họ tên người ký.','error');if(!receiptRT.canvasDirty)return aiNotice('Vui lòng ký trực tiếp trong khung chữ ký.','error');
+            const c=$ai('ai-receipt-sign-canvas'),signatureData=c.toDataURL('image/jpeg',0.72),st=$ai('ai-receipt-sign-modal-status');st.textContent='Đang lưu chữ ký lên Firebase...';
+            const sig={name,role:RECEIPT_ROLE_META[role].label,signedAt:receiptServerTimestamp(),signatureData,deviceId:receiptRT.deviceId};
+            try{
+                await receiptRealtimeRef.child(receiptRT.currentId).child('signatures').child(role).set(sig);
+                await receiptRealtimeRef.child(receiptRT.currentId).child('signatureAudit').push({action:'SIGN',role,name,at:receiptServerTimestamp(),deviceId:receiptRT.deviceId});
+                try{localStorage.setItem('ideco_receipt_signer_name_'+role,name)}catch(e){}
+                await updateReceiptCloudStatus(receiptRT.currentId);closeReceiptSignModal();
+            }catch(e){st.textContent='❌ '+e.message;aiNotice('Không lưu được chữ ký Firebase: '+e.message,'error')}
+        }
+        async function revokeReceiptSignature(role){
+            if(!receiptRT.currentId||!receiptRT.currentRecord?.signatures?.[role])return;const old=receiptRT.currentRecord.signatures[role];
+            if(!confirm(`Thu hồi chữ ký của ${old.name||RECEIPT_ROLE_META[role].label}? Sau khi thu hồi, nội dung chỉ mở khóa khi không còn chữ ký nào.`))return;
+            try{
+                await receiptRealtimeRef.child(receiptRT.currentId).child('signatures').child(role).remove();
+                await receiptRealtimeRef.child(receiptRT.currentId).child('signatureAudit').push({action:'REVOKE',role,name:old.name||'',at:receiptServerTimestamp(),deviceId:receiptRT.deviceId});
+                await updateReceiptCloudStatus(receiptRT.currentId);
+            }catch(e){aiNotice('Không thu hồi được chữ ký: '+e.message,'error')}
+        }
+        async function pdfReceiptById(id){
+            const rec=receiptRT.records.find(x=>x.id===id);if(!rec)return;receiptRecordToCurrent(rec);await new Promise(r=>setTimeout(r,80));await saveReceiptPDF();
+        }
+        function bindReceiptRealtime(){
+            try{
+                receiptRealtimeRef.on('value',snap=>{
+                    const v=snap.val()||{};receiptRT.records=Object.entries(v).map(([id,r])=>({id,...r})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+                    if(receiptRT.currentId){const fresh=receiptRT.records.find(x=>x.id===receiptRT.currentId)||null;receiptRT.currentRecord=fresh;if(fresh){renderReceiptSignerCards();renderReceiptSignatures();if($ai('ai-receipt-cloud-code'))$ai('ai-receipt-cloud-code').textContent=fresh.code||receiptRT.currentId}else resetReceiptRealtimeCurrent()}
+                    renderReceiptList();
+                },e=>{console.warn('receivingReceipts realtime',e);setReceiptCloudStatus('❌ Không đọc được biên bản realtime: '+e.message,'error')});
+            }catch(e){console.warn('bind receipt realtime',e)}
+        }
+        function bindReceiptRealtimeUI(){
+            $ai('ai-receipt-save-cloud')?.addEventListener('click',saveCurrentReceiptCloud);
+            $ai('ai-receipt-list-search')?.addEventListener('input',renderReceiptList);
+            $ai('ai-receipt-list-refresh')?.addEventListener('click',()=>receiptRealtimeRef.once('value').then(()=>setReceiptCloudStatus('Đã yêu cầu làm mới danh sách.','ok')).catch(e=>aiNotice(e.message,'error')));
+            $ai('ai-receipt-live-signers')?.addEventListener('click',e=>{const s=e.target.closest('[data-receipt-sign-role]'),r=e.target.closest('[data-receipt-revoke-role]');if(s)openReceiptSignModal(s.dataset.receiptSignRole);else if(r)revokeReceiptSignature(r.dataset.receiptRevokeRole)});
+            $ai('ai-receipt-list')?.addEventListener('click',e=>{const v=e.target.closest('[data-receipt-view]'),p=e.target.closest('[data-receipt-pdf]'),d=e.target.closest('[data-receipt-delete]');if(v){const rec=receiptRT.records.find(x=>x.id===v.dataset.receiptView);if(rec)receiptRecordToCurrent(rec)}else if(p)pdfReceiptById(p.dataset.receiptPdf);else if(d&&!d.disabled)deleteReceiptRecord(d.dataset.receiptDelete)});
+            $ai('ai-receipt-sign-close')?.addEventListener('click',closeReceiptSignModal);$ai('ai-receipt-sign-clear')?.addEventListener('click',clearReceiptSignatureCanvas);$ai('ai-receipt-sign-confirm')?.addEventListener('click',confirmReceiptSignature);
+            $ai('ai-receipt-sign-modal')?.addEventListener('click',e=>{if(e.target===$ai('ai-receipt-sign-modal'))closeReceiptSignModal()});
+            initReceiptSignatureCanvas();renderReceiptSignerCards();bindReceiptRealtime();
         }
 
         function renderReceipt(){ const el=$ai('ai-receipt'); if(!aiState.rows.length){el.style.display='none';return;} el.style.display='block'; const supplier=$ai('ai-supplier').value||aiState.slipInfo.nhaCungCap||''; const invoice=$ai('ai-invoice').value||aiState.slipInfo.soPhieu||aiState.slipInfo.theoHoaDonSo||''; const date=$ai('ai-receive-date').value||new Date().toISOString().slice(0,10); const receiver=$ai('ai-receiver').value||'';
-            $ai('ai-receipt-meta').innerHTML=`<div><b>Nhà cung cấp:</b><br>${escAI(supplier||'Chưa khai báo')}</div><div><b>Số phiếu/Hóa đơn:</b><br>${escAI(invoice||'Chưa khai báo')}</div><div><b>Ngày nhận:</b><br>${escAI(date)}</div><div><b>Người giao:</b><br>${escAI(aiState.slipInfo.hoTenNguoiGiao||'')}</div><div><b>Kho nhận:</b><br>${escAI(aiState.slipInfo.nhapTaiKho||'IDECO')}</div><div><b>Người lập:</b><br>${escAI(receiver)}</div>`;
+            $ai('ai-receipt-meta').innerHTML=`<div><b>Mã biên bản:</b><br>${escAI(receiptRT.currentRecord?.code||'CHƯA LƯU FIREBASE')}</div><div><b>Nhà cung cấp:</b><br>${escAI(supplier||'Chưa khai báo')}</div><div><b>Số phiếu/Hóa đơn:</b><br>${escAI(invoice||'Chưa khai báo')}</div><div><b>Ngày nhận:</b><br>${escAI(date)}</div><div><b>Người giao:</b><br>${escAI(aiState.slipInfo.hoTenNguoiGiao||'')}</div><div><b>Kho nhận:</b><br>${escAI(aiState.slipInfo.nhapTaiKho||'IDECO')}</div><div><b>Người lập:</b><br>${escAI(receiver)}</div><div><b>Trạng thái ký:</b><br>${escAI(receiptRT.currentRecord?receiptStatusText(receiptRT.currentRecord):'Chưa lưu để ký')}</div>`;
             $ai('ai-receipt-body').innerHTML=aiState.rows.map((r,i)=>{const p=rowWarehouseProduct(r);return `<tr><td>${i+1}</td><td>${escAI(p.code||'')}</td><td><b>${escAI(p.name||r.sourceName)}</b><div style="font-size:.7rem;color:#64748b">Phiếu: ${escAI(r.sourceName)}</div></td><td>${escAI(p.strength||'')}</td><td>${escAI(p.packSpec||'')}</td><td>${escAI(p.unit||r.sourceUnit)}</td><td>${escAI(r.lotNumber)}</td><td>${escAI(r.expiryRaw)}</td><td>${escAI(r.quantity??'')}</td><td>${r.status==='blocked'?'Thiếu điều kiện nhập kho':r.status==='new'?'CHƯA KHỚP TÊN MASTER - KHÔNG NHẬP KHO':r.status==='warning'?'ĐÃ KHỚP MASTER - CÓ THÔNG TIN THAM KHẢO':'ĐÃ KHỚP TÊN MASTER'}</td></tr>`;}).join('');
             renderReceiptSignatures();
         }
         async function saveReceiptPDF(){ const el=$ai('ai-receipt'); if(!el||!aiState.rows.length)return; try{setAIProgress('Đang tạo PDF Biên bản nhận hàng...',true); const canvas=await html2canvas(el,{scale:1.7,useCORS:true,backgroundColor:'#fff'}); const {jsPDF}=window.jspdf; const pdf=new jsPDF({orientation:'l',unit:'mm',format:'a4'}),pw=pdf.internal.pageSize.getWidth(),ph=pdf.internal.pageSize.getHeight(),ratio=Math.min(pw/canvas.width,ph/canvas.height),w=canvas.width*ratio,h=canvas.height*ratio; pdf.addImage(canvas.toDataURL('image/png'),'PNG',(pw-w)/2,5,w,h); pdf.save(`IDECO_BienBan_NhanHang_${new Date().toISOString().slice(0,10)}.pdf`); setAIProgress('Đã tạo PDF Biên bản nhận hàng.',true); setTimeout(()=>setAIProgress('',false),2500);}catch(e){aiNotice('Lỗi tạo PDF: '+e.message,'error');} }
 
-        async function analyzeFiles(){ if(aiState.busy)return; if(!aiState.files.length)return aiNotice('Vui lòng chọn phiếu NCC trước.','error'); if(!masterData.length)return aiNotice('CHƯA CÓ MASTER KHO. Hãy nạp Dữ Liệu Gốc trước khi AI phân tích phiếu NCC; ứng dụng không dùng dữ liệu tồn kho để thay Master.','error'); if(!aiState.settings.baiKey&&!currentAIKeys().length)return aiNotice('Chưa có API key AI. Mở Cài đặt AI để nhập key.','error'); aiState.busy=true; $ai('ai-analyze-btn').disabled=true; aiState.rawItems=[]; aiState.slipInfo={}; startAIProcessing(isFastAI()?'⚡ Huyền đang phân tích nhanh phiếu NCC...':'🛡️ Huyền đang kiểm tra kỹ phiếu NCC...'); try{
+        async function analyzeFiles(){ if(aiState.busy)return; resetReceiptRealtimeCurrent(); if(!aiState.files.length)return aiNotice('Vui lòng chọn phiếu NCC trước.','error'); if(!masterData.length)return aiNotice('CHƯA CÓ MASTER KHO. Hãy nạp Dữ Liệu Gốc trước khi AI phân tích phiếu NCC; ứng dụng không dùng dữ liệu tồn kho để thay Master.','error'); if(!aiState.settings.baiKey&&!currentAIKeys().length)return aiNotice('Chưa có API key AI. Mở Cài đặt AI để nhập key.','error'); aiState.busy=true; $ai('ai-analyze-btn').disabled=true; aiState.rawItems=[]; aiState.slipInfo={}; startAIProcessing(isFastAI()?'⚡ Huyền đang phân tích nhanh phiếu NCC...':'🛡️ Huyền đang kiểm tra kỹ phiếu NCC...'); try{
             for(let i=0;i<aiState.files.length;i++){
                 const f=aiState.files[i];
                 setAIProgress(`📄 Huyền đang đọc phiếu ${i+1}/${aiState.files.length}: ${f.name}...`,true);
@@ -3637,7 +3880,7 @@ YÊU CẦU BẮT BUỘC:
                 setAIProgress(`⛔ Chưa có dòng nào đủ điều kiện load Nhập kho. Cần Tên khớp Master + Quy cách + Lô + HSD + Số lượng. Chưa khớp tên: ${unmatched}; cảnh báo tham khảo: ${warn}; thiếu bắt buộc: ${bad}.`,true);
             }
         }catch(e){const msg=e?.message||String(e);aiState.lastError=msg;console.warn('Chi tiết tuyến AI:',msg);aiNotice('Huyền chưa phân tích được phiếu. Bạn kiểm tra kết nối/API trong Cài đặt hoặc mở NHẬP THỦ CÔNG DỰ PHÒNG để tiếp tục.','error');const tr=$ai('ai-test-result');if(tr){const tech=[...(aiState.attempts||[])].slice(-5).map(escAI).join('<br>');tr.innerHTML=`<div style="color:#b91c1c"><b>❌ Huyền chưa phân tích được phiếu.</b> Mở Cài đặt → Kiểm tra AI.</div>${tech?`<details style="margin-top:6px"><summary>Chi tiết tuyến kỹ thuật</summary><div style="font-size:.72rem;margin-top:5px;color:#64748b">${tech}</div></details>`:''}`;}const fb=$ai('manual-fallback-details');if(fb)fb.open=true;}finally{aiState.busy=false;stopAIProcessing();$ai('ai-analyze-btn').disabled=false;} }
-        function clearAI(){ stopAIProcessing(); aiState.busy=false;aiState.files=[];aiState.rawItems=[];aiState.rows=[];aiState.slipInfo={};aiState.currentStage='';renderAIFiles();$ai('ai-compare-root').innerHTML='<div style="padding:45px;text-align:center;color:#94a3b8">Tải phiếu NCC và bấm AI PHÂN TÍCH.</div>';$ai('ai-match-summary').innerHTML='<span class="ai-pill ai-info">Chưa có dữ liệu</span>';$ai('ai-block-note').style.display='none';$ai('ai-receipt').style.display='none';$ai('ai-rematch-btn').disabled=true;if($ai('ai-sync-master-btn'))$ai('ai-sync-master-btn').disabled=true;$ai('ai-to-warehouse-btn').disabled=true;$ai('ai-receipt-pdf-btn').disabled=true;setAIProgress('',false);}
+        function clearAI(){ resetReceiptRealtimeCurrent(); stopAIProcessing(); aiState.busy=false;aiState.files=[];aiState.rawItems=[];aiState.rows=[];aiState.slipInfo={};aiState.currentStage='';renderAIFiles();$ai('ai-compare-root').innerHTML='<div style="padding:45px;text-align:center;color:#94a3b8">Tải phiếu NCC và bấm AI PHÂN TÍCH.</div>';$ai('ai-match-summary').innerHTML='<span class="ai-pill ai-info">Chưa có dữ liệu</span>';$ai('ai-block-note').style.display='none';$ai('ai-receipt').style.display='none';$ai('ai-rematch-btn').disabled=true;if($ai('ai-sync-master-btn'))$ai('ai-sync-master-btn').disabled=true;$ai('ai-to-warehouse-btn').disabled=true;$ai('ai-receipt-pdf-btn').disabled=true;setAIProgress('',false);}
         function fillAISettings(){
             const s=aiState.settings;
             [1,2,3].forEach((n,i)=>$ai('ai-key-'+n).value=s.keys?.[i]||'');
@@ -3726,10 +3969,8 @@ YÊU CẦU BẮT BUỘC:
             if($ai('ai-sync-master-btn'))$ai('ai-sync-master-btn').onclick=syncSelectedRowsFromMaster;
             $ai('ai-to-warehouse-btn').onclick=goWarehouse;
             $ai('ai-receipt-pdf-btn').onclick=saveReceiptPDF;
-            loadReceiptSignerData();
-            ['ai-sign-warehouse-accounting','ai-sign-preparer','ai-sign-professional'].forEach(id=>$ai(id)?.addEventListener('input',saveReceiptSignerData));
-            ['ai-signed-warehouse-accounting','ai-signed-preparer','ai-signed-professional'].forEach(id=>$ai(id)?.addEventListener('change',saveReceiptSignerData));
-            ['ai-supplier','ai-invoice','ai-receive-date','ai-receiver'].forEach(id=>$ai(id).oninput=renderReceipt);
+            bindReceiptRealtimeUI();
+            ['ai-supplier','ai-invoice','ai-receive-date','ai-receiver'].forEach(id=>$ai(id).oninput=()=>{if(receiptRT.currentRecord&&receiptSignedCount(receiptRT.currentRecord)>0)return;renderReceipt();});
         }
         // Keep AI rows updated if Master changes in realtime.
         try{ refs.master.on('value',()=>{ if(aiState.rawItems.length&&!aiState.busy)setTimeout(()=>rematchAll(false),100); }); }catch(e){}

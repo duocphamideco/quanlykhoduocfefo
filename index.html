@@ -489,6 +489,7 @@
             <div class="nav-tab" onclick="switchTab('tab4', this)" id="btn-tab4">4. ĐÓNG HÀNG & GIAO HÀNG KPI</div>
             <div class="nav-tab" onclick="switchTab('tab5', this)" id="btn-tab5">5. KIỂM TRA HÓA ĐƠN THUỐC</div>
             <div class="nav-tab" onclick="switchTab('tab6', this)" id="btn-tab6">6. ĐẶT HÀNG/NGÀY &amp; DỰ BÁO</div>
+            <div class="nav-tab" onclick="switchTab('tab7', this)" id="btn-tab7">7. AI AGENT SOI ĐƠN &amp; GIÁ</div>
         </div>
 
         <div id="tab1" class="tab-content">
@@ -3541,6 +3542,990 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 </script>
         </div>
 
+        <div id="tab7" class="tab-content">
+          <div class="price-agent-shell" id="price-agent-full-shell">
+            <div class="price-agent-toolbar">
+              <div><b>🛡️ AI AGENT SOI ĐƠN &amp; GIÁ</b><small>Kiểm soát PDF/ảnh → Master → Giá/CK → Tồn kho → Sẵn sàng đầu ra</small></div>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <span class="price-agent-pill">🧪 FIREBASE TEST CHUNG · thunghiem-eeb1f</span>
+                <span class="price-agent-pill" style="background:#dcfce7;color:#166534;border-color:#86efac">🤖 AI CHÍNH / AI PHỤ · dùng chung TAB Nhập hàng</span>
+                <button type="button" class="btn btn-primary" onclick="window.openIDECOSettingsPanel&&window.openIDECOSettingsPanel()">⚙️ Cài đặt AI</button>
+                <button type="button" class="btn btn-primary" onclick="window.reloadPriceAgentTab&&window.reloadPriceAgentTab()">↻ Khởi động lại tab</button>
+              </div>
+            </div>
+            <iframe id="price-agent-iframe" class="price-agent-frame" title="IDECO AI Agent Soi đơn và Giá" loading="lazy"></iframe>
+          </div>
+          <script type="text/plain" id="price-agent-src"><!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>IDECO - Hệ thống kiểm tra đơn chuỗi nhà thuốc</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"><\/script>
+<style>
+:root{--red:#dc2626;--blue:#0284c7;--green:#16a34a;--amber:#d97706;--slate:#334155;--muted:#64748b;--line:#e2e8f0;--bg:#f1f5f9;--card:#fff;--danger:#b91c1c}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:#1e293b}.app{max-width:none;width:100%;margin:0;padding:14px 16px}.hero{text-align:center}.hero h1{color:var(--red);font-size:clamp(26px,4vw,46px);margin:12px 0 16px}.tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}.tab{border:1px solid var(--line);background:#e2e8f0;color:#475569;padding:11px 16px;border-radius:12px;font-weight:800;cursor:pointer}.tab.active{background:#fff;color:var(--blue);border-color:#7dd3fc;box-shadow:0 4px 18px #0f172a12}.panel{display:none}.panel.active{display:block}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}@media(max-width:980px){.grid2{grid-template-columns:1fr}}.card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 24px #0f172a0a;padding:18px;margin-bottom:16px}.card h2,.card h3{margin-top:0}.step{display:flex;gap:10px;align-items:center}.step b{font-size:24px;color:var(--blue)}.drop{border:2px dashed #cbd5e1;border-radius:14px;padding:28px;text-align:center;background:#f8fafc;cursor:pointer;transition:.2s}.drop:hover{border-color:#38bdf8;background:#f0f9ff}.drop.drag{border-color:#0ea5e9;background:#e0f2fe}.file-list{max-height:110px;overflow:auto;text-align:left;font-size:12px;color:#64748b;margin-top:8px}.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer;background:#e2e8f0;color:#334155}.btn:hover{filter:brightness(.97)}.btn:disabled{opacity:.45;cursor:not-allowed}.btn.blue{background:#0284c7;color:white}.btn.green{background:#16a34a;color:white}.btn.red{background:#dc2626;color:white}.btn.amber{background:#d97706;color:white}.btn.outline{background:#fff;border:1px solid #cbd5e1}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.grow{flex:1}.chain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}@media(max-width:700px){.chain-grid{grid-template-columns:1fr}}.chain{background:#fff;border:1px solid #cbd5e1;padding:10px;border-radius:10px;font-weight:700;cursor:pointer}.chain.active{background:#0ea5e9;color:#fff;border-color:#0ea5e9}.status{padding:10px 12px;border-radius:10px;margin:10px 0;font-size:14px}.status.info{background:#e0f2fe;color:#075985}.status.ok{background:#dcfce7;color:#166534}.status.err{background:#fee2e2;color:#991b1b}.status.warn{background:#fef3c7;color:#92400e}.hidden{display:none!important}label{font-weight:700;font-size:13px;color:#475569}input,select,textarea{width:100%;border:1px solid #cbd5e1;border-radius:9px;padding:9px 10px;background:white;color:#0f172a}textarea{min-height:150px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.field{display:grid;gap:5px;margin-bottom:10px}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px;max-height:560px}table{width:100%;border-collapse:collapse;font-size:13px;background:white}th{position:sticky;top:0;background:#f8fafc;z-index:1;color:#475569;text-transform:none}th,td{padding:9px 10px;border-bottom:1px solid #e2e8f0;white-space:nowrap;text-align:left}tr:hover td{background:#f8fafc}.num{text-align:right}.editable{border:1px solid transparent;border-radius:5px;padding:4px;background:transparent;min-width:80px}.editable:focus{border-color:#38bdf8;background:#fff}.section-title{border-left:5px solid var(--blue);padding-left:10px}.subtabs{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}.subtab{padding:8px 12px;border-radius:9px;border:1px solid #cbd5e1;background:#fff;font-weight:750;cursor:pointer}.subtab.active{background:#0f172a;color:#fff}.mapping{display:grid;grid-template-columns:210px minmax(220px,1fr);gap:8px;align-items:center;margin:8px 0}@media(max-width:650px){.mapping{grid-template-columns:1fr}}.result-good{border-left:5px solid #16a34a}.result-bad{border-left:5px solid #dc2626}.result-list{margin:0;padding-left:22px;line-height:1.65}.pill{display:inline-block;padding:3px 8px;border-radius:999px;font-size:12px;font-weight:800}.pill.ok{background:#dcfce7;color:#166534}.pill.bad{background:#fee2e2;color:#991b1b}.pill.warn{background:#fef3c7;color:#92400e}.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}@media(max-width:800px){.kpi{grid-template-columns:repeat(2,1fr)}}.kpi>div{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px}.kpi strong{font-size:24px;display:block}.modal{position:fixed;inset:0;background:#0f172aaa;display:flex;align-items:center;justify-content:center;padding:15px;z-index:50}.modal-box{background:#fff;border-radius:16px;max-width:920px;width:100%;max-height:94vh;overflow:auto;padding:20px}.muted{color:#64748b;font-size:13px}.small{font-size:12px}.audit-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:12px;margin-top:12px}.spinner{width:18px;height:18px;border:3px solid #ffffff66;border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;display:inline-block;vertical-align:middle}@keyframes spin{to{transform:rotate(360deg)}}.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}@media(max-width:950px){.settings-grid{grid-template-columns:1fr}}.code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#0f172a;color:#e2e8f0;padding:12px;border-radius:10px;overflow:auto;white-space:pre-wrap}.footer{text-align:center;color:#64748b;font-size:12px;padding:20px}.exp-row td{background:#f8fafc!important}.batch{padding:3px 0;color:#475569}.right{text-align:right}.danger-note{background:#fff1f2;border:1px solid #fecdd3;border-radius:12px;padding:12px;color:#9f1239}
+
+.priority-t{font-weight:800;border:2px solid #64748b!important}
+.priority-t.on{box-shadow:0 0 0 3px rgba(34,197,94,.18);border-color:#16a34a!important;background:#dcfce7!important;color:#166534!important}
+
+
+.credit-control{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid #dbe3ea;border-radius:12px;background:#f8fafc;margin-top:12px}
+.switch{position:relative;display:inline-block;width:54px;height:30px;flex:0 0 auto}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;inset:0;background:#cbd5e1;transition:.2s;border-radius:999px}
+.slider:before{content:"";position:absolute;height:22px;width:22px;left:4px;top:4px;background:#fff;transition:.2s;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.switch input:checked + .slider{background:#16a34a}
+.switch input:checked + .slider:before{transform:translateX(24px)}
+.priority-t.locked{opacity:.48;cursor:not-allowed!important;filter:grayscale(.45)}
+.analysis-marquee{display:none;overflow:hidden;white-space:nowrap;border-radius:10px;margin-top:10px;padding:9px 0;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;font-weight:700}
+.analysis-marquee.show{display:block}
+.analysis-marquee span{display:inline-block;padding-left:100%;animation:huyenMarquee 18s linear infinite}
+@keyframes huyenMarquee{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
+
+.api-secret-field{-webkit-text-security:disc}
+.api-secret-field.reveal-key{-webkit-text-security:none}
+
+.agent-hub{margin:0 0 14px;background:linear-gradient(135deg,#0f172a,#1e3a8a);color:#fff;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;box-shadow:0 8px 24px #0f172a24}.agent-hub b{font-size:14px}.agent-hub .agent-grow{flex:1;min-width:260px}.agent-pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:900;background:#ffffff18;border:1px solid #ffffff36}.agent-route-btn{border:1px solid #ffffff55;background:#ffffff12;color:#fff;padding:7px 10px;border-radius:9px;font-weight:900;cursor:pointer}.agent-route-btn.on{background:#fff;color:#1d4ed8}.agent-gate{background:#fff;border:2px solid #cbd5e1;border-radius:14px;padding:14px;margin:12px 0}.agent-gate.good{border-color:#22c55e;background:#f0fdf4}.agent-gate.warn{border-color:#f59e0b;background:#fffbeb}.agent-gate.bad{border-color:#ef4444;background:#fef2f2}.agent-gate-grid{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:8px;margin-top:10px}.agent-gate-grid>div{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:9px}.agent-gate-grid small{display:block;color:#64748b;font-weight:700}.agent-gate-grid strong{display:block;margin-top:3px}.agent-table-wrap{overflow:auto;max-height:420px;border:1px solid #e2e8f0;border-radius:10px;margin-top:10px}@media(max-width:900px){.agent-gate-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="hero"><h1>HỆ THỐNG KIỂM TRA ĐƠN CHUỖI NHÀ THUỐC</h1></header>
+<nav class="tabs">
+<button class="tab active" data-main="extract">1. Trích Xuất Đơn Hàng (AI)</button>
+<button class="tab" data-main="verify">2. Kiểm Tra & Phân Tích (IDECO)</button>
+<button class="tab" data-main="settings">⚙️ Cài Đặt</button>
+<button id="agentRouteMain" type="button" class="tab priority-t">AI CHÍNH</button><button id="agentRouteBackup" type="button" class="tab priority-t">AI PHỤ</button>
+</nav>
+<div class="agent-hub" id="agentHub"><div class="agent-grow"><b>🛡️ AI AGENT KIỂM SOÁT ĐƠN & GIÁ</b><div class="small" style="color:#cbd5e1;margin-top:3px">Cổng kiểm soát: PDF 2 lượt → Master chính thức → Giá/CK chuẩn → Tồn kho → Sẵn sàng đầu ra. Không tự bỏ qua dòng sai.</div></div><span class="agent-pill">🧪 FIREBASE TEST · thunghiem-eeb1f</span><span class="agent-pill" id="agentRouteStatus">AI CHÍNH</span><button id="openSharedAISettings" type="button" class="agent-route-btn">⚙️ Cài đặt AI chung</button></div>
+
+<section id="panel-extract" class="panel active">
+<div class="grid2">
+<div class="card">
+<div class="step"><b>1</b><h2>Tải PDF / ảnh đơn hàng</h2></div>
+<div id="dropzone" class="drop">📄<br><strong>Nhấn hoặc kéo thả tệp vào đây</strong><div class="muted">Hỗ trợ PDF, JPG, PNG, WEBP — nhiều tệp</div><div id="fileList" class="file-list"></div></div>
+<input id="aiFiles" type="file" accept="application/pdf,image/*" multiple class="hidden" />
+<div class="row" style="margin-top:8px"><button id="clearAiFiles" class="btn outline">Xóa tất cả</button><span id="fileTotal" class="muted">0 tệp</span></div>
+<hr style="border:0;border-top:1px solid #e2e8f0;margin:18px 0">
+<div class="step"><b>2</b><h2>Chọn chuỗi nhà thuốc</h2></div>
+<div id="chainGrid" class="chain-grid">
+<button class="chain" data-chain="longchau">Chuỗi NT Long Châu</button>
+<button class="chain" data-chain="pharmacity">Chuỗi NT Pharmacity</button>
+<button class="chain" data-chain="ankhang">Chuỗi NT An Khang</button>
+<button class="chain" data-chain="caman">Chuỗi Nhà Thuốc Cẩm Ân</button>
+<button class="chain" data-chain="trungson">Chuỗi Nhà Thuốc Trung Sơn</button>
+<button class="chain" data-chain="khac">Chuỗi NT Khác</button>
+</div>
+<div class="field" style="margin-top:12px"><label>Prompt tùy chỉnh (có thể chỉnh trước khi chạy)</label><textarea id="promptBox"></textarea></div>
+<div class="row"><label style="display:flex;gap:7px;align-items:center"><input id="doubleCheck" type="checkbox" checked style="width:auto"> Kiểm tra AI 2 lượt thông minh</label><label style="display:flex;gap:7px;align-items:center"><input id="strictMode" type="checkbox" checked style="width:auto"> Không tự đoán dữ liệu mờ</label></div>
+<div id="analysisMarquee" class="analysis-marquee"><span>Cho Huyền chút thời gian kiểm tra kỹ hơn, bạn thử nhớ mời chuỗi NT loại thuốc mới liên tục nha, kệ cứ chào thử ha, tác động Buyer họ nhé</span></div>
+<div id="aiProviderStatus" class="small" style="margin-top:10px"><b>Trợ lý:</b> HUYỀN • Chế độ tiêu chuẩn</div>
+<button id="runAI" class="btn blue" style="width:100%;margin-top:14px;padding:13px">✨ Tạo Bảng & Đối Chiếu PDF</button>
+<div id="aiStatus"></div>
+</div>
+<div class="card">
+<div class="row"><h2 class="grow">Kết quả Trích Xuất</h2><button id="copyAI" class="btn outline">📋 Sao chép</button><button id="exportAI" class="btn green">📊 Xuất Excel</button><button id="toVerify" class="btn blue">🚀 Chuyển sang Kiểm Tra</button></div>
+<div id="aiResult" class="table-wrap"><div class="muted" style="padding:28px;text-align:center">Kết quả sẽ hiển thị tại đây.</div></div>
+<div id="aiAudit"></div>
+</div>
+</div>
+</section>
+
+<section id="panel-verify" class="panel">
+<div class="card">
+<h2 class="section-title">Quản lý Dữ liệu Chuẩn</h2>
+<div class="row">
+<div class="field grow"><label>Chọn bảng dữ liệu gốc</label><select id="datasetSelect"><option value="">-- Chọn bảng dữ liệu --</option></select></div>
+<div class="field grow"><label>Tên bảng mới</label><input id="newDatasetName" placeholder="VD: LONG_CHAU_2026" /></div>
+<label class="btn blue" style="margin-top:14px">📂 Nạp Excel dữ liệu chuẩn<input id="masterFile" class="hidden" type="file" accept=".xlsx,.xls,.csv"></label>
+</div>
+<div id="masterMapping" class="hidden"></div>
+<div class="row" style="margin:10px 0"><button id="addMasterRow" class="btn">➕ Thêm hàng</button><button id="saveMaster" class="btn green">💾 Lưu thay đổi</button><button id="exportMaster" class="btn blue">📄 Xuất Excel</button><button id="deleteDataset" class="btn red">🗑️ Xóa bảng này</button><span id="masterStatus" class="muted"></span></div>
+<div id="masterTable" class="table-wrap"><div class="muted" style="padding:20px">Vui lòng chọn bảng dữ liệu.</div></div>
+</div>
+
+<div class="card">
+<h2 class="section-title">Báo cáo tồn kho & Soi chiếu đơn</h2>
+<div class="subtabs"><button class="subtab active" data-invtab="report">📦 Báo cáo tồn kho</button><button class="subtab" data-invtab="analysis">🔍 Phân tích đặt hàng</button></div>
+<div id="inv-report">
+<div class="row"><input id="inventorySearch" class="grow" placeholder="Tìm mã hoặc tên sản phẩm..." style="max-width:520px"><button id="exportInventory" class="btn green">📊 Xuất tồn kho</button><span id="inventoryUpdate" class="muted"></span></div>
+<div id="inventoryTable" class="table-wrap" style="margin-top:10px"><div class="muted" style="padding:20px">Đang kết nối kho...</div></div>
+</div>
+<div id="inv-analysis" class="hidden">
+<div class="field"><label>Cấu trúc dữ liệu</label><div class="row"><label><input type="radio" name="invFmt" value="customer_export" checked style="width:auto"> Đơn Khách Hàng</label><label><input type="radio" name="invFmt" value="simple" style="width:auto"> Mã | Tên | Số lượng</label></div></div>
+<div class="field"><label>Dán dữ liệu đơn hàng từ Excel</label><textarea id="inventoryPaste" placeholder="Dán dữ liệu vào đây..."></textarea></div>
+<div class="row"><button id="runInventoryAnalysis" class="btn blue">🔍 Phân tích ngay</button><button id="exportNeedBuy" class="btn red">Xuất hàng cần đặt</button><button id="exportInvAnalysis" class="btn green">Xuất tất cả</button></div>
+<div id="inventoryAnalysisResult" class="table-wrap" style="margin-top:12px"><div class="muted" style="padding:20px">Chưa có kết quả.</div></div>
+</div>
+</div>
+
+<div class="card">
+<h2 class="section-title">🛡️ AI AGENT — Cổng kiểm soát từ Đơn vào → Đơn ra</h2>
+<div class="muted">Agent kiểm tra độc lập bằng dữ liệu Firebase TEST: Master chính thức <b>excelFiles</b>, bảng giá chuẩn <b>du_lieu_goc</b>, tồn kho <b>pharmaceuticals</b> và lịch sử xuất <b>exports</b>. AI chỉ đọc chứng từ; quyết định Đúng/Sai dùng quy tắc dữ liệu.</div>
+<div class="row" style="margin-top:10px"><button id="runAgentGate" class="btn blue">🛡️ AGENT SOI TOÀN BỘ</button><button id="saveAgentAudit" class="btn green">☁️ Lưu biên bản kiểm soát TEST</button><span id="agentGateStatus" class="muted">Chờ dữ liệu đơn và bảng giá chuẩn.</span></div>
+<div id="agentGateResult" class="agent-gate"><b>Chưa chạy AI Agent.</b></div>
+</div>
+
+<div class="card">
+<h2 class="section-title">Kiểm Tra Giá & Đơn Hàng</h2>
+<div class="status info">Đối chiếu với bảng: <strong id="selectedDatasetLabel">...</strong></div>
+<div class="subtabs"><button class="subtab active" data-order-tab="upload">📂 Tải file lên</button><button class="subtab" data-order-tab="paste">📋 Dán dữ liệu</button></div>
+<div id="order-upload"><label class="btn blue">📂 Tải file Đơn Hàng<input id="orderFile" type="file" class="hidden" accept=".xlsx,.xls,.csv"></label></div>
+<div id="order-paste" class="hidden"><textarea id="orderPaste" placeholder="Dán dữ liệu bảng tính vào đây..."></textarea><button id="processPaste" class="btn green" style="margin-top:8px">🔍 Xử lý & Ánh xạ cột</button></div>
+<div id="orderMapping" class="hidden"></div>
+<div id="verifyResults" class="hidden" style="margin-top:18px">
+<h2>Kết Quả Kiểm Tra Giá</h2>
+<div class="subtabs"><button class="subtab active" data-result-tab="check">📊 Kết quả so giá</button><button class="subtab" data-result-tab="sales">🛒 Đơn hàng bán</button><button class="subtab" data-result-tab="customer">👤 Đơn khách hàng</button></div>
+<div id="result-check"></div><div id="result-sales" class="hidden"></div><div id="result-customer" class="hidden"></div>
+</div>
+</div>
+</section>
+
+<section id="panel-settings" class="panel">
+<div class="settings-grid">
+<div class="card">
+<h2>AI CHÍNH / AI PHỤ dùng chung</h2>
+<div class="status info"><b>Không khai API riêng trong TAB này.</b> Ứng dụng dùng trực tiếp API key, model và tuyến AI đã cấu hình tại TAB Nhập hàng của hệ sinh thái.</div>
+<div class="row"><button id="settingsRouteMain" class="btn blue">AI CHÍNH</button><button id="settingsRouteBackup" class="btn outline">AI PHỤ</button><button id="settingsOpenSharedAI" class="btn green">⚙️ Mở Cài đặt AI chung</button><button id="settingsTestSharedAI" class="btn outline">🧪 Kiểm tra AI đang dùng</button></div>
+<div id="sharedAISettingStatus" class="small" style="margin-top:9px"></div>
+</div>
+<div class="card" style="display:none">
+<h2>Gemini AI</h2>
+<div class="danger-note"><strong>Lưu ý bảo mật:</strong> Gemini API Key là bí mật. Nếu lưu trực tiếp trong Realtime Database và Rules cho phép đọc công khai, bất kỳ ai cũng có thể lấy key. Bản này chỉ đọc/ghi key tại đường dẫn cấu hình bạn chỉ định; nên khóa Rules hoặc dùng Authentication/App Check.</div>
+<div class="field" style="margin-top:12px">
+<label>Gemini API Key</label>
+<div class="row" style="gap:8px;align-items:center">
+<input id="geminiKey"
+ type="text"
+ class="api-secret-field"
+ autocomplete="off"
+ autocapitalize="off"
+ autocorrect="off"
+ spellcheck="false"
+ name="ideco_gemini_api_token_no_autofill"
+ data-lpignore="true"
+ data-1p-ignore="true"
+ data-bwignore="true"
+ placeholder="AIza..."
+ style="flex:1" />
+<button id="toggleGeminiKey" type="button" class="btn outline" style="white-space:nowrap">👁 Hiện key</button>
+</div>
+<div id="geminiKeyInfo" class="small" style="margin-top:6px">Chưa nạp API Key.</div>
+</div>
+<div class="field"><label>Model</label><input id="geminiModel" value="gemini-2.5-flash" /></div>
+<div class="field"><label>Đường dẫn cấu hình Gemini dùng chung trên Firebase RTDB</label><input id="geminiKeyPath" value="app_settings/gemini" readonly /></div>
+<div class="credit-control">
+  <label class="switch">
+    <input id="allowPriorityT" type="checkbox" checked>
+    <span class="slider"></span>
+  </label>
+  <div>
+    <div><b>Cho phép dùng Gemini 3.7 Flash — ƯU TIÊN T</b></div>
+    <div class="small">BGĐ dùng công tắc này để kiểm soát credit. Khi TẮT, nút ƯU TIÊN T ngoài giao diện sẽ bị khóa trên mọi máy dùng chung Firebase.</div>
+    <div id="priorityAdminStatus" class="small" style="margin-top:4px"></div>
+  </div>
+</div>
+<div class="small" style="margin-top:-4px;margin-bottom:10px">Key và model được lưu tập trung tại <b>app_settings/gemini</b> và tự đồng bộ cho mọi máy dùng cùng Firebase.</div>
+<div class="row"><button id="loadGeminiKey" class="btn outline">⬇️ Đọc key từ Firebase</button><button id="saveGeminiKey" class="btn green">☁️ Lưu key lên Firebase</button><button id="testGemini" class="btn blue">🧪 Kiểm tra Gemini</button></div>
+<div id="geminiSettingStatus"></div><div id="fileOriginWarning" class="status warn" style="margin-top:10px;display:none">
+⚠️ Ứng dụng đang mở bằng <b>file://</b>. Chrome coi file local là security origin riêng. Bản này không dùng localStorage để giữ API Key; API Key phải được xác minh trực tiếp trên Firebase mỗi lần mở.
+</div><div class="small" style="margin-top:8px"><b>Cơ chế mới:</b> khi một máy lưu key, mọi máy khác dùng cùng Firebase sẽ tự tải key từ Realtime Database lúc mở ứng dụng hoặc khi dữ liệu thay đổi.</div>
+</div>
+<div class="card">
+<h2>Firebase TEST chung</h2>
+<div class="status ok"><b>Đã khóa về project TEST: thunghiem-eeb1f.</b><br>Dữ liệu giá chuẩn: <b>du_lieu_goc</b> · Master chính thức: <b>excelFiles</b> · Tồn kho: <b>pharmaceuticals</b> · Xuất kho: <b>exports</b> · Biên bản Agent: <b>order_price_agent_audits</b>.</div>
+</div>
+<div class="card" style="display:none">
+<h2>Firebase chính — Dữ liệu chuẩn & Cài đặt</h2>
+<div id="mainFirebaseFields"></div>
+<div class="row"><button id="saveMainFirebase" class="btn green">💾 Lưu cấu hình</button><button id="testMainFirebase" class="btn blue">🔌 Kết nối lại</button></div>
+<div id="mainFbStatus"></div>
+</div>
+<div class="card" style="display:none">
+<h2>Firebase Kho</h2>
+<div id="inventoryFirebaseFields"></div>
+<div class="row"><button id="saveInventoryFirebase" class="btn green">💾 Lưu cấu hình</button><button id="testInventoryFirebase" class="btn blue">🔌 Kết nối lại</button></div>
+<div id="invFbStatus"></div>
+</div>
+<div class="card">
+<h2>Thông tin triển khai</h2>
+<p class="muted">File HTML có thể mở trực tiếp bằng Chrome/Edge. Các chức năng Firebase, Gemini và thư viện Excel cần kết nối Internet.</p>
+<div class="code">AI: dùng chung TAB Nhập hàng
+Price data: du_lieu_goc/{ten_bang}
+Master chính thức: excelFiles
+Inventory: pharmaceuticals
+Exports: exports</div>
+</div>
+</div>
+</section>
+<div class="footer">IDECO AI AGENT — Firebase TEST chung • AI CHÍNH/AI PHỤ dùng chung TAB Nhập hàng • Kiểm soát đơn & giá nhiều lớp.</div>
+</div>
+
+<script type="module">
+import { initializeApp, deleteApp } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js';
+import { getDatabase, ref, onValue, get, set, remove, update } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js';
+
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const uid=()=>Math.random().toString(36).slice(2)+Date.now().toString(36);
+const fmt=n=>new Intl.NumberFormat('en-US',{maximumFractionDigits:0}).format(Number(n)||0);
+const parseNumber=v=>{if(v===0)return 0;if(v==null||v==='')return 0;if(typeof v==='number')return v;let s=String(v).trim(),neg=s.startsWith('(')&&s.endsWith(')');if(neg)s=s.slice(1,-1);s=s.replace(/,/g,'').replace('%','');let dots=(s.match(/\./g)||[]).length;if(dots>1){let p=s.split('.'),d=p.pop();s=p.join('')+'.'+d}let n=parseFloat(s);return isNaN(n)?0:(neg?-Math.abs(n):n)};
+const parseQty=v=>Math.round(parseNumber(v));
+const normCode=v=>{let s=String(v??'').trim().replace(/^0+/,'');return s||'0'};
+const getCK=(row,key)=>{if(!key)return 0;let v=row[key];if(v==null||v==='')return 0;if(typeof v==='number')return v>0&&v<=1?+(v*100).toFixed(2):v;let s=String(v).trim();let n=parseFloat(s.replace(/,/g,'').replace('%',''));if(isNaN(n))return 0;return !s.includes('%')&&Math.abs(n)>0&&Math.abs(n)<=1?+(n*100).toFixed(2):n};
+const toast=(el,msg,type='info')=>{el.innerHTML=`<div class="status ${type}">${esc(msg)}</div>`};
+const downloadBlob=(blob,name)=>{let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)};
+const exportXlsx=(rows,name,sheet='Data')=>{if(!rows?.length)return alert('Không có dữ liệu để xuất.');let ws=XLSX.utils.json_to_sheet(rows),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,sheet);XLSX.writeFile(wb,name.endsWith('.xlsx')?name:name+'.xlsx')};
+
+const TEST_FIREBASE_CONFIG={apiKey:'AIzaSyArwL_z1HJgoF1VSI2cUy7dDum_kmWuuCc',authDomain:'thunghiem-eeb1f.firebaseapp.com',databaseURL:'https://thunghiem-eeb1f-default-rtdb.firebaseio.com',projectId:'thunghiem-eeb1f',storageBucket:'thunghiem-eeb1f.firebasestorage.app',messagingSenderId:'136411195211',appId:'1:136411195211:web:553beff72c3988eb39eace',measurementId:'G-QRGS6JETKV'};
+const DEFAULT_MAIN={...TEST_FIREBASE_CONFIG};
+const DEFAULT_INV={...TEST_FIREBASE_CONFIG};
+let mainConfig={...TEST_FIREBASE_CONFIG};
+let invConfig={...TEST_FIREBASE_CONFIG};
+let mainApp=null,mainDb=null,invApp=null,invDb=null,unsubDatasets=null,unsubInventory=null,unsubGeminiSettings=null;
+let officialMasterData=[],exportHistoryData=[],unsubOfficialMaster=null,unsubExports=null,agentLastAudit=null;
+function getSharedAI(){try{return window.parent&&window.parent!==window?(window.parent.IDECO_SHARED_AI||null):null}catch(e){return null}}
+function sharedRoute(){const a=getSharedAI();try{return a&&typeof a.getRoute==='function'&&a.getRoute()==='backup'?'backup':'main'}catch(e){return 'main'}}
+function sharedRouteLabel(){return sharedRoute()==='backup'?'AI PHỤ':'AI CHÍNH'}
+function setSharedRoute(mode){const a=getSharedAI();if(!a||typeof a.setRoute!=='function')return false;try{return a.setRoute(mode==='backup'?'backup':'main')!==false}catch(e){return false}}
+function openParentAISettings(){try{if(window.parent&&typeof window.parent.openIDECOSettingsPanel==='function'){window.parent.openIDECOSettingsPanel();return true}}catch(e){}return false}
+function updateSharedAIUI(){const mode=sharedRoute();[['#agentRouteMain','main'],['#agentRouteBackup','backup'],['#settingsRouteMain','main'],['#settingsRouteBackup','backup']].forEach(([sel,m])=>{const e=$(sel);if(e)e.classList.toggle('on',mode===m)});if($('#agentRouteStatus'))$('#agentRouteStatus').textContent=sharedRouteLabel();if($('#aiProviderStatus'))$('#aiProviderStatus').innerHTML='<b>Trợ lý:</b> HUYỀN • '+sharedRouteLabel()+' • dùng chung TAB Nhập hàng';if($('#sharedAISettingStatus'))$('#sharedAISettingStatus').textContent='Đang dùng '+sharedRouteLabel()+' · Cấu hình lấy từ TAB Nhập hàng.'}
+
+const SHARED_GEMINI_PATH='app_settings/gemini';
+const KIE_API_KEY='6a11cd4b360b77e7cd515b8296a00e6a';
+const KIE_MODEL='gemini-3-7-flash';
+const KIE_ENDPOINT='https://api.kie.ai/gemini/v1/models/gemini-3-7-flash:streamGenerateContent';
+let priorityT=localStorage.getItem('ideco_priority_t')==='1';
+let priorityTAllowed=true;
+let unsubPriorityTAdmin=null;
+const PRIORITY_T_ADMIN_PATH='app_settings/priority_t';
+
+function updatePriorityTUI(){
+ const b=$('#priorityT');
+ if(!b)return;
+ if(!priorityTAllowed && priorityT){
+   priorityT=false;
+   localStorage.setItem('ideco_priority_t','0');
+ }
+ b.classList.toggle('on',priorityT);
+ b.classList.toggle('locked',!priorityTAllowed);
+ b.disabled=!priorityTAllowed;
+ b.textContent=!priorityTAllowed?'🔒 ƯU TIÊN T: KHÓA':(priorityT?'⚡ ƯU TIÊN T: BẬT':'⚡ ƯU TIÊN T: TẮT');
+ b.title=!priorityTAllowed?'BGĐ đang khóa chế độ ưu tiên để kiểm soát credit':'Bật khi thật sự cần';
+ if($('#aiProviderStatus')){
+   $('#aiProviderStatus').innerHTML=priorityT
+    ? '<b>Trợ lý:</b> HUYỀN • ⚡ ƯU TIÊN T'
+    : '<b>Trợ lý:</b> HUYỀN • Chế độ tiêu chuẩn';
+ }
+ if($('#allowPriorityT'))$('#allowPriorityT').checked=priorityTAllowed;
+}
+if($('#priorityT'))$('#priorityT').onclick=()=>{
+ if(!priorityTAllowed){
+   alert('🔒 BGĐ đang khóa ƯU TIÊN T để kiểm soát credit. HUYỀN sẽ tiếp tục dùng chế độ thường.');
+   return;
+ }
+ const nextState=!priorityT;
+
+ if(nextState){
+   const ok=window.confirm(
+`⚡ BẬT ƯU TIÊN T
+
+Trạng thái này Huyền phải ráng nên hơi tốn token công ty 😅
+
+Nếu kẹt lắm mình mới dùng nha!
+
+Còn để TẮT thì hơi lâu một tí thôi nhưng Huyền khỏe re hà, hỗ trợ được nhiều hơn 💚
+
+Bạn vẫn muốn bật ƯU TIÊN T chứ?`
+   );
+   if(!ok)return;
+ }
+
+ priorityT=nextState;
+ localStorage.setItem('ideco_priority_t',priorityT?'1':'0');
+ updatePriorityTUI();
+
+ if(priorityT){
+   toast($('#aiStatus'),'⚡ HUYỀN đã bật chế độ ưu tiên. Chỉ nên dùng khi thật sự cần nha!','ok');
+ }else{
+   toast($('#aiStatus'),'💚 HUYỀN về chế độ thường rồi — hơi lâu chút nhưng khỏe re, hỗ trợ được nhiều hơn!','ok');
+ }
+};
+updatePriorityTUI();
+[['#agentRouteMain','main'],['#settingsRouteMain','main'],['#agentRouteBackup','backup'],['#settingsRouteBackup','backup']].forEach(([sel,mode])=>{const e=$(sel);if(e)e.onclick=()=>{if(!setSharedRoute(mode)){toast($('#aiStatus')||$('#sharedAISettingStatus'),'Không đổi được tuyến AI. Hãy kiểm tra Cài đặt AI chung.','err');return}updateSharedAIUI()}});
+if($('#openSharedAISettings'))$('#openSharedAISettings').onclick=openParentAISettings;
+if($('#settingsOpenSharedAI'))$('#settingsOpenSharedAI').onclick=openParentAISettings;
+if($('#settingsTestSharedAI'))$('#settingsTestSharedAI').onclick=async()=>{try{const a=getSharedAI();if(!a||typeof a.textRequest!=='function')throw new Error('Module AI chung chưa sẵn sàng.');const r=await a.textRequest('Trả lời đúng một từ: OK',{plainText:true,purpose:'AI Agent kiểm tra kết nối'});toast($('#sharedAISettingStatus'),sharedRouteLabel()+' kết nối tốt: '+String(r.text||'').slice(0,40),'ok')}catch(e){toast($('#sharedAISettingStatus'),'Kết nối AI lỗi: '+e.message,'err')}};
+updateSharedAIUI();
+let geminiRuntime={apiKey:'',model:'gemini-3.6-flash',ready:false};
+let geminiFirebaseVerified=false;
+let geminiLastVerifiedAt=0;
+
+function isValidGoogleApiKey(key){
+ const s=String(key||'').trim();
+
+ // Google AI Studio hiện có 2 kiểu key thường gặp:
+ // 1) Legacy/standard key: AIza...
+ // 2) Auth key mới: AQ....
+ const legacy=/^AIza[A-Za-z0-9_-]{20,}$/.test(s);
+ const authKey=/^AQ\.[A-Za-z0-9_-]{20,}$/.test(s);
+
+ return legacy || authKey;
+}
+function describeInvalidKey(key){
+ const s=String(key||'').trim();
+ if(!s)return 'API Key đang trống.';
+ if(s.length<20)return `Chuỗi hiện tại chỉ có ${s.length} ký tự — có vẻ là mật khẩu/trình duyệt tự điền, không phải API Key.`;
+ if(!(s.startsWith('AIza')||s.startsWith('AQ.')))return 'API Key Google AI Studio thường bắt đầu bằng “AIza” hoặc “AQ.”.';
+ return 'Chuỗi API Key không đúng định dạng hoặc quá ngắn.';
+}
+
+
+async function readGeminiFromFirebaseVerified(){
+ if(!mainDb)throw new Error('Firebase chính chưa kết nối.');
+ const s=await get(ref(mainDb,SHARED_GEMINI_PATH));
+ if(!s.exists())throw new Error('Chưa có cấu hình tại '+SHARED_GEMINI_PATH);
+ const v=s.val();
+ const key=typeof v==='string'?String(v).trim():String(v?.apiKey||'').trim();
+ const model=typeof v==='object'&&v?.model?String(v.model).trim():'gemini-3.6-flash';
+ if(!isValidGoogleApiKey(key)){
+   throw new Error('Firebase đang chứa API Key không hợp lệ ('+key.length+' ký tự).');
+ }
+ setGeminiRuntime(key,model);
+ geminiFirebaseVerified=true;
+ geminiLastVerifiedAt=Date.now();
+ return {key,model,value:v};
+}
+
+async function writeGeminiToFirebaseAndVerify(key,model){
+ if(!mainDb)throw new Error('Firebase chính chưa kết nối.');
+ if(!isValidGoogleApiKey(key))throw new Error(describeInvalidKey(key));
+
+ const payload={
+   apiKey:key,
+   model:model||'gemini-3.6-flash',
+   updatedAt:Date.now(),
+   updatedBy:'IDECO_HTML_VERIFIED'
+ };
+
+ await set(ref(mainDb,SHARED_GEMINI_PATH),payload);
+
+ // Đọc NGƯỢC từ server ngay sau khi ghi để chắc chắn dữ liệu thực sự tồn tại.
+ const s=await get(ref(mainDb,SHARED_GEMINI_PATH));
+ if(!s.exists())throw new Error('Firebase không trả dữ liệu sau khi lưu.');
+ const saved=s.val();
+ const savedKey=typeof saved==='string'?String(saved).trim():String(saved?.apiKey||'').trim();
+
+ if(savedKey!==key){
+   throw new Error('Xác minh thất bại: key đọc lại từ Firebase không trùng key vừa lưu.');
+ }
+
+ setGeminiRuntime(savedKey, saved?.model||model);
+ geminiFirebaseVerified=true;
+ geminiLastVerifiedAt=Date.now();
+ return saved;
+}
+
+function maskKeyPreview(key){
+ const s=String(key||'');
+ if(!s)return 'Chưa nạp API Key.';
+ const head=s.slice(0,4), tail=s.length>8?s.slice(-4):'';
+ return `✅ Đã nạp API Key từ Firebase: ${head}••••${tail} (${s.length} ký tự)`;
+}
+function setGeminiRuntime(key,model){
+ key=String(key||'').trim();
+ model=String(model||'').trim()||'gemini-3.6-flash';
+
+ if(key && !isValidGoogleApiKey(key)){
+   geminiRuntime={apiKey:'',model,ready:false};
+   if($('#geminiKey'))$('#geminiKey').value='';
+   if($('#geminiModel'))$('#geminiModel').value=model;
+   if($('#geminiKeyInfo'))$('#geminiKeyInfo').textContent='⚠️ Firebase đang chứa key không hợp lệ: '+describeInvalidKey(key)+' Hãy nhập lại API Key đúng rồi bấm “Lưu key lên Firebase”.';
+   return false;
+ }
+
+ geminiRuntime={apiKey:key,model,ready:!!key};
+ if($('#geminiKey'))$('#geminiKey').value=key;
+ if($('#geminiModel'))$('#geminiModel').value=model;
+ if($('#geminiKeyInfo'))$('#geminiKeyInfo').textContent=maskKeyPreview(key);
+ return true;
+}
+async function ensureGeminiSettings(){
+ // Không tin localStorage/file:// cho API Key. Nếu chưa xác minh với Firebase ở phiên này,
+ // đọc trực tiếp từ Realtime Database trước khi gọi AI.
+ if(!geminiFirebaseVerified || !isValidGoogleApiKey(geminiRuntime.apiKey)){
+   const cfg=await readGeminiFromFirebaseVerified();
+   return cfg;
+ }
+ return {key:geminiRuntime.apiKey,model:geminiRuntime.model||'gemini-3.6-flash'};
+}
+function connectFirebase(){
+ mainConfig={...TEST_FIREBASE_CONFIG}; invConfig={...TEST_FIREBASE_CONFIG};
+ try{if(mainApp)deleteApp(mainApp).catch(()=>{});mainApp=initializeApp(mainConfig,'main_'+uid());mainDb=getDatabase(mainApp);toast($('#mainFbStatus'),'✅ Firebase TEST chung đã kết nối.','ok');subscribeDatasets();subscribeOfficialMaster();subscribeExports()}catch(e){toast($('#mainFbStatus'),'Lỗi Firebase TEST: '+e.message,'err')}
+ try{if(invApp)deleteApp(invApp).catch(()=>{});invApp=initializeApp(invConfig,'inv_'+uid());invDb=getDatabase(invApp);toast($('#invFbStatus'),'✅ Tồn kho TEST đã kết nối.','ok');subscribeInventory()}catch(e){toast($('#invFbStatus'),'Lỗi Firebase kho TEST: '+e.message,'err')}
+ updateSharedAIUI();
+}
+
+const cfgKeys=['apiKey','authDomain','databaseURL','projectId','storageBucket','messagingSenderId','appId','measurementId'];
+function renderConfigFields(container,cfg,prefix){container.innerHTML=cfgKeys.map(k=>`<div class="field"><label>${k}</label><input id="${prefix}_${k}" value="${esc(cfg[k]||'')}"></div>`).join('')}
+function readConfig(prefix){let o={};cfgKeys.forEach(k=>{let e=$(`#${prefix}_${k}`);if(e&&e.value.trim())o[k]=e.value.trim()});return o}
+renderConfigFields($('#mainFirebaseFields'),mainConfig,'maincfg');renderConfigFields($('#inventoryFirebaseFields'),invConfig,'invcfg');
+$('#geminiModel').value='gemini-3.6-flash';$('#geminiKeyPath').value=SHARED_GEMINI_PATH;
+$('#saveMainFirebase').onclick=connectFirebase;$('#testMainFirebase').onclick=connectFirebase;$('#saveInventoryFirebase').onclick=connectFirebase;$('#testInventoryFirebase').onclick=connectFirebase;
+
+// main navigation — mục Cài đặt được bảo vệ bằng mật khẩu
+const SETTINGS_PASSWORD='minhtriet1973';
+function openMainPanel(b){
+ $$('.tab[data-main]').forEach(x=>x.classList.toggle('active',x===b));
+ $$('.panel').forEach(p=>p.classList.remove('active'));
+ $('#panel-'+b.dataset.main).classList.add('active');
+}
+$$('.tab[data-main]').forEach(b=>b.onclick=()=>{
+ if(b.dataset.main==='settings'){
+  const pass=window.prompt('🔒 CÀI ĐẶT ĐƯỢC BẢO VỆ\n\nVui lòng nhập mật khẩu để truy cập:');
+  if(pass===null)return;
+  if(pass!==SETTINGS_PASSWORD){alert('❌ Mật khẩu không chính xác. Không thể truy cập Cài đặt.');return;}
+ }
+ openMainPanel(b);
+});
+function switchMain(name){$(`.tab[data-main="${name}"]`).click()}
+
+const PROMPTS={
+longchau:`Bạn là chuyên gia nhập liệu và kiểm tra đơn hàng dược phẩm. Hãy đọc TOÀN BỘ PDF/ảnh của Nhà Thuốc Long Châu, không bỏ sót trang hoặc dòng. Trích xuất chính xác 5 cột: ["STT","Mã sản phẩm","Tên sản phẩm","Giá xuất (HD) VAT","Sản lượng"]. "Sản lượng" lấy từ SL đặt/số lượng tương ứng. Mã và tên phải tách biệt. Giữ số 0 đầu mã sản phẩm. Giá và số lượng trả về dạng chuỗi, dấu phẩy phân cách hàng nghìn. Nếu ô mờ/không chắc, giữ chuỗi nhìn thấy và ghi cảnh báo trong audit, KHÔNG tự đoán.`,
+pharmacity:`Bạn là chuyên gia nhập liệu và kiểm tra đơn hàng dược phẩm. Hãy đọc TOÀN BỘ PDF/ảnh của Pharmacity, không bỏ sót trang hoặc dòng. Trích xuất chính xác 6 cột: ["STT","Mã (item product)","Tên sản phẩm (Product name)","Gía bán (Unit price)","Chiết khấu (Discount percent)","Số lượng (Quantity)"]. Tách riêng mã và tên. Bảo toàn mã, giá, phần trăm và số lượng đúng như chứng từ. Nếu ô mờ/không chắc, không tự đoán mà đưa vào audit.`,
+caman:`Bạn là chuyên gia nhập liệu và kiểm tra đơn hàng dược phẩm. Hãy đọc TOÀN BỘ PDF/ảnh của Chuỗi Nhà Thuốc Cẩm Ân, không bỏ sót trang hoặc dòng. Trước tiên nhận diện chính xác cấu trúc bảng trong chứng từ, sau đó trích xuất đầy đủ các trường thực tế liên quan đến đơn hàng như STT, mã sản phẩm/mã hàng, tên sản phẩm, đơn vị tính/quy cách, số lượng, đơn giá/giá bán/giá xuất hóa đơn, chiết khấu và thành tiền nếu các cột đó có trong chứng từ. GIỮ NGUYÊN tên cột theo chứng từ khi có thể. Không tự tạo dữ liệu không tồn tại. Giữ số 0 đầu mã hàng. Nếu có nhiều cột giá, ưu tiên cột giá dùng cho đặt hàng/xuất hóa đơn và ghi chú trong audit. Nếu ô mờ/không chắc, giữ phần nhìn thấy và đưa vào uncertainCells, tuyệt đối không tự đoán.`,
+trungson:`Bạn là chuyên gia nhập liệu và kiểm tra đơn hàng dược phẩm. Hãy đọc TOÀN BỘ PDF/ảnh của Chuỗi Nhà Thuốc Trung Sơn, không bỏ sót trang hoặc dòng. Trước tiên nhận diện cấu trúc bảng thực tế của chứng từ rồi trích xuất đầy đủ các trường đơn hàng như STT, mã sản phẩm/mã hàng, tên sản phẩm, đơn vị tính/quy cách, số lượng, đơn giá/giá bán/giá xuất hóa đơn, chiết khấu và thành tiền nếu xuất hiện. GIỮ NGUYÊN tên cột theo chứng từ khi có thể. Mã và tên phải tách biệt nếu tài liệu có cột riêng. Giữ số 0 đầu mã. Không suy đoán dữ liệu bị mờ; đưa mọi ô chưa chắc chắn vào uncertainCells.`,
+khac:`Bạn là chuyên gia nhập liệu đơn hàng cho các chuỗi nhà thuốc khác. Hãy tự nhận diện bố cục của TOÀN BỘ PDF/ảnh trước khi trích xuất. Không áp đặt mẫu của Long Châu, Pharmacity, An Khang, Cẩm Ân hay Trung Sơn nếu chứng từ có cấu trúc khác. Hãy giữ các cột quan trọng đúng theo chứng từ, ưu tiên: STT, mã sản phẩm/mã ERP/mã hàng, tên sản phẩm, đơn vị tính/quy cách, số lượng, đơn giá/giá bán/giá xuất hóa đơn, chiết khấu, thành tiền, số đơn/PO nếu có. Không bỏ sót trang hoặc dòng. Giữ số 0 đầu mã sản phẩm. Không tự đoán ô mờ hoặc dữ liệu không tồn tại; ghi rõ trong audit và uncertainCells. Mục tiêu là tạo bảng sát nhất với chứng từ gốc để tiếp tục đối chiếu dữ liệu IDECO.`,
+ankhang:`Bạn là chuyên gia nhập liệu và kiểm tra đơn hàng dược phẩm. Hãy đọc TOÀN BỘ PDF/ảnh của Nhà Thuốc An Khang, không bỏ sót trang hoặc dòng. Trích xuất chính xác 5 cột: ["STT","Tên Thuốc","Đơn Vị Tính","Số Lượng","Đơn Giá"]. Nếu có nhiều cột giá, lấy Đơn Giá cuối cùng dùng cho đặt hàng. Bảo toàn tên thuốc, đơn vị, số lượng và đơn giá. Nếu ô mờ/không chắc, không tự đoán mà đưa vào audit.`};
+let aiFiles=[],selectedChain='',aiData=null;
+const dz=$('#dropzone'),fileInput=$('#aiFiles');dz.onclick=()=>fileInput.click();['dragenter','dragover'].forEach(n=>dz.addEventListener(n,e=>{e.preventDefault();dz.classList.add('drag')}));['dragleave','drop'].forEach(n=>dz.addEventListener(n,e=>{e.preventDefault();dz.classList.remove('drag')}));dz.addEventListener('drop',e=>addAiFiles([...e.dataTransfer.files]));fileInput.onchange=e=>{addAiFiles([...e.target.files]);e.target.value=''};
+function addAiFiles(fs){fs.filter(f=>f.type==='application/pdf'||f.type.startsWith('image/')).forEach(f=>{if(!aiFiles.some(x=>x.name===f.name&&x.size===f.size))aiFiles.push(f)});renderAiFiles()}
+function renderAiFiles(){$('#fileTotal').textContent=`${aiFiles.length} tệp`;$('#fileList').innerHTML=aiFiles.map((f,i)=>`<div>${i+1}. ${esc(f.name)} — ${(f.size/1024/1024).toFixed(2)} MB</div>`).join('')}
+$('#clearAiFiles').onclick=()=>{aiFiles=[];renderAiFiles()};
+$$('.chain').forEach(b=>b.onclick=()=>{selectedChain=b.dataset.chain;$$('.chain').forEach(x=>x.classList.toggle('active',x===b));$('#promptBox').value=PROMPTS[selectedChain]});
+const fileB64=f=>new Promise((res,rej)=>{let r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=rej;r.readAsDataURL(f)});
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+function isRetryableError(e){
+ const s=String(e?.message||e||'').toLowerCase();
+ return s.includes('429')||s.includes('500')||s.includes('502')||s.includes('503')||s.includes('504')||
+        s.includes('network')||s.includes('fetch')||s.includes('timeout')||s.includes('quá thời gian');
+}
+async function withOneRetry(fn){
+ try{return await fn()}
+ catch(e){
+   if(!isRetryableError(e))throw e;
+   await sleep(1200);
+   return await fn();
+ }
+}
+
+async function readKieStreamResponse(r){
+ const raw=await r.text();
+ const ct=(r.headers.get('content-type')||'').toLowerCase();
+
+ // Non-stream JSON response
+ if(!ct.includes('text/event-stream') && !raw.trim().startsWith('data:')){
+   let j=JSON.parse(raw);
+   let arr=Array.isArray(j)?j:[j];
+   let text='';
+   for(const chunk of arr){
+     for(const p of (chunk?.candidates?.[0]?.content?.parts||[])){
+       if(p?.text)text+=p.text;
+     }
+   }
+   return {text:text.trim(),raw:j};
+ }
+
+ // SSE stream
+ let text='', chunks=[];
+ for(const line of raw.split(/\r?\n/)){
+   const s=line.trim();
+   if(!s.startsWith('data:'))continue;
+   const payload=s.slice(5).trim();
+   if(!payload || payload==='[DONE]')continue;
+   try{
+     const j=JSON.parse(payload);
+     chunks.push(j);
+     for(const p of (j?.candidates?.[0]?.content?.parts||[])){
+       if(p?.text)text+=p.text;
+     }
+   }catch(_){}
+ }
+ return {text:text.trim(),raw:chunks};
+}
+
+async function kieGenerate(parts,systemPrompt,expectJson=true){
+ let userParts=[...parts];
+ if(systemPrompt){
+   userParts.push({text:'\nYÊU CẦU HỆ THỐNG:\n'+systemPrompt});
+ }
+ const body={
+   stream:true,
+   contents:[{role:'user',parts:userParts}],
+   generationConfig:{
+     temperature:0,
+     maxOutputTokens:16384,
+     thinkingConfig:{includeThoughts:false,thinkingLevel:'low'}
+   }
+ };
+ if(expectJson)body.generationConfig.responseMimeType='application/json';
+
+ const ctl=new AbortController();
+ const timer=setTimeout(()=>ctl.abort(),75000);
+ try{
+   const r=await fetch(KIE_ENDPOINT,{
+     method:'POST',
+     headers:{
+       'Authorization':'Bearer '+KIE_API_KEY,
+       'Content-Type':'application/json'
+     },
+     body:JSON.stringify(body),
+     signal:ctl.signal
+   });
+   if(!r.ok){
+     let msg=await r.text().catch(()=> '');
+     throw new Error('Kie.ai HTTP '+r.status+(msg?' • '+msg.slice(0,300):''));
+   }
+   const out=await readKieStreamResponse(r);
+   if(!out.text)throw new Error('Kie.ai không trả về nội dung.');
+   return out;
+ }catch(e){
+   if(e.name==='AbortError')throw new Error('Kie.ai quá thời gian 75 giây.');
+   throw e;
+ }finally{
+   clearTimeout(timer);
+ }
+}
+
+async function googleGenerate(parts,systemPrompt,expectJson=true){
+ const cfg=await ensureGeminiSettings();
+ const key=cfg.key;
+ const model=($('#geminiModel')?.value||cfg.model||'gemini-3.6-flash').trim();
+ geminiRuntime.model=model;
+ 
+ let body={contents:[{role:'user',parts}],generationConfig:{temperature:0,maxOutputTokens:16384}};
+ if(systemPrompt)body.systemInstruction={parts:[{text:systemPrompt}]};
+ if(expectJson)body.generationConfig.responseMimeType='application/json';
+ let url=`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+
+ const ctl=new AbortController();
+ const timer=setTimeout(()=>ctl.abort(),75000);
+ try{
+   let r=await fetch(url,{
+     method:'POST',
+     headers:{
+       'Content-Type':'application/json',
+       'x-goog-api-key':key
+     },
+     body:JSON.stringify(body),
+     signal:ctl.signal
+   });
+   let j=await r.json().catch(()=>({}));
+   if(!r.ok)throw new Error(j?.error?.message||`Gemini HTTP ${r.status}`);
+   let text=(j.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('').trim();
+   if(!text)throw new Error('Gemini không trả về nội dung.');
+   return {text,raw:j};
+ }catch(e){
+   if(e.name==='AbortError')throw new Error('HUYỀN chế độ tiêu chuẩn quá thời gian 75 giây.');
+   throw e;
+ }finally{
+   clearTimeout(timer);
+ }
+}
+
+async function geminiGenerate(parts,systemPrompt,expectJson=true){
+ if(priorityT && priorityTAllowed){
+   return await withOneRetry(()=>kieGenerate(parts,systemPrompt,expectJson));
+ }
+ return await withOneRetry(()=>googleGenerate(parts,systemPrompt,expectJson));
+}
+function safeJSON(s){s=s.trim().replace(/^```json\s*/i,'').replace(/^```/,'').replace(/```$/,'').trim();return JSON.parse(s)}
+$('#runAI').onclick=async()=>{
+ if(!aiFiles.length)return toast($('#aiStatus'),'Vui lòng tải ít nhất 1 PDF/ảnh.','err');
+ if(!selectedChain&&!$('#promptBox').value.trim())return toast($('#aiStatus'),'Vui lòng chọn chuỗi nhà thuốc.','err');
+ let total=aiFiles.reduce((s,f)=>s+f.size,0);
+ if(aiFiles.some(f=>f.type==='application/pdf'&&f.size>50*1024*1024))return toast($('#aiStatus'),'Mỗi PDF phải ≤ 50 MB đối với chế độ gửi inline.','err');
+
+ let btn=$('#runAI');
+ btn.disabled=true;
+ btn.innerHTML='<span class="spinner"></span> HUYỀN đang xem xét đơn nhé, chờ chút';
+ const started=performance.now();
+ const marqueeEl=$('#analysisMarquee');
+ if(marqueeEl)marqueeEl.classList.add('show');
+ let waitSeconds=0;
+ const waitTimer=setInterval(()=>{
+   waitSeconds++;
+   btn.innerHTML=`<span class="spinner"></span> HUYỀN đang xem xét đơn nhé, chờ chút • ${waitSeconds}s`;
+ },1000);
+
+ try{
+   const provider=priorityT?'HUYỀN chế độ ưu tiên':'HUYỀN chế độ tiêu chuẩn';
+   toast($('#aiStatus'),'HUYỀN đang xem xét đơn nhé, chờ chút','info');
+
+   // Mã hóa file chỉ MỘT LẦN cho cả lượt 1 và lượt kiểm tra.
+   const encodedFiles=await Promise.all(aiFiles.map(async f=>({
+     inline_data:{mime_type:f.type||'application/pdf',data:await fileB64(f)}
+   })));
+
+   let prompt=$('#promptBox').value.trim();
+   let strict=$('#strictMode').checked?'Tuyệt đối không suy đoán ký tự/số liệu không nhìn rõ; đánh dấu uncertain thay vì tự điền.':'';
+   let parts=[...encodedFiles,{
+     text:`${prompt}\n${strict}\nĐọc nhanh nhưng không bỏ sót dòng. Trả về JSON đúng schema: {"headers":[string],"rows":[[string]],"audit":{"documentCount":number,"rowCount":number,"warnings":[string],"uncertainCells":[{"row":number,"column":string,"value":string,"reason":string}],"notes":[string]}}. Chỉ JSON, không markdown.`
+   }];
+
+   let first=await geminiGenerate(
+     parts,
+     'Bạn là chuyên viên nhập liệu đơn hàng. Ưu tiên: đúng mã, đúng tên, đúng giá, đúng số lượng. Đọc theo thứ tự trang; tránh giải thích dài.',
+     true
+   );
+   let data=safeJSON(first.text);
+   if(!Array.isArray(data.headers)||!Array.isArray(data.rows))throw new Error('JSON lượt 1 không đúng cấu trúc.');
+
+   // KIỂM TRA 2 LƯỢT THÔNG MINH:
+   // Chỉ gửi lại toàn PDF nếu lượt 1 phát hiện cảnh báo/ô không chắc chắn
+   // hoặc đơn nhỏ <= 4 MB (đối chiếu lại vẫn nhanh).
+   if($('#doubleCheck').checked){
+     const warnings=data?.audit?.warnings||[];
+     const uncertain=data?.audit?.uncertainCells||[];
+     const mustAudit=warnings.length>0 || uncertain.length>0 || total<=4*1024*1024;
+
+     if(mustAudit){
+       toast($('#aiStatus'),'HUYỀN đang xem xét đơn nhé, chờ chút','info');
+       let auditParts=[...encodedFiles,{
+         text:`Kết quả lượt 1:\n${JSON.stringify(data)}\n\nĐối chiếu nhanh từng dòng với chứng từ gốc. Chỉ sửa sai khác thực sự; bổ sung dòng bị thiếu; không tự đoán chỗ mờ. Trả về đúng JSON: {"headers":[string],"rows":[[string]],"audit":{"verified":true,"changes":[string],"warnings":[string],"uncertainCells":[{"row":number,"column":string,"value":string,"reason":string}],"rowCount":number,"confidence":"high|medium|low"}}`
+       }];
+       let second=await geminiGenerate(
+         auditParts,
+         'Kiểm toán dữ liệu ngắn gọn. Tập trung mã sản phẩm, giá, chiết khấu và số lượng; không viết giải thích ngoài JSON.',
+         true
+       );
+       data=safeJSON(second.text);
+     }else{
+       data.audit=data.audit||{};
+       data.audit.verified=true;
+       data.audit.confidence=data.audit.confidence||'high';
+       data.audit.notes=[...(data.audit.notes||[]),'Đã dùng kiểm tra 2 lượt thông minh: lượt 1 không có cảnh báo nên bỏ qua việc gửi lại PDF để tăng tốc.'];
+     }
+   }
+
+   aiData=data;
+   renderAiResult();
+   const secs=((performance.now()-started)/1000).toFixed(1);
+   toast($('#aiStatus'),`✅ HUYỀN đã xem xong ${data.rows.length} dòng trong ${secs} giây.`,'ok');
+ }catch(e){
+   console.error(e);
+   // Khi Google bị treo/lỗi, hướng dẫn bật Priority T ngay.
+   if(!priorityT){
+     toast($('#aiStatus'),'Lỗi HUYỀN chế độ tiêu chuẩn: '+e.message+' • Có thể bật “ƯU TIÊN T” để chuyển sang HUYỀN chế độ ưu tiên.','err');
+   }else{
+     toast($('#aiStatus'),'HUYỀN đang bị nghẽn ở chế độ ưu tiên: '+e.message,'err');
+   }
+ }finally{
+   clearInterval(waitTimer);
+   if(marqueeEl)marqueeEl.classList.remove('show');
+   btn.disabled=false;
+   btn.innerHTML='✨ Tạo Bảng & Đối Chiếu PDF';
+ }
+};
+function renderAiResult(){if(!aiData)return;$('#aiResult').innerHTML=`<table><thead><tr>${aiData.headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${aiData.rows.map((r,ri)=>`<tr>${aiData.headers.map((_,ci)=>`<td><input class="editable ai-cell" data-r="${ri}" data-c="${ci}" value="${esc(r[ci]??'')}"></td>`).join('')}</tr>`).join('')}</tbody></table>`;$$('.ai-cell').forEach(i=>i.onchange=()=>aiData.rows[+i.dataset.r][+i.dataset.c]=i.value);let a=aiData.audit||{};$('#aiAudit').innerHTML=`<div class="audit-box"><strong>Kiểm tra chất lượng AI:</strong> ${a.confidence?`<span class="pill ${a.confidence==='high'?'ok':a.confidence==='low'?'bad':'warn'}">${esc(a.confidence)}</span>`:''}<div class="small">Số dòng: ${a.rowCount??aiData.rows.length}</div>${(a.changes||[]).length?`<div class="small"><b>Đã hiệu chỉnh:</b><ul>${a.changes.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:''}${(a.warnings||[]).length?`<div class="small"><b>Cảnh báo:</b><ul>${a.warnings.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:''}${(a.uncertainCells||[]).length?`<div class="status warn"><b>Ô cần kiểm tra thủ công:</b> ${a.uncertainCells.length}</div>`:''}</div>`}
+$('#copyAI').onclick=async()=>{if(!aiData)return;await navigator.clipboard.writeText([aiData.headers.join('\t'),...aiData.rows.map(r=>r.join('\t'))].join('\n'));alert('Đã sao chép bảng.')};
+$('#exportAI').onclick=()=>{if(!aiData)return;let rows=aiData.rows.map(r=>Object.fromEntries(aiData.headers.map((h,i)=>[h,r[i]??''])));exportXlsx(rows,'Trich_Xuat_Don_Hang.xlsx','TrichXuat')};
+$('#toVerify').onclick=()=>{if(aiData){$('#orderPaste').value=[aiData.headers.join('\t'),...aiData.rows.map(r=>r.join('\t'))].join('\n');switchMain('verify');$('[data-order-tab="paste"]').click();processOrderPaste()}else switchMain('verify')};
+
+
+// Quyền sử dụng ƯU TIÊN T — BGĐ kiểm soát credit qua Firebase Realtime Database
+function subscribePriorityTAdmin(){
+ if(!mainDb)return;
+ if(unsubPriorityTAdmin)unsubPriorityTAdmin();
+ unsubPriorityTAdmin=onValue(ref(mainDb,PRIORITY_T_ADMIN_PATH),snap=>{
+   if(snap.exists()){
+     const v=snap.val();
+     priorityTAllowed=typeof v==='object' ? v.enabled!==false : v!==false;
+   }else{
+     priorityTAllowed=true;
+   }
+   updatePriorityTUI();
+   if($('#priorityAdminStatus')){
+     $('#priorityAdminStatus').textContent=priorityTAllowed
+       ? '✅ Đang cho phép sử dụng ƯU TIÊN T.'
+       : '🔒 Đang khóa ƯU TIÊN T trên các máy.';
+   }
+ },e=>{
+   if($('#priorityAdminStatus'))$('#priorityAdminStatus').textContent='Không đọc được trạng thái từ Firebase: '+e.message;
+ });
+}
+
+$('#allowPriorityT').onchange=async()=>{
+ if(!mainDb){
+   $('#allowPriorityT').checked=priorityTAllowed;
+   return toast($('#priorityAdminStatus'),'Firebase chính chưa kết nối.','err');
+ }
+ const enabled=$('#allowPriorityT').checked;
+ try{
+   await set(ref(mainDb,PRIORITY_T_ADMIN_PATH),{
+     enabled,
+     updatedAt:Date.now(),
+     updatedBy:'IDECO_ADMIN'
+   });
+   priorityTAllowed=enabled;
+   if(!enabled){
+     priorityT=false;
+     localStorage.setItem('ideco_priority_t','0');
+   }
+   updatePriorityTUI();
+   toast($('#priorityAdminStatus'),enabled?'✅ Đã cho phép ƯU TIÊN T trên các máy.':'🔒 Đã khóa ƯU TIÊN T để kiểm soát credit.','ok');
+ }catch(e){
+   $('#allowPriorityT').checked=priorityTAllowed;
+   toast($('#priorityAdminStatus'),'Không lưu được trạng thái: '+e.message,'err');
+ }
+};
+
+// Gemini settings — dùng chung qua Firebase Realtime Database
+function applyGeminiSettings(v,showStatus=false){
+ if(!v)return;
+ let key='',model=$('#geminiModel')?.value||'gemini-3.6-flash';
+ if(typeof v==='string')key=String(v);
+ else{
+   key=String(v.apiKey||'');
+   if(v.model)model=String(v.model);
+ }
+ const accepted=setGeminiRuntime(key,model);
+ $('#geminiKeyPath').value=SHARED_GEMINI_PATH;
+ if(showStatus){
+   toast($('#geminiSettingStatus'),
+     accepted
+       ? 'Đã tải API Key dùng chung từ Firebase Realtime Database.'
+       : 'Firebase có dữ liệu API Key nhưng dữ liệu đó không hợp lệ. Hãy nhập lại key đúng dạng AIza... hoặc AQ.... rồi lưu lại.',
+     accepted?'ok':'err');
+ }
+ return accepted;
+}
+function subscribeGeminiSettings(){
+ if(!mainDb)return;
+ if(unsubGeminiSettings)unsubGeminiSettings();
+ $('#geminiKeyPath').value=SHARED_GEMINI_PATH;
+
+ unsubGeminiSettings=onValue(ref(mainDb,SHARED_GEMINI_PATH),snap=>{
+   if(!snap.exists()){
+     geminiFirebaseVerified=false;
+     setGeminiRuntime('',$('#geminiModel')?.value||'gemini-3.6-flash');
+     toast($('#geminiSettingStatus'),'Firebase đã kết nối nhưng chưa có API Key dùng chung.','info');
+     return;
+   }
+
+   const v=snap.val();
+   const key=typeof v==='string'?String(v).trim():String(v?.apiKey||'').trim();
+   const model=typeof v==='object'&&v?.model?String(v.model):'gemini-3.6-flash';
+
+   if(!isValidGoogleApiKey(key)){
+     geminiFirebaseVerified=false;
+     setGeminiRuntime('',model);
+     toast($('#geminiSettingStatus'),
+       '⚠️ Firebase đang chứa API Key không hợp lệ ('+key.length+' ký tự). Hãy nhập lại key đúng rồi bấm Lưu.',
+       'err');
+     return;
+   }
+
+   setGeminiRuntime(key,model);
+   geminiFirebaseVerified=true;
+   geminiLastVerifiedAt=Date.now();
+   const updated=(v&&typeof v==='object'&&v.updatedAt)?new Date(v.updatedAt).toLocaleString('vi-VN'):'';
+   if($('#geminiKeyInfo'))$('#geminiKeyInfo').textContent=maskKeyPreview(key)+' • ✅ ĐÃ XÁC MINH TRÊN FIREBASE';
+   toast($('#geminiSettingStatus'),
+     '✅ Đã đồng bộ API Key trực tiếp từ Firebase'+(updated?' • cập nhật '+updated:''),
+     'ok');
+ },e=>{
+   geminiFirebaseVerified=false;
+   toast($('#geminiSettingStatus'),'❌ Không đọc được Firebase: '+e.message,'err');
+ });
+}
+$('#saveGeminiKey').onclick=async()=>{
+ const key=$('#geminiKey').value.trim();
+ const model=$('#geminiModel').value.trim()||'gemini-3.6-flash';
+
+ if(!mainDb)return toast($('#geminiSettingStatus'),'Firebase chính chưa kết nối.','err');
+ if(!key)return toast($('#geminiSettingStatus'),'Vui lòng nhập API Key.','err');
+
+ if(!isValidGoogleApiKey(key)){
+   if($('#geminiKeyInfo'))$('#geminiKeyInfo').textContent='❌ KHÔNG LƯU: '+describeInvalidKey(key);
+   return toast($('#geminiSettingStatus'),'Không lưu vì chuỗi này không phải Google API Key hợp lệ.','err');
+ }
+
+ const btn=$('#saveGeminiKey');
+ const oldText=btn.textContent;
+ btn.disabled=true;
+ btn.textContent='⏳ Đang lưu và xác minh...';
+
+ try{
+   await writeGeminiToFirebaseAndVerify(key,model);
+   $('#geminiKeyPath').value=SHARED_GEMINI_PATH;
+   if($('#geminiKeyInfo')){
+     $('#geminiKeyInfo').textContent=maskKeyPreview(key)+' • ✅ ĐÃ XÁC MINH TRÊN FIREBASE';
+   }
+   toast($('#geminiSettingStatus'),
+     '✅ ĐÃ LƯU THẬT trên Firebase và đọc kiểm tra lại thành công. Có thể đóng ứng dụng/mở máy khác.',
+     'ok');
+ }catch(e){
+   geminiFirebaseVerified=false;
+   toast($('#geminiSettingStatus'),'❌ LƯU FIREBASE THẤT BẠI: '+e.message,'err');
+ }finally{
+   btn.disabled=false;
+   btn.textContent=oldText;
+ }
+};
+$('#loadGeminiKey').onclick=async()=>{
+ if(!mainDb)return toast($('#geminiSettingStatus'),'Firebase chính chưa kết nối.','err');
+ try{
+   const cfg=await readGeminiFromFirebaseVerified();
+   if($('#geminiKeyInfo'))$('#geminiKeyInfo').textContent=maskKeyPreview(cfg.key)+' • ✅ ĐÃ XÁC MINH TRÊN FIREBASE';
+   toast($('#geminiSettingStatus'),'✅ Đã đọc API Key trực tiếp từ Firebase Realtime Database.','ok');
+ }catch(e){
+   geminiFirebaseVerified=false;
+   toast($('#geminiSettingStatus'),'❌ Không đọc được API Key Firebase: '+e.message,'err');
+ }
+};
+$('#toggleGeminiKey').onclick=()=>{
+ const el=$('#geminiKey');
+ const showing=el.classList.toggle('reveal-key');
+ $('#toggleGeminiKey').textContent=showing?'🙈 Ẩn key':'👁 Hiện key';
+};
+$('#geminiKey').oninput=()=>{
+ const key=$('#geminiKey').value.trim();
+ if(!$('#geminiKeyInfo'))return;
+ if(!key){
+   $('#geminiKeyInfo').textContent='Chưa nạp API Key.';
+ }else if(isValidGoogleApiKey(key)){
+   $('#geminiKeyInfo').textContent=`✅ Key hợp lệ: ${key.slice(0,4)}••••${key.slice(-4)} (${key.length} ký tự) — bấm “Lưu key lên Firebase” để cập nhật dùng chung.`;
+ }else{
+   $('#geminiKeyInfo').textContent='⚠️ '+describeInvalidKey(key)+' Hệ thống sẽ KHÔNG cho lưu chuỗi này lên Firebase.';
+ }
+};
+
+$('#testGemini').onclick=async()=>{try{let r=await geminiGenerate([{text:'Trả lời đúng một từ: OK'}],'',false);toast($('#geminiSettingStatus'),'✅ Gemini hoạt động. API Key Firebase hợp lệ • Model: '+($('#geminiModel').value||geminiRuntime.model)+' • Phản hồi: '+r.text.slice(0,80),'ok')}catch(e){toast($('#geminiSettingStatus'),'Gemini lỗi: '+e.message,'err')}};
+
+// ===== AI CHUNG: đọc PDF/ảnh qua đúng AI CHÍNH / AI PHỤ của TAB Nhập hàng =====
+function mergeAIData(parts){
+ const headers=[];parts.forEach(d=>(d.headers||[]).forEach(h=>{if(!headers.includes(h))headers.push(h)}));
+ const rows=[];const warnings=[],uncertain=[],changes=[];let confidence='high';
+ parts.forEach(d=>{const hs=d.headers||[];(d.rows||[]).forEach(r=>rows.push(headers.map(h=>r[hs.indexOf(h)]??'')));const a=d.audit||{};warnings.push(...(a.warnings||[]));uncertain.push(...(a.uncertainCells||[]));changes.push(...(a.changes||[]));if(a.confidence==='low')confidence='low';else if(a.confidence==='medium'&&confidence==='high')confidence='medium'});
+ return {headers,rows,audit:{verified:true,rowCount:rows.length,warnings,uncertainCells:uncertain,changes,confidence,documentCount:parts.length}};
+}
+async function sharedAnalyzeOneFile(file,prompt,strict,doubleCheck){
+ const a=getSharedAI();if(!a||typeof a.fileRequest!=='function')throw new Error('Module AI chung chưa sẵn sàng. Mở Cài đặt AI chung để kiểm tra.');
+ const basePrompt=`${prompt}\n${strict}\nĐọc TOÀN BỘ chứng từ, không bỏ sót trang/dòng. Trả JSON đúng schema: {"headers":[string],"rows":[[string]],"audit":{"documentCount":number,"rowCount":number,"warnings":[string],"uncertainCells":[{"row":number,"column":string,"value":string,"reason":string}],"notes":[string],"confidence":"high|medium|low"}}. Chỉ JSON, không markdown.`;
+ const r1=await a.fileRequest(file,basePrompt,{plainText:true,purpose:'AI Agent · Đọc đơn hàng lượt 1'});let d1=safeJSON(r1.text);if(!Array.isArray(d1.headers)||!Array.isArray(d1.rows))throw new Error('AI lượt 1 trả cấu trúc không hợp lệ.');
+ if(!doubleCheck)return d1;
+ const auditPrompt=`Đây là KẾT QUẢ LƯỢT 1:\n${JSON.stringify(d1)}\n\nĐọc lại TOÀN BỘ chứng từ từ đầu. Kiểm tra từng Mã SP, Tên SP, Giá/Đơn giá, Chiết khấu, Số lượng. Chỉ sửa khi nhìn thấy chứng cứ trên PDF/ảnh; chỗ mờ phải đưa vào uncertainCells. Trả JSON cuối cùng cùng schema, audit.verified=true và audit.changes liệt kê thay đổi so với lượt 1.`;
+ const r2=await a.fileRequest(file,auditPrompt,{plainText:true,purpose:'AI Agent · Kiểm tra đơn hàng lượt 2'});let d2=safeJSON(r2.text);if(!Array.isArray(d2.headers)||!Array.isArray(d2.rows))throw new Error('AI lượt 2 trả cấu trúc không hợp lệ.');d2.audit=d2.audit||{};d2.audit.verified=true;return d2;
+}
+async function runSharedAgentExtraction(){
+ if(!aiFiles.length)return toast($('#aiStatus'),'Vui lòng tải ít nhất 1 PDF/ảnh.','err');
+ if(!selectedChain&&!$('#promptBox').value.trim())return toast($('#aiStatus'),'Vui lòng chọn chuỗi nhà thuốc.','err');
+ const btn=$('#runAI');btn.disabled=true;btn.innerHTML='<span class="spinner"></span> AI AGENT đang đọc & kiểm tra...';const marqueeEl=$('#analysisMarquee');if(marqueeEl)marqueeEl.classList.add('show');
+ try{const prompt=$('#promptBox').value.trim();const strict=$('#strictMode').checked?'TUYỆT ĐỐI KHÔNG tự đoán ô mờ; phải đánh dấu uncertainCells.':'';const out=[];for(let i=0;i<aiFiles.length;i++){toast($('#aiStatus'),`${sharedRouteLabel()} đang đọc ${i+1}/${aiFiles.length}: ${aiFiles[i].name}`,'info');out.push(await sharedAnalyzeOneFile(aiFiles[i],prompt,strict,$('#doubleCheck').checked))}aiData=mergeAIData(out);renderAiResult();toast($('#aiStatus'),`✅ AI AGENT đã đọc ${aiData.rows.length} dòng · ${aiData.audit?.uncertainCells?.length||0} ô cần kiểm tra.`,aiData.audit?.uncertainCells?.length?'warn':'ok');renderAgentGate()}catch(e){console.error(e);toast($('#aiStatus'),'AI AGENT chưa phân tích được: '+e.message,'err')}finally{if(marqueeEl)marqueeEl.classList.remove('show');btn.disabled=false;btn.innerHTML='✨ Tạo Bảng & Đối Chiếu PDF';updateSharedAIUI()}
+}
+$('#runAI').onclick=runSharedAgentExtraction;
+
+// MASTER DATA
+let datasets=[],selectedDataset='',masterData=[],tempMaster=null,masterHeaders=[],masterMapping={ma_sp:'',ma_erp:'',ten_sp:'',gia_ban:'',chiet_khau:'',gia_xuat_hd:'',quy_cach:''};
+function subscribeDatasets(){if(!mainDb)return;if(unsubDatasets)unsubDatasets();unsubDatasets=onValue(ref(mainDb,'du_lieu_goc'),s=>{let d=s.val()||{};datasets=Object.keys(d);$('#datasetSelect').innerHTML='<option value="">-- Chọn bảng dữ liệu --</option>'+datasets.map(k=>`<option value="${esc(k)}">${esc(k)}</option>`).join('');if(selectedDataset&&datasets.includes(selectedDataset))$('#datasetSelect').value=selectedDataset},e=>toast($('#masterStatus'),'Không đọc được dữ liệu chuẩn: '+e.message,'err'))}
+$('#datasetSelect').onchange=async e=>{selectedDataset=e.target.value;$('#selectedDatasetLabel').textContent=selectedDataset||'...';if(!selectedDataset){masterData=[];renderMaster();return}toast($('#masterStatus'),'Đang tải dữ liệu...','info');try{let s=await get(ref(mainDb,`du_lieu_goc/${selectedDataset}`));let d=s.val();masterData=d?Object.values(d):[];renderMaster();$('#masterStatus').textContent=`${masterData.length} sản phẩm`;renderAgentGate()}catch(err){toast($('#masterStatus'),'Lỗi tải bảng: '+err.message,'err')}};
+function renderMaster(){if(!masterData.length){$('#masterTable').innerHTML='<div class="muted" style="padding:20px">Bảng chưa có dữ liệu.</div>';return}let cols=[['ma_sp','Mã SP'],['ma_erp','Mã ERP'],['ten_sp','Tên SP'],['gia_ban','Giá bán'],['chiet_khau','Chiết khấu'],['gia_xuat_hd','Giá xuất HD'],['quy_cach','Quy cách']];$('#masterTable').innerHTML=`<table><thead><tr><th>STT</th>${cols.map(c=>`<th>${c[1]}</th>`).join('')}<th></th></tr></thead><tbody>${masterData.map((r,i)=>`<tr><td>${i+1}</td>${cols.map(c=>`<td><input class="editable master-cell" data-i="${i}" data-k="${c[0]}" value="${esc(r[c[0]+'_display']??r[c[0]]??'')}"></td>`).join('')}<td><button class="btn red master-del" data-i="${i}">Xóa</button></td></tr>`).join('')}</tbody></table>`;$$('.master-cell').forEach(x=>x.onchange=()=>{let i=+x.dataset.i,k=x.dataset.k,v=x.value;masterData[i][k]=(['gia_ban','gia_xuat_hd','chiet_khau','quy_cach'].includes(k)?parseNumber(v):v);if(k==='gia_ban')masterData[i].gia_ban_display=v;if(k==='gia_xuat_hd')masterData[i].gia_xuat_hd_display=v;if(k==='chiet_khau')masterData[i].ck_display=v});$$('.master-del').forEach(b=>b.onclick=()=>{masterData.splice(+b.dataset.i,1);renderMaster()})}
+$('#addMasterRow').onclick=()=>{masterData.unshift({ma_sp:'',ma_erp:'',ten_sp:'',gia_ban:0,chiet_khau:0,gia_xuat_hd:0,quy_cach:1});renderMaster()};
+$('#masterFile').onchange=e=>{let f=e.target.files?.[0];if(!f)return;readExcel(f,(h,d)=>{masterHeaders=h;tempMaster=d;renderMasterMapping()});e.target.value=''};
+function readExcel(file,cb){let r=new FileReader();r.onload=e=>{try{let wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'}),ws=wb.Sheets[wb.SheetNames[0]],arr=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:''});if(!arr.length)throw new Error('File trống');let h=arr[0].map(x=>String(x).trim()),rows=arr.slice(1).filter(r=>r.some(v=>String(v).trim())).map(row=>Object.fromEntries(h.map((x,i)=>[x,row[i]??''])));cb(h,rows)}catch(err){alert(err.message)}};r.readAsArrayBuffer(file)}
+function guessHeader(key){let patterns={ma_sp:['mã sp','ma sp','mã sản phẩm','product code'],ma_erp:['mã erp','ma erp','erp'],ten_sp:['tên sp','tên sản phẩm','tên hàng','product name'],gia_ban:['giá bán','gia ban'],chiet_khau:['chiết khấu','chiet khau','ck'],gia_xuat_hd:['giá xuất','gia xuat','vat'],quy_cach:['quy cách','quy cach','qc']};return masterHeaders.find(h=>patterns[key].some(p=>h.toLowerCase().includes(p)))||''}
+function renderMasterMapping(){Object.keys(masterMapping).forEach(k=>masterMapping[k]=guessHeader(k));$('#masterMapping').classList.remove('hidden');$('#masterMapping').innerHTML=`<div class="card" style="background:#f8fafc"><h3>Ánh xạ cột Dữ liệu Chuẩn</h3>${Object.keys(masterMapping).map(k=>`<div class="mapping"><label>${k.toUpperCase()} ${['ma_sp','ma_erp','ten_sp','gia_ban','gia_xuat_hd','quy_cach'].includes(k)?'(*)':''}</label><select class="master-map" data-k="${k}"><option value="">-- Chọn --</option>${masterHeaders.map(h=>`<option ${masterMapping[k]===h?'selected':''}>${esc(h)}</option>`).join('')}</select></div>`).join('')}<button id="confirmMasterMap" class="btn green">Xác nhận & Lưu</button> <button id="cancelMasterMap" class="btn outline">Hủy</button></div>`;$$('.master-map').forEach(s=>s.onchange=()=>masterMapping[s.dataset.k]=s.value);$('#cancelMasterMap').onclick=()=>$('#masterMapping').classList.add('hidden');$('#confirmMasterMap').onclick=saveMappedMaster}
+async function saveMappedMaster(){let req=['ma_sp','ma_erp','ten_sp','gia_ban','gia_xuat_hd','quy_cach'];if(req.some(k=>!masterMapping[k]))return alert('Vui lòng chọn đủ các trường bắt buộc (*).');let name=$('#newDatasetName').value.trim()||selectedDataset;if(!name)return alert('Nhập tên bảng mới hoặc chọn bảng hiện có.');masterData=tempMaster.map((row,i)=>{let gb=row[masterMapping.gia_ban],gx=row[masterMapping.gia_xuat_hd],ck=masterMapping.chiet_khau?row[masterMapping.chiet_khau]:'';return {stt:i+1,ma_sp:String(row[masterMapping.ma_sp]||'').trim(),ma_erp:String(row[masterMapping.ma_erp]||'').trim(),ten_sp:String(row[masterMapping.ten_sp]||'').trim(),gia_ban:parseNumber(gb),gia_ban_display:String(gb??''),chiet_khau:getCK(row,masterMapping.chiet_khau),ck_display:String(ck??''),gia_xuat_hd:parseNumber(gx),gia_xuat_hd_display:String(gx??''),quy_cach:parseQty(row[masterMapping.quy_cach])||1}});selectedDataset=name;await set(ref(mainDb,`du_lieu_goc/${name}`),masterData);$('#masterMapping').classList.add('hidden');$('#newDatasetName').value='';renderMaster();toast($('#masterStatus'),`Đã lưu ${masterData.length} dòng vào ${name}.`,'ok');setTimeout(()=>{$('#datasetSelect').value=name;$('#selectedDatasetLabel').textContent=name},300)}
+$('#saveMaster').onclick=async()=>{if(!selectedDataset)return alert('Chọn bảng dữ liệu trước.');try{await set(ref(mainDb,`du_lieu_goc/${selectedDataset}`),masterData);toast($('#masterStatus'),'Đã lưu thay đổi.','ok')}catch(e){toast($('#masterStatus'),'Lỗi lưu: '+e.message,'err')}};
+$('#exportMaster').onclick=()=>exportXlsx(masterData,`${selectedDataset||'MasterData'}.xlsx`,'MasterData');
+$('#deleteDataset').onclick=async()=>{if(!selectedDataset)return;let p=prompt(`Nhập mật khẩu để xóa vĩnh viễn bảng "${selectedDataset}":`);if(p===null)return;if(p!=='minhtriet1973')return alert('Mật khẩu không chính xác!');if(!confirm('Xác nhận xóa vĩnh viễn?'))return;await remove(ref(mainDb,`du_lieu_goc/${selectedDataset}`));selectedDataset='';masterData=[];renderMaster();$('#selectedDatasetLabel').textContent='...'};
+
+// ORDER VERIFICATION
+let orderHeaders=[],orderRows=[],orderMap={ma_sp:'',ten_sp:'',gia_xuat:'',so_luong:'',chiet_khau:''},compareAgainst='gia_ban',verifyResult=null;
+$$('[data-order-tab]').forEach(b=>b.onclick=()=>{$$('[data-order-tab]').forEach(x=>x.classList.toggle('active',x===b));$('#order-upload').classList.toggle('hidden',b.dataset.orderTab!=='upload');$('#order-paste').classList.toggle('hidden',b.dataset.orderTab!=='paste')});
+$('#orderFile').onchange=e=>{let f=e.target.files?.[0];if(f)readExcel(f,(h,d)=>{orderHeaders=h;orderRows=d;renderOrderMapping()});e.target.value=''};$('#processPaste').onclick=processOrderPaste;
+function processOrderPaste(){let t=$('#orderPaste').value.trim();if(!t)return alert('Vui lòng dán dữ liệu.');let lines=t.split(/\r?\n/).filter(x=>x.trim()),sep=lines[0].includes('\t')?'\t':',';orderHeaders=lines[0].split(sep).map(x=>x.trim());orderRows=lines.slice(1).map(l=>{let v=l.split(sep),o={};orderHeaders.forEach((h,i)=>o[h]=(v[i]??'').trim());return o});renderOrderMapping()}
+function guessOrder(k){let p={ma_sp:['mã sản phẩm','mã (item','mã sp','mã','item product'],ten_sp:['tên sản phẩm','product name','tên thuốc','tên sp'],gia_xuat:['giá xuất','gía bán','giá bán','unit price','đơn giá'],so_luong:['sản lượng','số lượng','quantity','sl đặt'],chiet_khau:['chiết khấu','discount']};return orderHeaders.find(h=>p[k].some(x=>h.toLowerCase().includes(x)))||''}
+function renderOrderMapping(){Object.keys(orderMap).forEach(k=>orderMap[k]=guessOrder(k));$('#orderMapping').classList.remove('hidden');$('#orderMapping').innerHTML=`<div class="card" style="background:#f8fafc"><h3>Ánh xạ cột Đơn Hàng</h3>${Object.keys(orderMap).map(k=>`<div class="mapping"><label>${k.toUpperCase()} ${['ma_sp','ten_sp','gia_xuat','so_luong'].includes(k)?'(*)':''}</label><select class="order-map" data-k="${k}"><option value="">-- Chọn --</option>${orderHeaders.map(h=>`<option ${orderMap[k]===h?'selected':''}>${esc(h)}</option>`).join('')}</select></div>`).join('')}<div class="mapping"><label>So sánh giá với</label><select id="compareAgainst"><option value="gia_ban">Giá bán (Gốc)</option><option value="gia_xuat_hd">Giá xuất VAT (Gốc)</option></select></div><button id="runVerify" class="btn green">Xác nhận & Kiểm tra</button></div>`;$$('.order-map').forEach(s=>s.onchange=()=>orderMap[s.dataset.k]=s.value);$('#compareAgainst').value=compareAgainst;$('#compareAgainst').onchange=e=>compareAgainst=e.target.value;$('#runVerify').onclick=runVerify}
+function runVerify(){if(['ma_sp','ten_sp','gia_xuat','so_luong'].some(k=>!orderMap[k]))return alert('Vui lòng chọn đủ trường bắt buộc.');if(!selectedDataset||!masterData.length)return alert('Vui lòng chọn bảng Dữ liệu Chuẩn trước.');let mm=new Map(masterData.map(x=>[normCode(x.ma_sp),x])),correct=[],incorrect=[],sales=[],customer=[];orderRows.forEach((o,idx)=>{let code=String(o[orderMap.ma_sp]||'').trim();if(!code)return;let price=parseNumber(o[orderMap.gia_xuat]),priceRaw=o[orderMap.gia_xuat],ck=getCK(o,orderMap.chiet_khau),ckRaw=o[orderMap.chiet_khau]||'0%',qty=parseQty(o[orderMap.so_luong])||1,m=mm.get(normCode(code));if(m){let mp=compareAgainst==='gia_xuat_hd'?parseNumber(m.gia_xuat_hd):parseNumber(m.gia_ban),mpd=compareAgainst==='gia_xuat_hd'?(m.gia_xuat_hd_display??fmt(mp)):(m.gia_ban_display??fmt(mp)),mck=parseNumber(m.chiet_khau),mckd=m.ck_display??(m.chiet_khau?m.chiet_khau+'%':'0%'),pm=Math.abs(price-mp)<1,cm=!orderMap.chiet_khau||Math.abs(ck-mck)<.1;if(pm&&cm)correct.push(`<b>${esc(code)}</b> - ${esc(o[orderMap.ten_sp])}: Giá ${esc(priceRaw)} ${orderMap.chiet_khau?`| CK ${esc(ckRaw)}`:''}`);else incorrect.push(`<b>${esc(code)}</b> - ${esc(o[orderMap.ten_sp])}: ${!pm?`Giá đơn <b>${esc(priceRaw)}</b> ≠ chuẩn <b>${esc(mpd)}</b>. `:''}${!cm?`CK đơn <b>${esc(ckRaw)}</b> ≠ chuẩn <b>${esc(mckd)}</b>.`:''}`);let qc=parseQty(m.quy_cach)||1,gdu=Math.round(parseNumber(m.gia_ban)/qc),qcm=qty*qc,tong=gdu*qcm;sales.push({stt:sales.length+1,ma_sp:m.ma_sp,ma_erp:m.ma_erp,ten_sp:m.ten_sp,quy_cach_don_vi_mua:qcm,gia_ban_don_vi:gdu,tong_gia_tri:tong,thue_5:Math.round(tong*.05)});let vat=parseNumber(m.gia_xuat_hd);customer.push({stt:customer.length+1,ma_erp:m.ma_erp,ten_sp:m.ten_sp,don_gia:m.gia_ban_display??fmt(m.gia_ban),chiet_khau:m.ck_display??(m.chiet_khau?m.chiet_khau+'%':'0%'),so_luong:qty,thanh_tien:vat*qty})}else incorrect.push(`<b>${esc(code)}</b> - ${esc(o[orderMap.ten_sp])}: Không tìm thấy mã trong Dữ liệu Chuẩn.`)});verifyResult={correct,incorrect,sales,customer};renderVerifyResults();renderAgentGate()}
+function renderVerifyResults(){$('#verifyResults').classList.remove('hidden');$('#result-check').innerHTML=`<div class="card result-good"><h3>✅ ĐÚNG (${verifyResult.correct.length})</h3><ul class="result-list">${verifyResult.correct.length?verifyResult.correct.map(x=>`<li>${x}</li>`).join(''):'<li>Không có.</li>'}</ul></div><div class="card result-bad"><h3>❌ SAI / KHÔNG KHỚP (${verifyResult.incorrect.length})</h3><ul class="result-list">${verifyResult.incorrect.length?verifyResult.incorrect.map(x=>`<li>${x}</li>`).join(''):'<li>Không có.</li>'}</ul></div>`;$('#result-sales').innerHTML=`<div class="right"><button id="expSales" class="btn green">Xuất Excel</button></div><div class="table-wrap" style="margin-top:8px"><table><thead><tr><th>STT</th><th>Mã</th><th>Mã ERP</th><th>Tên SP</th><th>QC Đơn vị mua</th><th>Giá bán ĐV</th><th>Tổng GT</th><th>Thuế 5%</th></tr></thead><tbody>${verifyResult.sales.map(r=>`<tr><td>${r.stt}</td><td>${esc(r.ma_sp)}</td><td>${esc(r.ma_erp)}</td><td>${esc(r.ten_sp)}</td><td class="num">${fmt(r.quy_cach_don_vi_mua)}</td><td class="num">${fmt(r.gia_ban_don_vi)}</td><td class="num">${fmt(r.tong_gia_tri)}</td><td class="num">${fmt(r.thue_5)}</td></tr>`).join('')}</tbody></table></div>`;$('#result-customer').innerHTML=`<div class="right"><button id="expCustomer" class="btn green">Xuất Excel</button></div><div class="table-wrap" style="margin-top:8px"><table><thead><tr><th>STT</th><th>Mã ERP</th><th>Tên hàng hóa</th><th>Đơn giá</th><th>Chiết khấu</th><th>Số lượng</th><th>Thành tiền VAT</th></tr></thead><tbody>${verifyResult.customer.map(r=>`<tr><td>${r.stt}</td><td>${esc(r.ma_erp)}</td><td>${esc(r.ten_sp)}</td><td class="num">${esc(r.don_gia)}</td><td>${esc(r.chiet_khau)}</td><td class="num">${fmt(r.so_luong)}</td><td class="num">${fmt(r.thanh_tien)}</td></tr>`).join('')}</tbody></table></div>`;$('#expSales').onclick=()=>exportXlsx(verifyResult.sales,'Don_Ban.xlsx','DonBan');$('#expCustomer').onclick=()=>exportXlsx(verifyResult.customer,'Don_Khach_Hang.xlsx','DonKhachHang')}
+$$('[data-result-tab]').forEach(b=>b.onclick=()=>{$$('[data-result-tab]').forEach(x=>x.classList.toggle('active',x===b));['check','sales','customer'].forEach(x=>$(`#result-${x}`).classList.toggle('hidden',x!==b.dataset.resultTab))});
+
+// ===== AI AGENT CONTROL: Master chính thức + Giá chuẩn + Tồn + Lịch sử xuất =====
+function deepCollectMasterRows(v,out=[]){if(Array.isArray(v)){v.forEach(x=>deepCollectMasterRows(x,out));return out}if(!v||typeof v!=='object')return out;const name=String(v.name||v.productName||v['Tên SP']||v['Tên Sản Phẩm']||'').trim(),code=String(v.code||v.productCode||v['Mã SP']||'').trim();if(name&&(v.packSpec!==undefined||v.unit!==undefined||v.strength!==undefined||code))out.push({code,name,unit:String(v.unit||'').trim(),strength:String(v.strength||'').trim(),packSpec:String(v.packSpec||'').trim()});Object.values(v).forEach(x=>{if(x&&typeof x==='object')deepCollectMasterRows(x,out)});return out}
+function dedupeOfficialMaster(rows){const m=new Map();rows.forEach(x=>{const k=(x.code?'C:'+x.code.toLowerCase():'N:'+x.name.toLowerCase());if(!m.has(k))m.set(k,x)});return [...m.values()]}
+function subscribeOfficialMaster(){if(!mainDb)return;if(unsubOfficialMaster)unsubOfficialMaster();unsubOfficialMaster=onValue(ref(mainDb,'excelFiles'),s=>{officialMasterData=dedupeOfficialMaster(deepCollectMasterRows(s.val()||{}));renderAgentGate()},e=>console.warn('Master TEST',e))}
+function subscribeExports(){if(!mainDb)return;if(unsubExports)unsubExports();unsubExports=onValue(ref(mainDb,'exports'),s=>{const d=s.val()||{};exportHistoryData=Object.values(d).filter(Boolean);renderAgentGate()},e=>console.warn('Exports TEST',e))}
+function normAgent(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').toLowerCase().replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim()}
+function findOfficialMaster(code,name){const c=String(code||'').trim().toLowerCase();if(c){const x=officialMasterData.find(m=>String(m.code||'').trim().toLowerCase()===c);if(x)return x}const n=normAgent(name);if(n){const exact=officialMasterData.filter(m=>normAgent(m.name)===n);if(exact.length===1)return exact[0]}return null}
+function inventoryFor(code,name){const c=String(code||'').trim().toLowerCase(),n=normAgent(name);let hit=c?inventoryGrouped.filter(x=>String(x.productCode||'').trim().toLowerCase()===c):[];if(!hit.length&&n)hit=inventoryGrouped.filter(x=>normAgent(x.productName)===n);return hit.reduce((s,x)=>s+(Number(x.totalQty)||0),0)}
+function exportedFor(code,name){const c=String(code||'').trim().toLowerCase(),n=normAgent(name);let hit=c?exportHistoryData.filter(x=>String(x.productCode||'').trim().toLowerCase()===c):[];if(!hit.length&&n)hit=exportHistoryData.filter(x=>normAgent(x.productName)===n);return hit.reduce((s,x)=>s+(Number(x.quantity)||0),0)}
+function orderObjectsForAgent(){if(orderRows.length&&orderMap.ma_sp&&orderMap.ten_sp)return orderRows.map((o,i)=>({idx:i+1,code:String(o[orderMap.ma_sp]||'').trim(),name:String(o[orderMap.ten_sp]||'').trim(),price:parseNumber(o[orderMap.gia_xuat]),priceRaw:o[orderMap.gia_xuat],qty:parseQty(o[orderMap.so_luong])||0,ck:getCK(o,orderMap.chiet_khau)}));if(aiData&&aiData.headers?.length){const find=(arr)=>aiData.headers.find(h=>arr.some(k=>String(h).toLowerCase().includes(k)))||'';const hc=find(['mã sản phẩm','mã (item','mã sp','item product','mã']),hn=find(['tên sản phẩm','product name','tên thuốc','tên sp']),hp=find(['giá xuất','gía bán','giá bán','unit price','đơn giá']),hq=find(['sản lượng','số lượng','quantity','sl đặt']),hck=find(['chiết khấu','discount']);return aiData.rows.map((r,i)=>{const o=Object.fromEntries(aiData.headers.map((h,j)=>[h,r[j]??'']));return {idx:i+1,code:String(o[hc]||'').trim(),name:String(o[hn]||'').trim(),price:parseNumber(o[hp]),priceRaw:o[hp],qty:parseQty(o[hq])||0,ck:getCK(o,hck)}})}return []}
+function buildAgentGate(){const rows=orderObjectsForAgent();if(!rows.length)return {rows:[],state:'warn',summary:{total:0,pass:0,warn:0,block:0},message:'Chưa có dữ liệu đơn để Agent soi.'};const priceMap=new Map(masterData.map(x=>[normCode(x.ma_sp),x]));let pass=0,warn=0,block=0;const result=rows.map(r=>{const priceMaster=priceMap.get(normCode(r.code)),off=findOfficialMaster(r.code,r.name),stock=inventoryFor(r.code,r.name),exported=exportedFor(r.code,r.name);let priceOk=null,ckOk=null,issues=[],warnings=[];if(!off)issues.push('Không khớp Master chính thức');else if(r.name&&normAgent(off.name)!==normAgent(r.name))warnings.push('Tên đơn khác cách viết Master');if(!priceMaster)issues.push('Không có mã trong bảng giá chuẩn');else{const std=compareAgainst==='gia_xuat_hd'?parseNumber(priceMaster.gia_xuat_hd):parseNumber(priceMaster.gia_ban);priceOk=Math.abs((Number(r.price)||0)-std)<1;if(!priceOk)issues.push('Giá không khớp chuẩn');if(orderMap.chiet_khau){ckOk=Math.abs((Number(r.ck)||0)-parseNumber(priceMaster.chiet_khau))<.1;if(!ckOk)issues.push('Chiết khấu không khớp')}}if(r.qty<=0)issues.push('Số lượng không hợp lệ');if(r.qty>stock)warnings.push(`Thiếu tồn ${r.qty-stock}`);const uncertain=(aiData?.audit?.uncertainCells||[]).some(u=>Number(u.row)===r.idx||Number(u.row)===r.idx-1);if(uncertain)issues.push('AI đánh dấu ô chưa chắc chắn');let status=issues.length?'BLOCK':warnings.length?'CHECK':'PASS';if(status==='PASS')pass++;else if(status==='CHECK')warn++;else block++;return {...r,priceMaster,official:off,stock,exported,priceOk,ckOk,issues,warnings,status}});return {rows:result,state:block?'bad':warn?'warn':'good',summary:{total:result.length,pass,warn,block},message:block?'Có dòng bị CHẶN — chưa nên phát hành đầu ra.':warn?'Có dòng cần kiểm tra trước khi phát hành.':'Tất cả cổng kiểm soát đạt — có thể chuyển sang bước xuất/đơn bán sau xác nhận của người phụ trách.'}}
+function renderAgentGate(){const box=$('#agentGateResult');if(!box)return;const g=buildAgentGate();agentLastAudit=g;box.className='agent-gate '+g.state;const s=g.summary;$('#agentGateStatus').textContent=g.message;box.innerHTML=`<b>${g.state==='good'?'✅':g.state==='bad'?'⛔':'⚠️'} ${esc(g.message)}</b><div class="agent-gate-grid"><div><small>Tổng dòng</small><strong>${s.total}</strong></div><div><small>PASS</small><strong style="color:#15803d">${s.pass}</strong></div><div><small>Cần kiểm tra</small><strong style="color:#b45309">${s.warn}</strong></div><div><small>CHẶN</small><strong style="color:#b91c1c">${s.block}</strong></div><div><small>Master chính thức</small><strong>${officialMasterData.length}</strong></div></div>${g.rows.length?`<div class="agent-table-wrap"><table><thead><tr><th>TT</th><th>Trạng thái</th><th>Mã</th><th>Tên đơn</th><th>Master</th><th>Giá</th><th>SL đơn</th><th>Tồn TEST</th><th>Đã xuất</th><th>Ghi chú</th></tr></thead><tbody>${g.rows.map(r=>`<tr><td>${r.idx}</td><td><span class="pill ${r.status==='PASS'?'ok':r.status==='CHECK'?'warn':'bad'}">${r.status}</span></td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td>${esc(r.official?.name||'CHƯA KHỚP')}</td><td>${r.priceOk===false?'<span class="pill bad">SAI GIÁ</span>':r.priceOk===true?'<span class="pill ok">ĐÚNG</span>':'--'}</td><td class="num">${fmt(r.qty)}</td><td class="num">${fmt(r.stock)}</td><td class="num">${fmt(r.exported)}</td><td>${esc([...r.issues,...r.warnings].join(' · ')||'Đạt')}</td></tr>`).join('')}</tbody></table></div>`:''}`;return g}
+$('#runAgentGate').onclick=()=>renderAgentGate();
+$('#saveAgentAudit').onclick=async()=>{const g=renderAgentGate();if(!g.rows.length)return alert('Chưa có dữ liệu để lưu biên bản Agent.');if(!mainDb)return alert('Firebase TEST chưa kết nối.');const id=Date.now()+'_'+Math.random().toString(36).slice(2,8);const payload={createdAt:new Date().toISOString(),dataset:selectedDataset||'',compareAgainst,route:sharedRouteLabel(),summary:g.summary,message:g.message,rows:g.rows.map(r=>({idx:r.idx,code:r.code,name:r.name,qty:r.qty,stock:r.stock,exported:r.exported,status:r.status,issues:r.issues,warnings:r.warnings,officialCode:r.official?.code||'',officialName:r.official?.name||''}))};try{await set(ref(mainDb,'order_price_agent_audits/'+id),payload);toast($('#agentGateStatus'),'✅ Đã lưu biên bản Agent lên Firebase TEST.','ok')}catch(e){toast($('#agentGateStatus'),'Lỗi lưu biên bản: '+e.message,'err')}};
+
+// INVENTORY
+let inventoryRaw=[],inventoryGrouped=[],inventoryAnalysis=[];
+function subscribeInventory(){if(!invDb)return;if(unsubInventory)unsubInventory();unsubInventory=onValue(ref(invDb,'pharmaceuticals'),s=>{let d=s.val()||{};inventoryRaw=Object.keys(d).map(k=>({id:k,...d[k]}));groupInventory();$('#inventoryUpdate').textContent='Cập nhật: '+new Date().toLocaleTimeString('vi-VN');renderInventory();renderAgentGate()},e=>$('#inventoryTable').innerHTML=`<div class="status err">Không đọc được kho: ${esc(e.message)}</div>`)}
+function groupInventory(){let m=new Map();inventoryRaw.forEach(x=>{let name=String(x.productName||'').trim(),code=String(x.productCode||'').trim(),unit=String(x.unit||'').trim(),key=(name+code+unit).toLowerCase();if(!m.has(key))m.set(key,{key,productName:name,productCode:code,unit,totalQty:0,batches:[]});let e=m.get(key),q=parseInt(String(x.quantity))||0;if(q>0){e.totalQty+=q;e.batches.push({lot:x.lotNumber||'',exp:x.expiryDate||'',qty:q})}});inventoryGrouped=[...m.values()].filter(x=>x.totalQty>0).sort((a,b)=>a.productName.localeCompare(b.productName))}
+function renderInventory(){let q=$('#inventorySearch').value.toLowerCase(),rows=inventoryGrouped.filter(x=>x.productName.toLowerCase().includes(q)||x.productCode.toLowerCase().includes(q));$('#inventoryTable').innerHTML=`<table><thead><tr><th>STT</th><th>Mã SP</th><th>Tên hàng hóa</th><th>ĐVT</th><th>Tổng tồn</th><th>Chi tiết</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.productCode)}</td><td>${esc(r.productName)}</td><td>${esc(r.unit)}</td><td class="num"><b>${fmt(r.totalQty)}</b></td><td><details><summary>${r.batches.length} lô</summary>${r.batches.map(b=>`<div class="batch">Lô: ${esc(b.lot)} • HSD: ${esc(b.exp)} • SL: ${fmt(b.qty)}</div>`).join('')}</details></td></tr>`).join('')}</tbody></table>`}
+$('#inventorySearch').oninput=renderInventory;$('#exportInventory').onclick=()=>exportXlsx(inventoryGrouped.map((x,i)=>({STT:i+1,'Mã Sản Phẩm':x.productCode,'Tên Hàng Hóa':x.productName,'Đơn Vị':x.unit,'Tổng Tồn':x.totalQty,'Chi Tiết Lô':x.batches.map(b=>`(Lô:${b.lot}-Hạn:${b.exp}-SL:${b.qty})`).join('; ')})),`BaoCaoTonKho_${new Date().toISOString().slice(0,10)}.xlsx`,'BaoCaoTonKho');
+$$('[data-invtab]').forEach(b=>b.onclick=()=>{$$('[data-invtab]').forEach(x=>x.classList.toggle('active',x===b));$('#inv-report').classList.toggle('hidden',b.dataset.invtab!=='report');$('#inv-analysis').classList.toggle('hidden',b.dataset.invtab!=='analysis')});
+$('#runInventoryAnalysis').onclick=()=>{let t=$('#inventoryPaste').value.trim();if(!t)return alert('Vui lòng dán dữ liệu đơn hàng.');let fmtv=document.querySelector('input[name="invFmt"]:checked').value,lines=t.split(/\r?\n/).filter(x=>x.trim()),imap=new Map(inventoryGrouped.filter(x=>x.productCode).map(x=>[x.productCode.toLowerCase(),x.totalQty])),nmap=new Map(inventoryGrouped.filter(x=>x.productName).map(x=>[x.productName.toLowerCase(),x.totalQty]));let header=false,ic=-1,inm=-1,iq=-1,cols0=lines[0].split('\t').map(x=>x.trim().toLowerCase());if(cols0.some(x=>x.includes('số lượng')||x.includes('quantity')||x==='sl')&&cols0.some(x=>x.includes('mã')||x.includes('erp')||x.includes('code'))){header=true;cols0.forEach((c,i)=>{if(ic<0&&(c.includes('mã')||c.includes('erp')||c.includes('code')))ic=i;else if(inm<0&&(c.includes('tên')||c.includes('name')||c.includes('sp')))inm=i;else if(iq<0&&(c.includes('số lượng')||c.includes('quantity')||c==='sl'))iq=i})}inventoryAnalysis=[];lines.slice(header?1:0).forEach((line,i)=>{let c=line.split('\t').map(x=>x.trim()),code='',name='',qs='';if(header&&ic>=0&&iq>=0){code=c[ic]||'';name=inm>=0?c[inm]||'':'';qs=c[iq]||''}else if(fmtv==='customer_export'){let isStt=!isNaN(Number(c[0]))&&c[0].length<5;if(isStt&&c.length>=6){code=c[1];name=c[2];qs=c[5]}else if(!isStt&&c.length>=5){code=c[0];name=c[1];qs=c[4]}else if(c.length===3){[code,name,qs]=c}else{code=c[1]||c[0];name=c[2]||c[1];qs=c[5]||c[2]}}else{let isStt=!isNaN(Number(c[0]))&&c[0].length<5;if(isStt&&c.length>=4){code=c[1];name=c[2];qs=c[3]}else{code=c[0];name=c[1];qs=c[2]}}let qty=parseQty(qs);if(qty<=0)return;let stock=code&&imap.has(code.toLowerCase())?imap.get(code.toLowerCase()):(name&&nmap.has(name.toLowerCase())?nmap.get(name.toLowerCase()):0),need=Math.max(0,qty-stock);inventoryAnalysis.push({stt:inventoryAnalysis.length+1,ma_erp:code,ten_sp:name,sl_don_hang:qty,ton_kho:stock,can_dat:need,ghi_chu:need>0?'CẦN ĐẶT':'ĐỦ HÀNG',status:need>0?'can_dat':'du_hang'})});renderInventoryAnalysis()};
+function renderInventoryAnalysis(){$('#inventoryAnalysisResult').innerHTML=`<table><thead><tr><th>STT</th><th>Mã ERP</th><th>Tên hàng hóa</th><th>SL Đơn</th><th>Tồn kho</th><th>Cần đặt</th><th>Trạng thái</th></tr></thead><tbody>${inventoryAnalysis.map(r=>`<tr><td>${r.stt}</td><td>${esc(r.ma_erp)}</td><td>${esc(r.ten_sp)}</td><td class="num">${fmt(r.sl_don_hang)}</td><td class="num">${fmt(r.ton_kho)}</td><td class="num"><b>${r.can_dat?fmt(r.can_dat):'-'}</b></td><td><span class="pill ${r.status==='can_dat'?'bad':'ok'}">${r.ghi_chu}</span></td></tr>`).join('')}</tbody></table>`}
+$('#exportNeedBuy').onclick=()=>exportXlsx(inventoryAnalysis.filter(x=>x.status==='can_dat'),'Hang_Can_Dat.xlsx','CanDat');$('#exportInvAnalysis').onclick=()=>exportXlsx(inventoryAnalysis,'Phan_Tich_Ton_Kho.xlsx','PhanTich');
+
+// Chặn password manager tự điền chuỗi mật khẩu vào ô API Key.
+setTimeout(()=>{
+ const el=$('#geminiKey');
+ if(!el)return;
+ const v=el.value.trim();
+ if(v && !isValidGoogleApiKey(v)){
+   el.value='';
+   geminiRuntime.apiKey='';
+   geminiRuntime.ready=false;
+   if($('#geminiKeyInfo'))$('#geminiKeyInfo').textContent='⚠️ Đã chặn một chuỗi tự điền không phải API Key.';
+ }
+},800);
+
+connectFirebase();
+updateSharedAIUI();
+setTimeout(()=>{renderAgentGate();updateSharedAIUI()},500);
+
+if(location.protocol==='file:'){
+ const w=$('#fileOriginWarning');
+ if(w)w.style.display='block';
+}
+
+// Sau khi khởi tạo, chủ động xác minh Firebase nhiều lần để tránh race khi mở file://.
+if(!getSharedAI())(async()=>{
+ for(const delay of [400,1200,2500]){
+   await new Promise(r=>setTimeout(r,delay));
+   if(!mainDb)continue;
+   try{
+     await readGeminiFromFirebaseVerified();
+     if($('#geminiKeyInfo')){
+       $('#geminiKeyInfo').textContent=maskKeyPreview(geminiRuntime.apiKey)+' • ✅ ĐÃ XÁC MINH TRÊN FIREBASE';
+     }
+     break;
+   }catch(e){
+     if(delay===2500){
+       geminiFirebaseVerified=false;
+       console.warn('Không xác minh được API Key Firebase khi khởi động:',e);
+     }
+   }
+ }
+})();
+<\/script>
+</body>
+</html>
+</script>
+        </div>
+
         <div class="app-footer" id="app-footer">
             Hệ thống quản lý kho dược IDECO.
         </div>
@@ -4997,7 +5982,7 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             </div>`).join('');
         }
         
-        window.switchTab=(id,el)=>{ document.querySelectorAll('.tab-content').forEach(d=>d.style.display='none'); const target=document.getElementById(id); if(target)target.style.display='block'; document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active')); if(el)el.classList.add('active'); if(id==='tab6'&&window.initForecastOrderTab)window.initForecastOrderTab(); }
+        window.switchTab=(id,el)=>{ document.querySelectorAll('.tab-content').forEach(d=>d.style.display='none'); const target=document.getElementById(id); if(target)target.style.display='block'; document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active')); if(el)el.classList.add('active'); if(id==='tab6'&&window.initForecastOrderTab)window.initForecastOrderTab(); if(id==='tab7'&&window.initPriceAgentTab)window.initPriceAgentTab(); }
         window.toggleMode=(m)=>{ document.getElementById('mode-paste').style.display=m==='paste'?'block':'none'; document.getElementById('mode-file').style.display=m==='file'?'block':'none'; }
         window.toggleMasterSection=()=>{ const el=document.getElementById('master-section'); el.style.display=el.style.display==='none'?'block':'none'; }
         window.showToast=(m,t)=>{ const el=document.getElementById('toast'); el.innerText=m; el.style.background=t==='error'?'#ef4444':'#10b981'; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),3000); }
@@ -6911,6 +7896,37 @@ async function exportCleanElementPDF(sourceEl, fileName, orientation='p'){
   #tab6 .forecast-embed-frame{display:block!important;width:100%!important;max-width:none!important;height:calc(100vh - 244px)!important;min-height:720px!important;border:0!important;margin:0!important;padding:0!important;background:#f8fafc!important}
   @media(max-width:1100px){#tab6 .forecast-embed-toolbar{align-items:flex-start}.forecast-embed-frame{height:calc(100vh - 260px)!important;min-height:680px!important}}
   @media(max-width:700px){#tab6 .forecast-embed-toolbar{padding:7px 8px}.forecast-embed-toolbar small{display:block;margin-left:0;margin-top:2px}.forecast-fb-pill{font-size:.64rem}.forecast-embed-frame{height:calc(100vh - 270px)!important;min-height:620px!important}}
+</style>
+
+<script id="price-agent-tab-loader">
+(()=>{
+  let priceAgentLoaded=false;
+  function loadPriceAgent(force=false){
+    const src=document.getElementById('price-agent-src');
+    const frame=document.getElementById('price-agent-iframe');
+    if(!src||!frame)return;
+    if(priceAgentLoaded&&!force)return;
+    frame.srcdoc=src.textContent||'';
+    priceAgentLoaded=true;
+  }
+  window.initPriceAgentTab=()=>loadPriceAgent(false);
+  window.reloadPriceAgentTab=()=>{
+    const frame=document.getElementById('price-agent-iframe');
+    if(frame)frame.srcdoc='';
+    priceAgentLoaded=false;
+    setTimeout(()=>loadPriceAgent(true),80);
+  };
+})();
+</script>
+<style id="price-agent-tab-shell-style">
+  #tab7{padding:0!important;background:#f1f5f9!important;width:100%!important;max-width:none!important;overflow:hidden!important}
+  #tab7 .price-agent-shell{width:100%!important;max-width:none!important;margin:0!important;border:0!important;border-radius:0!important;background:#fff;overflow:hidden!important;box-shadow:none!important}
+  #tab7 .price-agent-toolbar{box-sizing:border-box;display:flex!important;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;width:100%;padding:8px 12px;background:#0f172a;color:#fff;border-bottom:1px solid #334155}
+  #tab7 .price-agent-toolbar b{font-size:.88rem}#tab7 .price-agent-toolbar small{display:inline;margin-left:6px;color:#cbd5e1;font-size:.72rem}
+  #tab7 .price-agent-pill{display:inline-flex;align-items:center;gap:5px;background:#fef3c7;color:#92400e;border:1px solid #f59e0b;border-radius:999px;padding:4px 8px;font-size:.7rem;font-weight:900}
+  #tab7 .price-agent-frame{display:block!important;width:100%!important;max-width:none!important;height:calc(100vh - 244px)!important;min-height:760px!important;border:0!important;margin:0!important;padding:0!important;background:#f1f5f9!important}
+  @media(max-width:1100px){#tab7 .price-agent-toolbar{align-items:flex-start}#tab7 .price-agent-frame{height:calc(100vh - 260px)!important;min-height:700px!important}}
+  @media(max-width:700px){#tab7 .price-agent-toolbar{padding:7px 8px}#tab7 .price-agent-toolbar small{display:block;margin-left:0;margin-top:2px}#tab7 .price-agent-pill{font-size:.64rem}#tab7 .price-agent-frame{height:calc(100vh - 270px)!important;min-height:640px!important}}
 </style>
 </body>
 </html>

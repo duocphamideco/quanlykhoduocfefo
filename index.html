@@ -1065,7 +1065,7 @@
                             <div><label>API Key AI CHÍNH 3 · dự phòng</label><div style="display:flex;gap:6px"><input type="password" id="ai-key-3" autocomplete="off"><button class="btn btn-primary ai-key-eye" type="button" data-eye-target="ai-key-3" style="width:auto;padding:6px 9px">👁️</button></div></div>
                             <div><label>API Key AI CHÍNH 4 · dự phòng thêm</label><div style="display:flex;gap:6px"><input type="password" id="ai-key-4" autocomplete="off"><button class="btn btn-primary ai-key-eye" type="button" data-eye-target="ai-key-4" style="width:auto;padding:6px 9px">👁️</button></div></div>
                             <div class="full"><label>API Key AI PHỤ · tuyến trả phí</label><div style="display:flex;gap:6px"><input type="password" id="ai-kie-key" autocomplete="off"><button class="btn btn-primary ai-key-eye" type="button" data-eye-target="ai-kie-key" style="width:auto;padding:6px 9px">👁️</button></div><div style="font-size:.72rem;color:#64748b;margin-top:3px">Dùng làm tuyến trả phí ổn định khi AI CHÍNH lỗi/quota, và có thể bật trực tiếp bằng nút AI PHỤ.</div></div>
-                            <div><label>Tuyến chính</label><div style="padding:9px 10px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc;font-weight:900;color:#1d4ed8">AI CHÍNH</div><select id="ai-primary-model" style="display:none"><option value="gemini-3.7-flash">AI CHÍNH</option><option value="gemini-3.6-flash">AI CHÍNH</option><option value="gemini-3.5-flash-lite">AI CHÍNH</option><option value="gemini-3.1-flash-lite">AI CHÍNH</option><option value="gemini-2.5-flash">AI CHÍNH</option><option value="gemini-2.5-flash-lite">AI CHÍNH</option></select></div>
+                            <div><label>Tuyến chính</label><div style="padding:9px 10px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc;font-weight:900;color:#1d4ed8">AI CHÍNH</div><select id="ai-primary-model" style="display:none"><option value="gemini-2.5-flash" selected>AI CHÍNH</option></select></div>
                             <div><label>Tuyến phụ / trả phí</label><div style="padding:9px 10px;border:1px solid #cbd5e1;border-radius:8px;background:#f0fdf4;font-weight:900;color:#166534">AI PHỤ</div><select id="ai-fallback-model" style="display:none"><option value="kie:gemini-3-7-flash">AI PHỤ</option><option value="gemini-3.7-flash">AI PHỤ</option><option value="gemini-3.6-flash">AI PHỤ</option><option value="gemini-3.5-flash-lite">AI PHỤ</option><option value="gemini-3.1-flash-lite">AI PHỤ</option><option value="gemini-2.5-flash">AI PHỤ</option></select></div>
                             <div><label>Chế độ phân tích</label><select id="ai-analysis-mode"><option value="fast">⚡ NHANH · khuyên dùng</option><option value="thorough">🛡️ KIỂM TRA KỸ</option></select></div>
                             <div><label>Chiến lược ổn định</label><div style="padding:9px 10px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc;color:#475569;font-size:.82rem"><b>AI CHÍNH:</b> dùng lần lượt các key đã nhập. Nếu không thành công, hệ thống tự chuyển <b>AI PHỤ trả phí</b>. Nút AI PHỤ sẽ ép dùng tuyến phụ ngay.</div></div>
@@ -1080,6 +1080,7 @@
                                 <button id="ai-lock-settings" class="btn btn-danger" type="button">🔒 Khóa lại</button>
                                 <span id="ai-settings-status" style="font-size:.82rem;color:#64748b"></span>
                             </div>
+                            <div class="full" id="ai-firebase-sync-status" style="font-size:.78rem;color:#475569;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:8px 10px">☁️ Đang kiểm tra cấu hình AI dùng chung trên Firebase Realtime...</div>
                             <div class="full app-password-settings">
                                 <h4>🔐 Bảo mật đăng nhập ứng dụng</h4>
                                 <p>Mật khẩu mở toàn bộ ứng dụng là lớp riêng với mật khẩu Cài đặt <b>minhtriet1973</b>. Mật khẩu mới được lưu dạng hash trong LocalStorage của máy này.</p>
@@ -1091,7 +1092,7 @@
                             </div>
                             <div class="full" id="ai-connection-test-result" style="font-size:.82rem;line-height:1.5;color:#475569"></div>
                             <div class="full" style="font-size:.78rem;color:#64748b;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:9px 10px">
-                                <b>⚡ Chế độ NHANH:</b> AI CHÍNH xử lý trước bằng các API key đã nhập. Nếu lỗi/quota, ứng dụng tự chuyển sang <b>AI PHỤ trả phí</b>. Ảnh/PDF scan được xử lý trực tiếp; PDF có lớp chữ được trích xuất tại máy để nhanh và giảm token. <b>🛡️ KIỂM TRA KỸ:</b> giữ thêm lớp AI rà lại dữ liệu trọng yếu.<br><br>Cấu hình lưu bằng LocalStorage. Giao diện chỉ hiển thị <b>AI CHÍNH / AI PHỤ</b>; tên model và nhà cung cấp được ẩn khỏi người dùng.
+                                <b>⚡ Chế độ NHANH:</b> AI CHÍNH xử lý trước bằng các API key đã nhập. Nếu lỗi/quota, ứng dụng tự chuyển sang <b>AI PHỤ trả phí</b>. Ảnh/PDF scan được xử lý trực tiếp; PDF có lớp chữ được trích xuất tại máy để nhanh và giảm token. <b>🛡️ KIỂM TRA KỸ:</b> giữ thêm lớp AI rà lại dữ liệu trọng yếu.<br><br><b>☁️ Đồng bộ:</b> khi bấm <b>Lưu cài đặt AI</b>, toàn bộ 4 key AI CHÍNH + key AI PHỤ được ghi và xác minh trên Firebase Realtime tại <b>app_settings/ai_common</b>; LocalStorage chỉ còn là cache dự phòng của máy hiện tại. Giao diện chỉ hiển thị <b>AI CHÍNH / AI PHỤ</b>; tên model và nhà cung cấp được ẩn khỏi người dùng.
                             </div>
                         </div>
                     </details>
@@ -1640,8 +1641,14 @@ const sanitizeAiText = (t) => String(t || "")
   .replace(/google/gi, "nhà cung cấp");
 
 // ===== AI DÙNG CHUNG VỚI TAB NHẬP HÀNG =====
+const isOpaqueLocalAIFrame = () => {
+  try {
+    return location.protocol === "file:" || location.protocol === "about:" ||
+      location.origin === "null" || String(location.href||"").startsWith("about:srcdoc");
+  } catch (e) { return true; }
+};
 const getSharedAI = () => {
-  if (location.protocol === "file:") return null;
+  if (isOpaqueLocalAIFrame()) return null;
   try { return window.parent && window.parent !== window ? (window.parent.IDECO_SHARED_AI || null) : null; } catch (e) { return null; }
 };
 const getSharedAIRoute = () => {
@@ -1660,11 +1667,11 @@ const sharedAIConfigured = () => {
   try {
     const st = typeof ai.getState === "function" ? ai.getState() : null;
     const s = st && st.settings ? st.settings : {};
-    return getSharedAIRoute() === "backup" ? !!((s.keys || []).some(Boolean)) : !!String(s.baiKey || "").trim();
+    return getSharedAIRoute() === "backup" ? !!String(s.kieKey || "").trim() : !!((s.keys || []).some(Boolean));
   } catch (e) { return true; }
 };
 const openSharedAISettings = () => {
-  if (location.protocol === "file:") return false;
+  if (isOpaqueLocalAIFrame()) return false;
   try {
     if (window.parent && typeof window.parent.openIDECOSettingsPanel === "function") { window.parent.openIDECOSettingsPanel(); return true; }
   } catch (e) {}
@@ -3588,6 +3595,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="icon" href="data:,">
 <title>IDECO - Hệ thống kiểm tra đơn chuỗi nhà thuốc</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"><\/script>
 <style>
@@ -3813,15 +3821,17 @@ let mainConfig={...TEST_FIREBASE_CONFIG};
 let invConfig={...TEST_FIREBASE_CONFIG};
 let mainApp=null,mainDb=null,invApp=null,invDb=null,unsubDatasets=null,unsubInventory=null,unsubGeminiSettings=null;
 let officialMasterData=[],exportHistoryData=[],unsubOfficialMaster=null,unsubExports=null,agentLastAudit=null;
-function getSharedAI(){if(location.protocol==='file:')return null;try{return window.parent&&window.parent!==window?(window.parent.IDECO_SHARED_AI||null):null}catch(e){return null}}
+function isOpaqueLocalPriceFrame(){try{return location.protocol==='file:'||location.protocol==='about:'||location.origin==='null'||String(location.href||'').startsWith('about:srcdoc')}catch(e){return true}}
+function getSharedAI(){if(isOpaqueLocalPriceFrame())return null;try{return window.parent&&window.parent!==window?(window.parent.IDECO_SHARED_AI||null):null}catch(e){return null}}
 let standaloneAIRoute='main';
 function sharedRoute(){const a=getSharedAI();if(!a)return standaloneAIRoute;try{return a&&typeof a.getRoute==='function'&&a.getRoute()==='backup'?'backup':'main'}catch(e){return standaloneAIRoute}}
 function sharedRouteLabel(){return sharedRoute()==='backup'?'AI PHỤ':'AI CHÍNH'}
 function setSharedRoute(mode){const wanted=mode==='backup'?'backup':'main';const a=getSharedAI();if(!a){standaloneAIRoute=wanted;return true}if(typeof a.setRoute!=='function')return false;try{return a.setRoute(wanted)!==false}catch(e){return false}}
-function openParentAISettings(){if(location.protocol==='file:'){try{switchMain('settings');return true}catch(e){return false}}try{if(window.parent&&typeof window.parent.openIDECOSettingsPanel==='function'){window.parent.openIDECOSettingsPanel();return true}}catch(e){}try{switchMain('settings');return true}catch(e){}return false}
+function openParentAISettings(){if(isOpaqueLocalPriceFrame()){try{switchMain('settings');return true}catch(e){return false}}try{if(window.parent&&typeof window.parent.openIDECOSettingsPanel==='function'){window.parent.openIDECOSettingsPanel();return true}}catch(e){}try{switchMain('settings');return true}catch(e){}return false}
 function updateSharedAIUI(){const mode=sharedRoute();[['#agentRouteMain','main'],['#agentRouteBackup','backup'],['#settingsRouteMain','main'],['#settingsRouteBackup','backup']].forEach(([sel,m])=>{const e=$(sel);if(e)e.classList.toggle('on',mode===m)});if($('#agentRouteStatus'))$('#agentRouteStatus').textContent=sharedRouteLabel();if($('#aiProviderStatus'))$('#aiProviderStatus').innerHTML='<b>Trợ lý:</b> HUYỀN • '+sharedRouteLabel()+' • dùng chung TAB Nhập hàng';if($('#sharedAISettingStatus'))$('#sharedAISettingStatus').textContent='Đang dùng '+sharedRouteLabel()+' · Cấu hình lấy từ TAB Nhập hàng.'}
 
 const SHARED_GEMINI_PATH='app_settings/gemini';
+const SHARED_AI_BUNDLE_PATH='app_settings/ai_common';
 const KIE_API_KEY='6a11cd4b360b77e7cd515b8296a00e6a';
 const KIE_MODEL='gemini-3-7-flash';
 const KIE_ENDPOINT='https://api.kie.ai/gemini/v1/models/gemini-3-7-flash:streamGenerateContent';
@@ -3887,7 +3897,7 @@ if($('#openSharedAISettings'))$('#openSharedAISettings').onclick=openParentAISet
 if($('#settingsOpenSharedAI'))$('#settingsOpenSharedAI').onclick=openParentAISettings;
 if($('#settingsTestSharedAI'))$('#settingsTestSharedAI').onclick=async()=>{try{const a=getSharedAI();let r;if(a&&typeof a.textRequest==='function')r=await a.textRequest('Trả lời đúng một từ: OK',{plainText:true,purpose:'AI Agent kiểm tra kết nối'});else r=await geminiGenerate([{text:'Trả lời đúng một từ: OK'}],'',false);toast($('#sharedAISettingStatus'),sharedRouteLabel()+' kết nối tốt: '+String(r.text||'').slice(0,40),'ok')}catch(e){toast($('#sharedAISettingStatus'),'Kết nối AI lỗi: '+e.message,'err')}};
 updateSharedAIUI();
-let geminiRuntime={apiKey:'',model:'gemini-3.6-flash',ready:false};
+let geminiRuntime={apiKey:'',model:'gemini-2.5-flash',ready:false};
 let geminiFirebaseVerified=false;
 let geminiLastVerifiedAt=0;
 
@@ -3913,13 +3923,26 @@ function describeInvalidKey(key){
 
 async function readGeminiFromFirebaseVerified(){
  if(!mainDb)throw new Error('Firebase chính chưa kết nối.');
- const s=await get(ref(mainDb,SHARED_GEMINI_PATH));
- if(!s.exists())throw new Error('Chưa có cấu hình tại '+SHARED_GEMINI_PATH);
- const v=s.val();
- const key=typeof v==='string'?String(v).trim():String(v?.apiKey||'').trim();
- const model=typeof v==='object'&&v?.model?String(v.model).trim():'gemini-3.6-flash';
+
+ // Ưu tiên bundle AI chung của toàn ứng dụng.
+ let s=await get(ref(mainDb,SHARED_AI_BUNDLE_PATH));
+ let v=s.exists()?s.val():null;
+ let key='',model='gemini-2.5-flash';
+ if(v&&typeof v==='object'){
+   const arr=Array.isArray(v.keys)?v.keys:[];
+   key=String(arr.find(x=>String(x||'').trim())||'').trim();
+   model='gemini-2.5-flash';
+ }
+ // Tương thích dữ liệu cũ nếu bundle mới chưa có.
+ if(!key){
+   s=await get(ref(mainDb,SHARED_GEMINI_PATH));
+   if(!s.exists())throw new Error('Firebase chưa có cấu hình AI dùng chung.');
+   v=s.val();
+   key=typeof v==='string'?String(v).trim():String(v?.apiKey||'').trim();
+   model=typeof v==='object'&&v?.model?String(v.model).trim():model;
+ }
  if(!isValidGoogleApiKey(key)){
-   throw new Error('Firebase đang chứa API Key không hợp lệ ('+key.length+' ký tự).');
+   throw new Error('Firebase đang chứa API Key AI CHÍNH không hợp lệ ('+key.length+' ký tự).');
  }
  setGeminiRuntime(key,model);
  geminiFirebaseVerified=true;
@@ -6057,11 +6080,16 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
         const AI_SETTINGS_AUTH = 'ideco_settings_unlocked_v1';
         const AI_SETTINGS_PASS_HASH = 'f3f929d3'; // FNV-1a của mật khẩu cài đặt
         const AI_ROUTE_LS = 'ideco_ai_route_mode_v1';
+        const AI_FIREBASE_PATH = 'app_settings/ai_common';
+        const AI_FIREBASE_LEGACY_PATH = 'app_settings/gemini';
+        const AI_FIREBASE_SESSION = 'AI_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
+        let aiFirebaseSyncBound = false;
+        let aiFirebaseLastStatus = 'Chưa đồng bộ Firebase';
         const AI_DEFAULT = {
             keys:['','','',''],
             kieKey:'6a11cd4b360b77e7cd515b8296a00e6a',
             kieEndpoint:'https://api.kie.ai/gemini/v1/models/gemini-3-7-flash:streamGenerateContent',
-            primaryModel:'gemini-3.7-flash',
+            primaryModel:'gemini-2.5-flash',
             fallbackModel:'kie:gemini-3-7-flash',
             timeoutMs:90000,
             analysisMode:'fast',
@@ -6089,8 +6117,9 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             const out={...AI_DEFAULT,...x,keys};
             // Migration từ bản DeepSeek/B.AI cũ: Gemini trở thành AI chính, KIE 3.7 trả phí trở thành dự phòng.
             const p=String(out.primaryModel||'').toLowerCase(), f=String(out.fallbackModel||'').toLowerCase();
-            if(p.startsWith('bai:')||p.includes('deepseek'))out.primaryModel='gemini-3.7-flash';
-            if(f.startsWith('bai:')||f.includes('deepseek'))out.fallbackModel='kie:gemini-3-7-flash';
+            // AI CHÍNH dùng Google AI Studio: cố định Gemini 2.5 Flash vì bộ API key hiện hành hỗ trợ ổn định model này.
+            out.primaryModel='gemini-2.5-flash';
+            if(f.startsWith('bai:')||f.includes('deepseek')||!isKie(out.fallbackModel))out.fallbackModel='kie:gemini-3-7-flash';
             if(!String(out.kieKey||'').trim())out.kieKey=AI_DEFAULT.kieKey;
             if(!String(out.kieEndpoint||'').trim())out.kieEndpoint=AI_DEFAULT.kieEndpoint;
             out.baiKey=''; out.baiVision=false;
@@ -6110,13 +6139,137 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
                 let best=candidates.sort((a,b)=>(b.keys||[]).filter(Boolean).length-(a.keys||[]).filter(Boolean).length)[0]||normalizeAISettings({});
                 const singles=legacySingleGeminiKeys();
                 if(!(best.keys||[]).some(Boolean)&&singles.length)best={...best,keys:[singles[0]||'',singles[1]||'',singles[2]||'',singles[3]||'']};
-                // Bản mới luôn ưu tiên Gemini; KIE 3.7 trả phí là tuyến dự phòng tự động.
-                if(String(best.primaryModel||'').startsWith('bai:'))best.primaryModel='gemini-3.7-flash';
-                if(!best.fallbackModel||String(best.fallbackModel).startsWith('bai:'))best.fallbackModel='kie:gemini-3-7-flash';
-                return best;
+                // V10: AI CHÍNH Google AI Studio luôn dùng Gemini 2.5 Flash.
+                best.primaryModel='gemini-2.5-flash';
+                best.fallbackModel='kie:gemini-3-7-flash';
+                return normalizeAISettings(best);
             }catch{return {...AI_DEFAULT,keys:[...AI_DEFAULT.keys]};}
         }
-        function saveAISettings(){ localStorage.setItem(AI_LS,JSON.stringify(aiState.settings)); try{updateAIRouteUI()}catch{} }
+        function saveAISettings(){
+            try{localStorage.setItem(AI_LS,JSON.stringify(aiState.settings))}catch(e){console.warn('Không lưu được AI cache cục bộ:',e)}
+            try{updateAIRouteUI()}catch{}
+        }
+        function aiSettingsFirebasePayload(){
+            const s=normalizeAISettings(aiState.settings);
+            return {
+                version:8,
+                keys:[0,1,2,3].map(i=>String(s.keys?.[i]||'').trim()),
+                kieKey:String(s.kieKey||'').trim(),
+                kieEndpoint:String(s.kieEndpoint||AI_DEFAULT.kieEndpoint).trim(),
+                primaryModel:'gemini-2.5-flash',
+                fallbackModel:String(s.fallbackModel||AI_DEFAULT.fallbackModel),
+                analysisMode:String(s.analysisMode||'fast'),
+                timeoutMs:Number(s.timeoutMs)||90000,
+                activeKey:Number(s.activeKey)||0,
+                updatedAt:Date.now(),
+                updatedBy:'IDECO_KHO_V8',
+                updatedSession:AI_FIREBASE_SESSION
+            };
+        }
+        function applyAISettingsFromFirebase(v){
+            if(!v||typeof v!=='object')return false;
+            const incoming=normalizeAISettings(v);
+            aiState.settings={...aiState.settings,...incoming,keys:[...(incoming.keys||[])].slice(0,4)};
+            while(aiState.settings.keys.length<4)aiState.settings.keys.push('');
+            saveAISettings();
+            try{fillAISettings()}catch{}
+            return true;
+        }
+        function setAIFirebaseStatus(msg,kind='info'){
+            aiFirebaseLastStatus=msg;
+            const el=$ai('ai-firebase-sync-status');
+            if(el){
+                const color=kind==='ok'?'#166534':kind==='error'?'#b91c1c':kind==='warn'?'#92400e':'#475569';
+                el.style.color=color;
+                el.textContent=msg;
+            }
+        }
+        async function saveAISettingsToFirebase(){
+            if(!db||typeof db.ref!=='function')throw new Error('Firebase chưa sẵn sàng.');
+            const payload=aiSettingsFirebasePayload();
+            const pathRef=db.ref(AI_FIREBASE_PATH);
+            await pathRef.set(payload);
+            const verify=await pathRef.once('value');
+            const saved=verify.val();
+            if(!saved||!Array.isArray(saved.keys))throw new Error('Firebase không trả lại cấu hình AI sau khi lưu.');
+            const expected=payload.keys.map(x=>String(x||''));
+            const actual=(saved.keys||[]).slice(0,4).map(x=>String(x||''));
+            while(actual.length<4)actual.push('');
+            if(JSON.stringify(expected)!==JSON.stringify(actual))throw new Error('Xác minh Firebase thất bại: danh sách API key đọc lại không trùng dữ liệu vừa lưu.');
+            if(String(saved.kieKey||'')!==String(payload.kieKey||''))throw new Error('Xác minh Firebase thất bại: API key AI PHỤ đọc lại không trùng.');
+            // Mirror AI CHÍNH 1 sang đường dẫn cũ để TAB Soi đơn & Giá chạy độc lập dưới file:// vẫn đọc được.
+            const firstKey=payload.keys.find(Boolean)||'';
+            if(firstKey){
+                try{
+                    await db.ref(AI_FIREBASE_LEGACY_PATH).set({
+                        apiKey:firstKey,
+                        model:'gemini-2.5-flash',
+                        updatedAt:Date.now(),
+                        updatedBy:'IDECO_KHO_V8_MIRROR'
+                    });
+                }catch(e){console.warn('Không mirror được AI CHÍNH 1 sang đường dẫn tương thích cũ:',e)}
+            }
+            setAIFirebaseStatus('☁️ Đã lưu & xác minh API key trên Firebase Realtime.', 'ok');
+            return saved;
+        }
+        async function loadAISettingsFromFirebase(){
+            if(!db||typeof db.ref!=='function')throw new Error('Firebase chưa sẵn sàng.');
+            const snap=await db.ref(AI_FIREBASE_PATH).once('value');
+            if(snap.exists()&&snap.val()){
+                applyAISettingsFromFirebase(snap.val());
+                setAIFirebaseStatus('☁️ Đã nạp cấu hình AI dùng chung từ Firebase Realtime.', 'ok');
+                return true;
+            }
+
+            // Nếu V8 chưa từng lưu bundle mới, thử khôi phục AI CHÍNH 1 từ đường dẫn Firebase cũ.
+            // Chỉ làm khi máy hiện tại chưa có bất kỳ key AI CHÍNH nào để tránh ghi đè cấu hình đang có.
+            if(!(aiState.settings.keys||[]).some(Boolean)){
+                try{
+                    const oldSnap=await db.ref(AI_FIREBASE_LEGACY_PATH).once('value');
+                    const oldVal=oldSnap.val();
+                    const oldKey=typeof oldVal==='string'?String(oldVal||'').trim():String(oldVal?.apiKey||'').trim();
+                    if(oldKey){
+                        const keys=[oldKey,'','',''];
+                        aiState.settings=normalizeAISettings({...aiState.settings,keys});
+                        saveAISettings();
+                        try{fillAISettings()}catch{}
+                        setAIFirebaseStatus('☁️ Đã khôi phục AI CHÍNH 1 từ cấu hình Firebase cũ. Bấm “Lưu cài đặt AI” để lưu đủ toàn bộ key theo chuẩn mới.', 'warn');
+                        return true;
+                    }
+                }catch(e){console.warn('Không đọc được cấu hình AI Firebase cũ:',e)}
+            }
+            setAIFirebaseStatus('☁️ Firebase chưa có bộ API key dùng chung. Nhập key rồi bấm “Lưu cài đặt AI”.', 'warn');
+            return false;
+        }
+        function bindAISettingsFirebaseRealtime(){
+            if(aiFirebaseSyncBound||!db||typeof db.ref!=='function')return;
+            aiFirebaseSyncBound=true;
+            db.ref(AI_FIREBASE_PATH).on('value',snap=>{
+                const v=snap.val();
+                if(!v||typeof v!=='object')return;
+                // Cập nhật realtime cả khi máy khác vừa thay đổi key.
+                applyAISettingsFromFirebase(v);
+                setAIFirebaseStatus('🔄 Cấu hình AI vừa được đồng bộ Realtime từ Firebase.', 'ok');
+            },err=>{
+                console.warn('Realtime AI settings lỗi:',err);
+                setAIFirebaseStatus('⚠️ Không theo dõi được cấu hình AI Realtime: '+(err?.message||err), 'error');
+            });
+        }
+        async function initAISettingsFirebase(){
+            // Firebase compat có thể cần một chút thời gian sau khi mở file.
+            let last=null;
+            for(const delay of [0,350,900,1800]){
+                if(delay)await sleepAI(delay);
+                try{
+                    await loadAISettingsFromFirebase();
+                    bindAISettingsFirebaseRealtime();
+                    return true;
+                }catch(e){last=e}
+            }
+            setAIFirebaseStatus('⚠️ Chưa nạp được API key từ Firebase. Đang dùng cache trên máy nếu có.', 'error');
+            if(last)console.warn('Khởi tạo Firebase AI settings:',last);
+            return false;
+        }
         function settingsPassHashAI(text){let h=2166136261;const s=String(text||'');for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(16).padStart(8,'0')}
         function isAISettingsUnlocked(){return false} // Không ghi nhớ mở khóa Cài đặt
         function lockAISettingsAccess(){
@@ -6190,10 +6343,26 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             if(!silent) aiNotice(mode==='backup'?'Đã bật AI PHỤ trả phí cho toàn bộ chức năng phân tích.':'Đã bật AI CHÍNH; nếu lỗi/quota sẽ tự chuyển AI PHỤ.');
             return true;
         }
-        const GEMINI_ECO_CHAIN=['gemini-3.5-flash-lite','gemini-3.1-flash-lite','gemini-2.5-flash-lite','gemini-2.5-flash','gemini-3.6-flash','gemini-3.7-flash'];
+        const GEMINI_ECO_CHAIN=['gemini-2.5-flash'];
         function isFastAI(){ return String(aiState.settings.analysisMode||'fast')!=='thorough'; }
-        function aiAttemptTimeout(){ const n=Number(aiState.settings.timeoutMs)||90000; return isFastAI()?Math.min(n,35000):n; }
+        function aiAttemptTimeout(){ const n=Number(aiState.settings.timeoutMs)||90000; return isFastAI()?Math.min(n,45000):n; }
         function baiAttemptTimeout(){ return isFastAI()?Math.max(42000,Math.min(Number(aiState.settings.timeoutMs)||90000,45000)):aiAttemptTimeout(); }
+
+        // Google khuyến nghị retry exponential backoff cho 429/503.
+        // 503 thường là nghẽn backend, đổi API key liên tục không giúp; ưu tiên retry ngắn rồi đổi model ổn định.
+        function transientGeminiBackoff(attempt){
+            const base=[900,2200,4800][Math.min(Math.max(0,attempt),2)];
+            return base + Math.floor(Math.random()*260);
+        }
+        function isGeminiServiceUnavailable(status,msg){
+            const s=String(msg||'').toLowerCase();
+            return status===500||status===502||status===503||status===504||
+                s.includes('unavailable')||s.includes('overloaded')||s.includes('service unavailable');
+        }
+        function googleMainFailoverModels(preferred){
+            // Không tự nhảy sang Gemini 3.x bằng key AI Studio vì các key hiện tại đang chạy ổn với 2.5 Flash.
+            return ['gemini-2.5-flash'];
+        }
         let baiCatalogCache={ids:[],at:0};
         function normalizeBaiModelId(v){
             let x=String(v||'').replace(/^bai:/i,'').trim();
@@ -6237,6 +6406,8 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             return queue;
         }
 
+        // V10: AI CHÍNH dùng đúng model tương thích với bộ key AI Studio hiện hành.
+        // Khi lỗi: retry ngắn -> đổi key khi quota/auth -> AI PHỤ trả phí. Không tự nhảy sang model 3.x của Google AI Studio.
         function configuredAIModels(){
             const primary=aiState.settings.primaryModel||AI_DEFAULT.primaryModel;
             const fallback=aiState.settings.fallbackModel||AI_DEFAULT.fallbackModel;
@@ -6254,10 +6425,7 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             return [...new Set(list.filter(Boolean))];
         }
         function geminiEconomyModels(){
-            const selected=[aiState.settings.primaryModel,aiState.settings.fallbackModel].filter(m=>m&&!isBai(m)&&!isKie(m));
-            const fastStable=['gemini-3.7-flash','gemini-3.6-flash','gemini-2.5-flash'];
-            const list=[...new Set([...selected,...fastStable,...GEMINI_ECO_CHAIN])];
-            return isFastAI()?list.slice(0,4):list;
+            return ['gemini-2.5-flash'];
         }
         function aiCacheKey(file,purpose){ return `${activeAIRoute()}|${aiState.settings.primaryModel}|${aiState.settings.fallbackModel}|${purpose||'AI'}|${file?.name||''}|${file?.size||0}|${file?.lastModified||0}`; }
         async function fetchAI(url,options,ms){ const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),ms||aiAttemptTimeout()); try{return await fetch(url,{...options,signal:ctl.signal});} finally{clearTimeout(t);} }
@@ -6271,46 +6439,144 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
         function shouldRetryAltAuthAI(status,msg){const s=String(msg||'').toLowerCase();return status===401||s.includes('invalid api key')||s.includes('missing api key')||s.includes('unauthenticated')||s.includes('invalid token')||s.includes('missing token')}
         function isModelErrorAI(status,msg){const s=String(msg||'').toLowerCase();return status===404||(status===400&&(s.includes('model')||s.includes('not found')||s.includes('not supported')))}
         async function geminiAI(parts,{jsonSchema=null,plainText=false,modelOverride=null,modelList=null,purpose='AI'}={}){
-            const keys=currentAIKeys(); if(!keys.length)throw new Error('Chưa có API key AI CHÍNH. Hệ thống sẽ dùng AI PHỤ nếu đã được cấu hình.');
-            const models=(modelList&&modelList.length?modelList:(modelOverride?[modelOverride]:geminiEconomyModels())).filter((x,i,a)=>x&&!isBai(x)&&a.indexOf(x)===i);
-            const start=Number(aiState.settings.activeKey)||0;
-            const keyCount=Math.max(keys.length,1); const ordered=[...keys].sort((a,b)=>((a.index-start+keyCount)%keyCount)-((b.index-start+keyCount)%keyCount));
+            const keys=currentAIKeys();
+            if(!keys.length)throw new Error('Chưa có API key AI CHÍNH. Hệ thống sẽ tự dùng AI PHỤ nếu đã cấu hình.');
+
+            // Khi được gọi với model chính, vẫn tạo chuỗi model ổn định để 503 không làm toàn bộ AI CHÍNH chết.
+            const requestedModels=(modelList&&modelList.length)
+                ? modelList
+                : (modelOverride ? googleMainFailoverModels(modelOverride) : geminiEconomyModels());
+            const models=[...new Set(requestedModels.filter(x=>x&&!isBai(x)&&!isKie(x)))];
+
+            const startKey=Number(aiState.settings.activeKey)||0;
+            const keyCount=Math.max(keys.length,1);
+            const ordered=[...keys].sort((a,b)=>((a.index-startKey+keyCount)%keyCount)-((b.index-startKey+keyCount)%keyCount));
+
             let last=null;
+            let sawService503=false;
+
             for(const model of models){
-                for(const item of ordered){
-                    try{
-                        // Trích xuất chứng từ không cần suy luận dài: giảm thinking để tiết kiệm token/quota.
-                        const generationConfig={maxOutputTokens:plainText?12000:10000};
-                        if(/^gemini-3\./.test(model)){
-                            // Gemini 3.7 KHÔNG hỗ trợ MINIMAL; dùng LOW để tránh HTTP 400.
-                            // 3.6 / 3.5 / 3.1 Flash-Lite hỗ trợ MINIMAL và phù hợp trích xuất nhanh.
-                            const level=/^gemini-3\.7/.test(model)?'low':'minimal';
-                            generationConfig.thinkingConfig={thinkingLevel:level};
-                        }else{
-                            generationConfig.temperature=plainText?0.1:0;
-                            if(/^gemini-2\.5/.test(model))generationConfig.thinkingConfig={thinkingBudget:0};
+                let moveNextModel=false;
+
+                for(let ki=0;ki<ordered.length;ki++){
+                    const item=ordered[ki];
+
+                    // 503/5xx là lỗi dịch vụ: retry cùng key theo exponential backoff.
+                    // 429/401/403 mới có ý nghĩa thử key dự phòng khác.
+                    const maxSameKeyAttempts=2;
+
+                    for(let attempt=0;attempt<maxSameKeyAttempts;attempt++){
+                        try{
+                            const generationConfig={maxOutputTokens:plainText?12000:10000};
+                            if(/^gemini-3\./.test(model)){
+                                const level=/^gemini-3\.7/.test(model)?'low':'minimal';
+                                generationConfig.thinkingConfig={thinkingLevel:level};
+                            }else{
+                                generationConfig.temperature=plainText?0.1:0;
+                                if(/^gemini-2\.5/.test(model))generationConfig.thinkingConfig={thinkingBudget:0};
+                            }
+                            if(jsonSchema){
+                                generationConfig.responseMimeType='application/json';
+                                generationConfig.responseSchema=jsonSchema;
+                            }
+
+                            const body={contents:[{role:'user',parts}],generationConfig};
+                            setAIProgress(attempt
+                                ? `AI CHÍNH đang thử lại kết nối lần ${attempt+1}...`
+                                : 'AI CHÍNH đang phân tích...', true);
+
+                            const res=await fetchAI(
+                                `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
+                                {
+                                    method:'POST',
+                                    headers:{'Content-Type':'application/json','x-goog-api-key':item.key},
+                                    body:JSON.stringify(body)
+                                },
+                                aiAttemptTimeout()
+                            );
+
+                            const data=await res.json().catch(()=>({}));
+                            if(!res.ok){
+                                const er=new Error(data?.error?.message||`HTTP ${res.status}`);
+                                er.status=res.status;
+                                throw er;
+                            }
+
+                            const out=(data?.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('').trim();
+                            if(!out)throw new Error('AI CHÍNH trả nội dung rỗng.');
+
+                            aiState.settings.activeKey=item.index;
+                            aiState.lastRoute='AI CHÍNH';
+                            aiState.lastError='';
+                            saveAISettings();
+                            return {text:out,provider:'gemini',model,keyIndex:item.index,raw:data};
+
+                        }catch(e){
+                            const status=e?.status||0;
+                            const msg=e?.name==='AbortError'
+                                ? 'Hết thời gian chờ AI CHÍNH'
+                                : (e?.message||String(e));
+
+                            last=new Error(msg);
+                            last.status=status;
+                            aiState.lastError=msg;
+                            aiState.attempts.push(`AI CHÍNH/${model}/Key${item.index+1}/L${attempt+1}: ${msg}`);
+
+                            if(isModelErrorAI(status,msg)){
+                                moveNextModel=true;
+                                break;
+                            }
+
+                            if(isGeminiServiceUnavailable(status,msg)){
+                                sawService503=true;
+                                if(attempt < maxSameKeyAttempts-1){
+                                    const wait=transientGeminiBackoff(attempt);
+                                    setAIProgress(`AI CHÍNH đang nghẽn máy chủ · tự thử lại sau ${(wait/1000).toFixed(1)} giây...`,true);
+                                    await sleepAI(wait);
+                                    continue;
+                                }
+                                // Đừng thử cả 4 key với cùng backend 503. Chuyển model ổn định tiếp theo ngay.
+                                moveNextModel=true;
+                                break;
+                            }
+
+                            if(status===429 || /quota|resource_exhausted|rate limit/i.test(msg)){
+                                setAIProgress(`AI CHÍNH đang đổi sang API key dự phòng ${Math.min(ki+2,ordered.length)}/${ordered.length}...`,true);
+                                await sleepAI(350);
+                                break; // key tiếp theo
+                            }
+
+                            if(isAuthErrorAI(status,msg)){
+                                await sleepAI(120);
+                                break; // key tiếp theo
+                            }
+
+                            if(isRetryableAI(status,msg)){
+                                if(attempt < maxSameKeyAttempts-1){
+                                    await sleepAI(transientGeminiBackoff(attempt));
+                                    continue;
+                                }
+                                break;
+                            }
+
+                            moveNextModel=true;
+                            break;
                         }
-                        if(jsonSchema){generationConfig.responseMimeType='application/json';generationConfig.responseSchema=jsonSchema;}
-                        const body={contents:[{role:'user',parts}],generationConfig};
-                        setAIProgress('Huyền đang tổng hợp... bạn ráng chờ chút nhé',true);
-                        const res=await fetchAI(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':item.key},body:JSON.stringify(body)},aiAttemptTimeout());
-                        const data=await res.json().catch(()=>({}));
-                        if(!res.ok){const er=new Error(data?.error?.message||`HTTP ${res.status}`);er.status=res.status;throw er}
-                        const out=(data?.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('').trim();
-                        if(!out)throw new Error('AI CHÍNH trả nội dung rỗng.');
-                        aiState.settings.activeKey=item.index; aiState.lastRoute=`Gemini · ${model} · Key ${item.index+1}`; aiState.lastError=''; saveAISettings();
-                        return {text:out,provider:'gemini',model,keyIndex:item.index,raw:data};
-                    }catch(e){
-                        const status=e?.status||0; const msg=e?.name==='AbortError'?'Hết thời gian chờ AI CHÍNH':(e?.message||String(e));
-                        last=new Error(msg); last.status=status; aiState.lastError=msg; aiState.attempts.push(`${model}/Key${item.index+1}: ${msg}`);
-                        if(isModelErrorAI(status,msg))break;
-                        if(isRetryableAI(status,msg)||isAuthErrorAI(status,msg)){await sleepAI(150);continue}
-                        // Lỗi khác của một model: vẫn cho phép thử model dự phòng kế tiếp.
-                        break;
                     }
+
+                    if(moveNextModel)break;
+                }
+
+                if(moveNextModel){
+                    setAIProgress('AI CHÍNH đang chuyển sang tuyến ổn định kế tiếp...',true);
+                    await sleepAI(120);
+                    continue;
                 }
             }
-            throw last||new Error(`${purpose}: AI CHÍNH chưa phản hồi với các key đã cấu hình.`);
+
+            const er=last||new Error(`${purpose}: AI CHÍNH chưa phản hồi.`);
+            if(sawService503)er.geminiServiceUnavailable=true;
+            throw er;
         }
         let kieCreditState={value:null,at:0,error:''};
         function updateKieCreditBadge(){
@@ -6359,20 +6625,74 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             }
             return {text:text.trim(),raw:chunks};
         }
-        async function kieAI(parts,{jsonSchema=null,plainText=false,purpose='AI KIE'}={}){
-            const key=String(aiState.settings.kieKey||'').trim(); if(!key)throw new Error('Chưa có API key AI PHỤ.');
+        async function kieAI(parts,{jsonSchema=null,plainText=false,purpose='AI PHỤ'}={}){
+            const key=String(aiState.settings.kieKey||'').trim();
+            if(!key)throw new Error('Chưa có API key AI PHỤ.');
+
             const endpoint=String(aiState.settings.kieEndpoint||AI_DEFAULT.kieEndpoint).trim()||AI_DEFAULT.kieEndpoint;
-            const generationConfig={temperature:0,maxOutputTokens:plainText?14000:16384,thinkingConfig:{includeThoughts:true,thinkingLevel:'high'}};
-            if(jsonSchema){generationConfig.responseMimeType='application/json';generationConfig.responseSchema=jsonSchema;}
+            const generationConfig={
+                temperature:0,
+                maxOutputTokens:plainText?14000:16384,
+                thinkingConfig:{includeThoughts:true,thinkingLevel:'high'}
+            };
+            if(jsonSchema){
+                generationConfig.responseMimeType='application/json';
+                generationConfig.responseSchema=jsonSchema;
+            }
             const body={stream:true,contents:[{role:'user',parts}],generationConfig};
-            setAIProgress('💳 Huyền đang dùng AI PHỤ trả phí để kiểm tra kỹ...',true);
-            const res=await fetchAI(endpoint,{method:'POST',headers:{Authorization:'Bearer '+key,'Content-Type':'application/json'},body:JSON.stringify(body)},Math.max(90000,Number(aiState.settings.timeoutMs)||90000));
-            if(!res.ok){let msg=await res.text().catch(()=> '');const er=new Error(`AI PHỤ HTTP ${res.status}${msg?' · '+msg.slice(0,500):''}`);er.status=res.status;throw er;}
-            const out=await readKieAIResponse(res);
-            if(!out.text)throw new Error('AI PHỤ trả nội dung rỗng.');
-            aiState.lastRoute='AI PHỤ trả phí'; aiState.lastError='';
-            updateAIRouteUI(); refreshKieCredit(true).catch(()=>{});
-            return {text:out.text,provider:'kie',model:'gemini-3-7-flash',keyIndex:-1,raw:out.raw};
+
+            let last=null;
+            for(let attempt=0;attempt<3;attempt++){
+                try{
+                    setAIProgress(attempt
+                        ? `AI PHỤ đang thử lại kết nối lần ${attempt+1}...`
+                        : 'AI PHỤ đang tiếp quản phân tích...', true);
+
+                    const res=await fetchAI(
+                        endpoint,
+                        {
+                            method:'POST',
+                            headers:{Authorization:'Bearer '+key,'Content-Type':'application/json'},
+                            body:JSON.stringify(body)
+                        },
+                        Math.max(90000,Number(aiState.settings.timeoutMs)||90000)
+                    );
+
+                    if(!res.ok){
+                        let msg=await res.text().catch(()=> '');
+                        const er=new Error(`AI PHỤ HTTP ${res.status}${msg?' · '+msg.slice(0,500):''}`);
+                        er.status=res.status;
+                        throw er;
+                    }
+
+                    const out=await readKieAIResponse(res);
+                    if(!out.text)throw new Error('AI PHỤ trả nội dung rỗng.');
+
+                    aiState.lastRoute='AI PHỤ';
+                    aiState.lastError='';
+                    updateAIRouteUI();
+                    refreshKieCredit(true).catch(()=>{});
+                    return {text:out.text,provider:'kie',model:'gemini-3-7-flash',keyIndex:-1,raw:out.raw};
+
+                }catch(e){
+                    last=e;
+                    const status=e?.status||0;
+                    const msg=e?.name==='AbortError'?'Hết thời gian chờ AI PHỤ':(e?.message||String(e));
+                    aiState.attempts.push(`AI PHỤ/L${attempt+1}: ${msg}`);
+
+                    const transient=status===429||status===500||status===502||status===503||status===504||
+                        /timeout|network|fetch|unavailable|overload|rate limit/i.test(msg);
+
+                    if(transient && attempt<2){
+                        const wait=[900,2200,4800][attempt]+Math.floor(Math.random()*220);
+                        setAIProgress(`AI PHỤ đang nghẽn tạm thời · tự thử lại sau ${(wait/1000).toFixed(1)} giây...`,true);
+                        await sleepAI(wait);
+                        continue;
+                    }
+                    throw e;
+                }
+            }
+            throw last||new Error(`${purpose}: AI PHỤ chưa phản hồi.`);
         }
 
         async function baiAI(text,{jsonSchema=null,plainText=false,model='bai:deepseek-v4-flash',purpose='AI'}={}){
@@ -6620,7 +6940,13 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
                         r=await kieAI(parts,{jsonSchema,plainText,purpose});
                     }else{
                         if(!currentAIKeys().length)continue;
-                        r=await geminiAI(parts,{jsonSchema,plainText,modelOverride:model,purpose});
+                        r=await geminiAI(parts,{
+                            jsonSchema,
+                            plainText,
+                            modelOverride:model,
+                            modelList:googleMainFailoverModels(model),
+                            purpose
+                        });
                     }
                     aiResultCache.set(cacheKey,{text:r.text,sourceText:pdfInfo?.text||'',model:r.model,keyIndex:r.keyIndex});
                     return {...r,sourceText:pdfInfo?.text||''};
@@ -6637,7 +6963,13 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             for(const model of configuredAIModels()){
                 try{
                     if(isKie(model))return await kieAI([{text:prompt}],{jsonSchema,plainText,purpose});
-                    if(currentAIKeys().length)return await geminiAI([{text:prompt}],{jsonSchema,plainText,modelOverride:model,purpose});
+                    if(currentAIKeys().length)return await geminiAI([{text:prompt}],{
+                        jsonSchema,
+                        plainText,
+                        modelOverride:model,
+                        modelList:googleMainFailoverModels(model),
+                        purpose
+                    });
                 }catch(e){last=e;aiState.attempts.push(`${model}: ${e?.message||e}`)}
             }
             throw last||new Error('Không có AI text khả dụng.');
@@ -7320,40 +7652,60 @@ YÊU CẦU BẮT BUỘC:
             [1,2,3,4].forEach((n,i)=>{const el=$ai('ai-key-'+n);if(el)el.value=s.keys?.[i]||''});
             if($ai('ai-kie-key'))$ai('ai-kie-key').value=s.kieKey||AI_DEFAULT.kieKey;
             if($ai('ai-kie-endpoint'))$ai('ai-kie-endpoint').value=s.kieEndpoint||AI_DEFAULT.kieEndpoint;
-            $ai('ai-primary-model').value=(!isKie(s.primaryModel)&&!isBai(s.primaryModel)?s.primaryModel:AI_DEFAULT.primaryModel);
+            $ai('ai-primary-model').value='gemini-2.5-flash';
             $ai('ai-fallback-model').value=(isKie(s.fallbackModel)||(!isBai(s.fallbackModel)&&s.fallbackModel))?s.fallbackModel:AI_DEFAULT.fallbackModel;
             if($ai('ai-analysis-mode'))$ai('ai-analysis-mode').value=s.analysisMode||'fast';
             const g=currentAIKeys().length;
             $ai('ai-settings-status').textContent=`AI CHÍNH: ${g} key · AI PHỤ: ${hasKieAI()?'đã có key':'chưa có key'}`;
             updateAIRouteUI(); refreshKieCredit(false).catch(()=>{});
         }
-        function collectAISettings(){
+        async function collectAISettings(saveFirebase=true){
             aiState.settings.keys=[1,2,3,4].map(n=>$ai('ai-key-'+n)?.value.trim()||'');
             aiState.settings.kieKey=$ai('ai-kie-key')?.value.trim()||'';
             aiState.settings.kieEndpoint=$ai('ai-kie-endpoint')?.value.trim()||AI_DEFAULT.kieEndpoint;
-            aiState.settings.primaryModel=$ai('ai-primary-model').value;
+            aiState.settings.primaryModel='gemini-2.5-flash';
             aiState.settings.fallbackModel=$ai('ai-fallback-model').value;
             if($ai('ai-analysis-mode'))aiState.settings.analysisMode=$ai('ai-analysis-mode').value||'fast';
             aiState.settings.baiKey=''; aiState.settings.baiVision=false;
-            saveAISettings(); fillAISettings(); aiNotice('Đã lưu cấu hình AI CHÍNH và AI PHỤ.');
+            saveAISettings(); fillAISettings();
+            if(!saveFirebase){
+                aiNotice('Đã cập nhật cấu hình AI trên máy này.');
+                return true;
+            }
+            const btn=$ai('ai-save-settings');
+            const oldText=btn?.textContent||'💾 Lưu cài đặt AI';
+            if(btn){btn.disabled=true;btn.textContent='⏳ Đang lưu Firebase...'}
+            setAIFirebaseStatus('⏳ Đang ghi API key lên Firebase Realtime...', 'info');
+            try{
+                await saveAISettingsToFirebase();
+                aiNotice('✅ Đã lưu cấu hình AI CHÍNH và AI PHỤ lên Firebase Realtime. Các máy khác sẽ tự đồng bộ.');
+                return true;
+            }catch(e){
+                setAIFirebaseStatus('❌ Lưu Firebase thất bại: '+(e?.message||e), 'error');
+                aiNotice('Lưu cục bộ đã xong nhưng CHƯA lưu được Firebase: '+(e?.message||e),'error');
+                return false;
+            }finally{
+                if(btn){btn.disabled=false;btn.textContent=oldText}
+            }
         }
-        function restoreLegacyAISettings(){
+        async function restoreLegacyAISettings(){
             const before=currentAIKeys().length, loaded=loadAISettings();
             const merged=[...(aiState.settings.keys||[])]; while(merged.length<4)merged.push('');
             (loaded.keys||[]).forEach(k=>{if(k&&!merged.includes(k)){const slot=merged.findIndex(x=>!x);if(slot>=0)merged[slot]=k}});
-            aiState.settings={...aiState.settings,...loaded,keys:merged.slice(0,4),kieKey:aiState.settings.kieKey||loaded.kieKey||AI_DEFAULT.kieKey,primaryModel:'gemini-3.7-flash',fallbackModel:'kie:gemini-3-7-flash',baiKey:'',baiVision:false};
+            aiState.settings={...aiState.settings,...loaded,keys:merged.slice(0,4),kieKey:aiState.settings.kieKey||loaded.kieKey||AI_DEFAULT.kieKey,primaryModel:'gemini-2.5-flash',fallbackModel:'kie:gemini-3-7-flash',baiKey:'',baiVision:false};
             saveAISettings(); fillAISettings();
+            try{await saveAISettingsToFirebase()}catch(e){setAIFirebaseStatus('⚠️ Đã khôi phục cục bộ nhưng chưa lưu Firebase: '+(e?.message||e),'warn')}
             const after=currentAIKeys().length;
             const el=$ai('ai-connection-test-result');
             if(el)el.innerHTML=after>before?`<span style="color:#15803d"><b>✅ Đã khôi phục ${after-before} API key cũ.</b></span>`:`<span style="color:#b45309"><b>ℹ️ Không tìm thấy thêm API key cũ.</b> AI PHỤ trả phí vẫn được giữ làm dự phòng.</span>`;
         }
         async function testAISettings(){
-            collectAISettings();
+            await collectAISettings(false);
             const el=$ai('ai-connection-test-result'); if(el)el.innerHTML='⏳ Đang kiểm tra AI CHÍNH + AI PHỤ...';
             const results=[];
             if(currentAIKeys().length){
                 try{
-                    const model=$ai('ai-primary-model')?.value||'gemini-3.7-flash';
+                    const model='gemini-2.5-flash';
                     const r=await geminiAI([{text:'Trả lời đúng một từ: OK'}],{plainText:true,modelOverride:model,purpose:'Kiểm tra AI CHÍNH'});
                     results.push(`✅ AI CHÍNH hoạt động · Key ${Number(r.keyIndex)+1}`);
                 }catch(e){results.push(`❌ AI CHÍNH: ${e.message}`)}
@@ -7372,6 +7724,7 @@ YÊU CẦU BẮT BUỘC:
             $ai('ai-receive-date').value=_nowLocal.slice(0,10);
             if($ai('ai-receive-time'))$ai('ai-receive-time').value=_nowLocal.slice(11,16);
             fillAISettings();
+            initAISettingsFirebase().catch(e=>console.warn('AI Firebase init:',e));
             const details=$ai('ai-settings-details'),summary=$ai('ai-settings-summary');
             if(details)details.open=false;
             if(summary)summary.onclick=async e=>{
@@ -7385,8 +7738,8 @@ YÊU CẦU BẮT BUỘC:
             $ai('ai-restore-settings').onclick=restoreLegacyAISettings;
             $ai('ai-lock-settings').onclick=lockAISettingsAccess;
             if($ai('kie-credit-refresh'))$ai('kie-credit-refresh').onclick=()=>refreshKieCredit(true);
-            if($ai('ai-primary-model'))$ai('ai-primary-model').onchange=()=>{collectAISettings();updateAIRouteUI();};
-            if($ai('ai-fallback-model'))$ai('ai-fallback-model').onchange=()=>{collectAISettings();updateAIRouteUI();};
+            if($ai('ai-primary-model'))$ai('ai-primary-model').onchange=()=>{collectAISettings(false);updateAIRouteUI();};
+            if($ai('ai-fallback-model'))$ai('ai-fallback-model').onchange=()=>{collectAISettings(false);updateAIRouteUI();};
             const drop=$ai('ai-drop'),input=$ai('ai-files');
             drop.onclick=()=>input.click();
             input.onchange=()=>{addAIFiles(input.files);input.value='';};

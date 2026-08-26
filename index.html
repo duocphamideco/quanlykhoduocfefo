@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Kho Dược GDP - IDECO (Updated with ERP Check & Date Filter)</title>
+    <link rel="icon" href="data:,">
+    <title>Quản Lý Kho Dược GDP - IDECO</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -27,8 +28,14 @@
         .tab-content { display: none; padding: 20px; flex: 1; }
         .tab-content.active { display: block; }
 
-        .grid-layout { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
-        @media(max-width:1000px) { .grid-layout { grid-template-columns: 1fr; } }
+        .grid-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.5fr); gap:20px; width:100%; min-width:0; }
+        .grid-layout > * { min-width:0; max-width:100%; }
+        #ai-grid-shell { grid-template-columns:minmax(340px,1fr) minmax(0,1.45fr) !important; align-items:start; width:100%; min-width:0; }
+        #ai-grid-shell > .card { min-width:0; max-width:100%; }
+        #ai-grid-shell > .card:nth-child(2) { overflow:hidden; }
+        #ai-grid-shell.is-collapsed { grid-template-columns:minmax(0,1fr) !important; }
+        #ai-grid-shell.is-collapsed > .panel-collapse-target { display:none !important; }
+        @media(max-width:1000px) { .grid-layout, #ai-grid-shell { grid-template-columns:minmax(0,1fr) !important; } #ai-grid-shell > .panel-collapse-target{display:block;} #ai-grid-shell.is-collapsed > .panel-collapse-target{display:none!important;} }
         .panel-tools { display:flex; justify-content:flex-end; gap:8px; flex-wrap:wrap; margin:0 0 10px; }
         .panel-toggle-btn { background:#0f766e; color:#fff; border:none; border-radius:8px; padding:8px 12px; font-size:.82rem; font-weight:800; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,.08); }
         .panel-toggle-btn:hover { opacity:.92; }
@@ -217,17 +224,32 @@
         .ai-settings-body .full { grid-column:1/-1; }
         .ai-note { padding:10px 12px; border-radius:8px; border-left:4px solid #2563eb; background:#eff6ff; color:#1e3a8a; font-size:.85rem; line-height:1.5; }
         .ai-block-note { padding:10px 12px; border-radius:8px; border-left:4px solid #dc2626; background:#fef2f2; color:#991b1b; font-size:.85rem; line-height:1.5; margin-top:10px; }
-        .ai-receipt { background:#fff; color:#000; padding:18px; border:1px solid #cbd5e1; border-radius:10px; margin-top:18px; }
-        .ai-receipt-head { display:flex; align-items:flex-start; justify-content:space-between; gap:15px; border-bottom:2px solid #1e40af; padding-bottom:12px; }
-        .ai-receipt-logo { width:82px; height:82px; object-fit:contain; display:block; }
+        .ai-receipt { background:#fff; color:#0f172a; padding:24px; border:1px solid #e2e8f0; border-radius:14px; margin:20px 0; box-shadow:0 8px 24px rgba(15,23,42,.07); }
+        .ai-receipt-head { display:grid; grid-template-columns:130px minmax(0,1fr) 130px; align-items:center; gap:16px; border-bottom:2px solid #e5e7eb; padding:8px 8px 22px; }
+        .ai-receipt-logo { width:112px; height:112px; object-fit:contain; display:block; }
         .layout-restore-btn { display:none; background:#334155; color:#fff; border:none; border-radius:8px; padding:8px 12px; font-weight:800; cursor:pointer; font-size:.8rem; }
         .panel-collapse-shell.is-collapsed .layout-restore-btn { display:inline-flex; }
-        .ai-receipt-title { text-align:center; flex:1; }
-        .ai-receipt-title h2 { color:#b91c1c; font-size:1.35rem; margin:4px 0; }
-        .ai-receipt-meta { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:12px 0; }
-        .ai-receipt-meta > div { border:1px solid #e2e8f0; border-radius:6px; padding:7px; }
-        .ai-receipt table { font-size:.78rem; }
-        .ai-receipt th { position:static; background:#1e40af; color:#fff; }
+        .ai-receipt-title { text-align:center; min-width:0; }
+        .ai-receipt-title .company-name { color:#285ca8; font-size:1.15rem; font-weight:900; line-height:1.35; }
+        .ai-receipt-title h2 { color:#ef4738; font-size:1.45rem; margin:10px 0 8px; letter-spacing:.2px; }
+        .receipt-form-code { display:inline-flex; align-items:center; justify-content:center; background:#2f66cf; color:#fff; padding:3px 5px; font-size:.9rem; line-height:1; }
+        .receipt-section { margin-top:22px; padding:18px 18px 20px; border:1px solid #d7dee7; border-radius:10px; background:#fbfcfe; }
+        .receipt-section-title { color:#173f96; font-weight:900; font-size:1rem; padding-bottom:8px; margin-bottom:12px; border-bottom:1px solid #e2e8f0; }
+        .ai-receipt-meta { display:grid; grid-template-columns:1.45fr .58fr .58fr; gap:12px; margin:0; }
+        .receipt-field { min-width:0; }
+        .receipt-field.wide { grid-column:span 1; }
+        .receipt-field.full { grid-column:1/-1; }
+        .receipt-field label { display:block; margin:0 0 6px; color:#2357a0; font-size:.83rem; font-weight:800; }
+        .receipt-value { min-height:46px; display:flex; align-items:center; width:100%; padding:10px 12px; border:1px solid #cfd8e3; border-radius:5px; background:#fff; color:#111827; font-size:.88rem; line-height:1.35; overflow-wrap:anywhere; }
+        .receipt-value.multiline { min-height:72px; align-items:flex-start; white-space:pre-wrap; }
+        .receipt-list-section { margin-top:18px; padding:16px 18px 18px; border:1px solid #d7dee7; border-radius:10px; background:#fff; }
+        .receipt-table-wrap { overflow:auto; border:1px solid #e2e8f0; border-radius:8px; }
+        .ai-receipt table { font-size:.78rem; margin:0; min-width:1080px; }
+        .ai-receipt th { position:static; background:#eef4ff; color:#1e3a8a; border-color:#dbe4f0; padding:8px 7px; }
+        .ai-receipt td { padding:7px; border-color:#e2e8f0; }
+        .ai-signatures { margin-top:22px; }
+        @media(max-width:900px){ .ai-receipt-head{grid-template-columns:90px 1fr 30px}.ai-receipt-logo{width:78px;height:78px}.ai-receipt-meta{grid-template-columns:1fr 1fr}.receipt-field.full{grid-column:1/-1} }
+        @media(max-width:640px){ .ai-receipt{padding:14px}.ai-receipt-head{grid-template-columns:1fr;text-align:center}.ai-receipt-head>div:first-child{justify-content:center!important;width:auto!important}.ai-receipt-head>div:last-child{display:none}.ai-receipt-logo{margin:auto}.ai-receipt-meta{grid-template-columns:1fr}.receipt-section,.receipt-list-section{padding:12px}.ai-receipt-title .company-name{font-size:1rem}.ai-receipt-title h2{font-size:1.25rem} }
         .ai-signatures { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:24px; text-align:center; font-weight:700; }
         .ai-signatures .receipt-sign-box { padding:10px 10px 8px; border:1px solid #cbd5e1; border-radius:8px; min-height:145px; display:flex; flex-direction:column; align-items:center; background:#fff; }
         .receipt-sign-box b { font-size:.82rem; color:#0f172a; }
@@ -272,6 +294,7 @@
         .ai-route-btn.active-main{background:#16a34a;border-color:#86efac;box-shadow:0 0 0 2px rgba(134,239,172,.18)}
         .ai-route-btn.active-backup{background:#7c3aed;border-color:#c4b5fd;box-shadow:0 0 0 2px rgba(196,181,253,.18)}
         .ai-route-status{font-size:.68rem;font-weight:800;color:#fff;opacity:.95;max-width:180px;line-height:1.15}
+        .kie-credit-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border-radius:999px;background:#fff7ed;color:#9a3412;border:1px solid #fdba74;font-size:.7rem;font-weight:900;white-space:nowrap}.kie-credit-badge.active{background:#dcfce7;color:#166534;border-color:#86efac}.kie-credit-badge.low{background:#fef2f2;color:#b91c1c;border-color:#fca5a5}
         .btn-guide{background:#fff;color:#1e40af;border:1px solid rgba(255,255,255,.7);box-shadow:0 1px 2px rgba(15,23,42,.12)}
         .btn-guide:hover{background:#eff6ff;opacity:1}
         .guide-modal{display:none;position:fixed;inset:0;background:rgba(15,23,42,.76);z-index:30000;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px)}
@@ -474,6 +497,7 @@
                     <button id="ai-route-main-btn" class="ai-route-btn" type="button" onclick="window.IDECOAIRoute&&window.IDECOAIRoute.set('main')">AI CHÍNH</button>
                     <button id="ai-route-backup-btn" class="ai-route-btn" type="button" onclick="window.IDECOAIRoute&&window.IDECOAIRoute.set('backup')">AI PHỤ</button>
                     <span id="ai-route-status" class="ai-route-status" style="display:none">Đang khởi tạo...</span>
+                    <span id="kie-credit-badge" class="kie-credit-badge" title="Credit AI PHỤ hiện hành">💳 Bạn đang tiêu diền nè: ...</span>
                 </div>
                 <button class="btn btn-primary" type="button" onclick="openIDECOSettingsPanel()">⚙️ Cài đặt</button>
                 <button class="btn btn-guide" type="button" onclick="openUserGuide()">📘 Hướng dẫn sử dụng</button>
@@ -976,14 +1000,18 @@
             </div>
 
             <div class="panel-tools"><button id="toggle-ai-left-panel" class="panel-toggle-btn" type="button">↔ Ẩn menu trái · Mở rộng bảng</button></div>
-            <div id="ai-grid-shell" class="grid-layout panel-collapse-shell" style="grid-template-columns:1fr 1.45fr">
+            <div id="ai-grid-shell" class="grid-layout panel-collapse-shell" style="grid-template-columns:minmax(340px,1fr) minmax(0,1.45fr)">
                 <div class="card panel-collapse-target">
                     <div class="card-header">A. Nhận Phiếu Giao Hàng Nhà Cung Cấp</div>
                     <div class="ai-note"><b>Nguyên tắc an toàn:</b> <b>Tên sản phẩm và Quy cách phải khớp MASTER KHO</b> trước khi nhập kho. Mã SP · Hàm lượng/Nồng độ · ĐVT ưu tiên lấy từ Master để tham khảo/bổ sung nhưng thiếu các trường này không khóa nhập kho. Phiếu NCC/AI dùng để lấy <b>Số lô · Hạn dùng · Số lượng</b>. Tên gần giống chỉ là gợi ý, không tự động được xem là đúng. Sản phẩm mới phải bổ sung Master trước khi ghi tồn.</div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
                         <div><label>Nhà cung cấp</label><input id="ai-supplier" placeholder="AI sẽ tự điền nếu đọc được"></div>
                         <div><label>Số phiếu / Hóa đơn</label><input id="ai-invoice" placeholder="AI sẽ tự điền nếu đọc được"></div>
+                        <div><label>Số hợp đồng</label><input id="ai-contract" placeholder="Nhập số hợp đồng nếu có"></div>
                         <div><label>Ngày nhận</label><input type="date" id="ai-receive-date"></div>
+                        <div><label>Giờ nhận</label><input type="time" id="ai-receive-time"></div>
+                        <div><label>Nơi nhận hàng</label><input id="ai-receive-place" value="003 Carlion 5 262/3 Lũy Bán Bích - Phường Tân Phú - Tp. Hồ Chí Minh" placeholder="Địa điểm nhận hàng"></div>
+                        <div style="grid-column:1/-1"><label>Kết quả kiểm nghiệm</label><textarea id="ai-test-result" style="min-height:72px" placeholder="Nhập kết quả kiểm nghiệm / tình trạng kiểm tra khi nhận hàng"></textarea></div>
                         <div><label>Người giao hàng (lập phiếu)</label><input id="ai-delivery-person" value="Công ty TM DP Cao Mai" placeholder="Tên người/đơn vị giao hàng lập phiếu"></div>
                         <div><label>Người nhận hàng</label><input id="ai-receiver" placeholder="Họ tên người nhận hàng"></div>
                         <div><label>Phụ trách chuyên môn</label><input id="ai-professional-receiver" placeholder="Họ tên phụ trách chuyên môn"></div>
@@ -1000,6 +1028,7 @@
                         <button id="ai-clear-btn" class="btn btn-danger">Làm mới</button>
                     </div>
                     <div id="ai-progress" class="ai-progress"></div>
+                    <div id="ai-analysis-error" style="display:none;margin-top:10px;padding:10px 12px;border:1px solid #fecaca;border-left:4px solid #dc2626;border-radius:8px;background:#fef2f2;color:#991b1b;font-size:.8rem;line-height:1.5"></div>
 
                     <details class="manual-fallback" id="manual-fallback-details">
                         <summary>🚨 AI / Internet lỗi? NHẬP THỦ CÔNG DỰ PHÒNG <span id="fallback-network-badge" class="network-badge">Đang kiểm tra mạng...</span></summary>
@@ -1031,19 +1060,18 @@
                     <details class="ai-settings" id="ai-settings-details">
                         <summary id="ai-settings-summary">🔐 ⚙️ Cài đặt AI · yêu cầu mật khẩu</summary>
                         <div class="ai-settings-body">
-                            <div><label>Gemini API Key 1</label><div style="display:flex;gap:6px"><input type="password" id="ai-key-1" autocomplete="off"><button class="btn btn-primary ai-key-eye" type="button" data-eye-target="ai-key-1" style="width:auto;padding:6px 9px">👁️</button></div></div>
-                            <div><label>Gemini API Key 2</label><div style="display:flex;gap:6px"><input type="password" id="ai-key-2" autocomplete="off"><button class="btn btn-primary ai-key-eye" type="button" data-eye-target="ai-key-2" style="width:auto;padding:6px 9px">👁️</button></div></div>
-                            <div><label>Gemini API Key 3</label><div style="display:flex;gap:6px"><input type="password" id="ai-key-3" autocomplete="off"><button class="btn btn-primary ai-key-eye" type="button" data-eye-target="ai-key-3" style="width:auto;padding:6px 9px">👁️</button></div></div>
-                            <div><label>B.AI API Key</label><div style="display:flex;gap:6px"><input type="password" id="ai-bai-key" autocomplete="off"><button class="btn btn-primary ai-key-eye" type="button" data-eye-target="ai-bai-key" style="width:auto;padding:6px 9px">👁️</button></div></div>
-                            <div><label>AI chính</label><select id="ai-primary-model"><option value="bai:deepseek-v4-flash">DeepSeek V4 Flash · B.AI · Vision</option><option value="gemini-3.7-flash">Gemini 3.7 Flash</option><option value="gemini-3.6-flash">Gemini 3.6 Flash</option><option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite · nhẹ</option><option value="gemini-3.1-flash-lite">Gemini 3.1 Flash-Lite · nhẹ</option><option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite · tiết kiệm</option><option value="gemini-2.5-flash">Gemini 2.5 Flash · ổn định</option></select></div>
-                            <div><label>AI dự phòng</label><select id="ai-fallback-model"><option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite · khuyên dùng</option><option value="gemini-3.1-flash-lite">Gemini 3.1 Flash-Lite · nhẹ</option><option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite · tiết kiệm</option><option value="gemini-2.5-flash">Gemini 2.5 Flash · ổn định</option><option value="gemini-3.6-flash">Gemini 3.6 Flash</option><option value="gemini-3.7-flash">Gemini 3.7 Flash</option><option value="bai:deepseek-v4-flash">DeepSeek V4 Flash · B.AI</option></select></div>
+                            <div><label>API Key AI CHÍNH 1</label><div style="display:flex;gap:6px"><input type="password" id="ai-key-1" autocomplete="off"><button class="btn btn-primary ai-key-eye" type="button" data-eye-target="ai-key-1" style="width:auto;padding:6px 9px">👁️</button></div></div>
+                            <div><label>API Key AI CHÍNH 2 · dự phòng</label><div style="display:flex;gap:6px"><input type="password" id="ai-key-2" autocomplete="off"><button class="btn btn-primary ai-key-eye" type="button" data-eye-target="ai-key-2" style="width:auto;padding:6px 9px">👁️</button></div></div>
+                            <div><label>API Key AI CHÍNH 3 · dự phòng</label><div style="display:flex;gap:6px"><input type="password" id="ai-key-3" autocomplete="off"><button class="btn btn-primary ai-key-eye" type="button" data-eye-target="ai-key-3" style="width:auto;padding:6px 9px">👁️</button></div></div>
+                            <div><label>API Key AI CHÍNH 4 · dự phòng thêm</label><div style="display:flex;gap:6px"><input type="password" id="ai-key-4" autocomplete="off"><button class="btn btn-primary ai-key-eye" type="button" data-eye-target="ai-key-4" style="width:auto;padding:6px 9px">👁️</button></div></div>
+                            <div class="full"><label>API Key AI PHỤ · tuyến trả phí</label><div style="display:flex;gap:6px"><input type="password" id="ai-kie-key" autocomplete="off"><button class="btn btn-primary ai-key-eye" type="button" data-eye-target="ai-kie-key" style="width:auto;padding:6px 9px">👁️</button></div><div style="font-size:.72rem;color:#64748b;margin-top:3px">Dùng làm tuyến trả phí ổn định khi AI CHÍNH lỗi/quota, và có thể bật trực tiếp bằng nút AI PHỤ.</div></div>
+                            <div><label>Tuyến chính</label><div style="padding:9px 10px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc;font-weight:900;color:#1d4ed8">AI CHÍNH</div><select id="ai-primary-model" style="display:none"><option value="gemini-3.7-flash">AI CHÍNH</option><option value="gemini-3.6-flash">AI CHÍNH</option><option value="gemini-3.5-flash-lite">AI CHÍNH</option><option value="gemini-3.1-flash-lite">AI CHÍNH</option><option value="gemini-2.5-flash">AI CHÍNH</option><option value="gemini-2.5-flash-lite">AI CHÍNH</option></select></div>
+                            <div><label>Tuyến phụ / trả phí</label><div style="padding:9px 10px;border:1px solid #cbd5e1;border-radius:8px;background:#f0fdf4;font-weight:900;color:#166534">AI PHỤ</div><select id="ai-fallback-model" style="display:none"><option value="kie:gemini-3-7-flash">AI PHỤ</option><option value="gemini-3.7-flash">AI PHỤ</option><option value="gemini-3.6-flash">AI PHỤ</option><option value="gemini-3.5-flash-lite">AI PHỤ</option><option value="gemini-3.1-flash-lite">AI PHỤ</option><option value="gemini-2.5-flash">AI PHỤ</option></select></div>
                             <div><label>Chế độ phân tích</label><select id="ai-analysis-mode"><option value="fast">⚡ NHANH · khuyên dùng</option><option value="thorough">🛡️ KIỂM TRA KỸ</option></select></div>
-                            <div><label>Giới hạn chờ mỗi tuyến</label><div style="padding:9px 10px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc;color:#475569;font-size:.82rem"><b>NHANH:</b> ưu tiên đúng AI chính đã chọn · DeepSeek tối đa ~45 giây, Gemini tối đa ~35 giây/tuyến · <b>KỸ:</b> theo cấu hình cũ.</div></div>
-                            <div class="full"><label>B.AI Endpoint</label><input id="ai-bai-endpoint" value="https://api.b.ai/v1/chat/completions"></div>
-                            <div class="full"><label>B.AI Vision Model ID</label><input id="ai-bai-vision-model" value="deepseek-v4-flash" placeholder="deepseek-v4-flash"><div style="font-size:.72rem;color:#64748b;margin-top:3px">Nếu tài khoản B.AI cung cấp alias Vision riêng, có thể nhập đúng Model ID tại đây. Ứng dụng cũng tự thử alias dấu gạch ngang / gạch dưới khi API báo sai model.</div></div>
-                            <div class="full" style="display:flex;align-items:center;gap:10px;padding:9px 10px;border:1px solid #bfdbfe;background:#eff6ff;border-radius:8px">
-                                <input id="ai-bai-vision" type="checkbox" style="width:auto" checked>
-                                <div><b>👁️ B.AI Vision · DeepSeek ưu tiên + B.AI Vision dự phòng</b><div style="font-size:.76rem;color:#475569;margin-top:2px">Ảnh/PDF scan sẽ thử DeepSeek V4 Flash Vision trực tiếp qua B.AI; tự thử 2 chuẩn Vision tương thích. Gemini chỉ là dự phòng khi đã có key.</div></div>
+                            <div><label>Chiến lược ổn định</label><div style="padding:9px 10px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc;color:#475569;font-size:.82rem"><b>AI CHÍNH:</b> dùng lần lượt các key đã nhập. Nếu không thành công, hệ thống tự chuyển <b>AI PHỤ trả phí</b>. Nút AI PHỤ sẽ ép dùng tuyến phụ ngay.</div></div>
+                            <div class="full" style="display:none"><label>AI PHỤ Endpoint</label><input id="ai-kie-endpoint" value="https://api.kie.ai/gemini/v1/models/gemini-3-7-flash:streamGenerateContent" readonly></div>
+                            <div class="full" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #86efac;background:#f0fdf4;border-radius:8px">
+                                <div style="font-size:1.4rem">💳</div><div style="flex:1"><b>AI PHỤ · tuyến trả phí</b><div id="kie-credit-settings" style="font-size:.78rem;color:#166534;margin-top:2px">Credit hiện hành: đang kiểm tra...</div></div><button id="kie-credit-refresh" type="button" class="btn btn-success">↻ Cập nhật credit</button>
                             </div>
                             <div class="full" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
                                 <button id="ai-save-settings" class="btn btn-success" type="button">💾 Lưu cài đặt AI</button>
@@ -1061,9 +1089,9 @@
                                 </div>
                                 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px"><button id="app-save-new-password" type="button" class="btn btn-success">💾 Lưu mật khẩu đăng nhập mới</button><span id="app-password-change-status" style="font-size:.8rem;color:#64748b"></span></div>
                             </div>
-                            <div class="full" id="ai-test-result" style="font-size:.82rem;line-height:1.5;color:#475569"></div>
+                            <div class="full" id="ai-connection-test-result" style="font-size:.82rem;line-height:1.5;color:#475569"></div>
                             <div class="full" style="font-size:.78rem;color:#64748b;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:9px 10px">
-                                <b>⚡ Chế độ NHANH:</b> PDF có chữ được đọc tại máy; ảnh/PDF scan ưu tiên <b>B.AI Vision thử nghiệm</b> khi đã bật và có key, sau đó mới Gemini dự phòng; soi tên Master tại máy; chỉ kiểm tra AI lần 2 khi thiếu Tên/Lô/HSD/Số lượng. <b>🛡️ KIỂM TRA KỸ:</b> giữ thêm lớp AI gợi ý tên Master.<br><br>Cấu hình được lưu bằng LocalStorage. Bản này tự tìm cấu hình NHAP cũ ở <b>ideco_gemini_settings_v3</b>, <b>v2</b> và một số tên key cũ. Với Chrome mở bằng <b>file://</b>, dữ liệu LocalStorage của hai file HTML khác nhau đôi khi bị trình duyệt tách riêng; khi đó cần dán key một lần vào bản mới rồi bấm Lưu.
+                                <b>⚡ Chế độ NHANH:</b> AI CHÍNH xử lý trước bằng các API key đã nhập. Nếu lỗi/quota, ứng dụng tự chuyển sang <b>AI PHỤ trả phí</b>. Ảnh/PDF scan được xử lý trực tiếp; PDF có lớp chữ được trích xuất tại máy để nhanh và giảm token. <b>🛡️ KIỂM TRA KỸ:</b> giữ thêm lớp AI rà lại dữ liệu trọng yếu.<br><br>Cấu hình lưu bằng LocalStorage. Giao diện chỉ hiển thị <b>AI CHÍNH / AI PHỤ</b>; tên model và nhà cung cấp được ẩn khỏi người dùng.
                             </div>
                         </div>
                     </details>
@@ -1071,6 +1099,7 @@
 
                 <div class="card">
                     <div class="card-header"><span>B. Bảng Biên Bản → Soi Chiếu Master KHO</span><button id="ai-restore-layout-btn" class="layout-restore-btn" type="button">↩ GIAO DIỆN BAN ĐẦU</button></div>
+                    <div id="ai-layout-rescue-bar" style="display:none;justify-content:flex-end;gap:8px;margin:0 0 8px"><button id="ai-restore-layout-btn-2" class="btn btn-primary" type="button">↩ QUAY VỀ GIAO DIỆN 2 CỘT</button></div>
                     <div id="ai-match-summary" class="ai-match-summary"><span class="ai-pill ai-info">Chưa có dữ liệu</span></div>
                     <div id="ai-block-note" class="ai-block-note" style="display:none"></div>
                     <div class="scroll-hint">↔ Kéo thanh trượt ngang để xem hết các cột Chọn Master / Chỉnh sửa / Đồng bộ.</div>
@@ -1091,16 +1120,22 @@
 
             <div id="ai-receipt" class="ai-receipt" style="display:none">
                 <div class="ai-receipt-head">
-                    <div style="width:92px;display:flex;align-items:center;justify-content:center"><img id="ai-receipt-logo" class="ai-receipt-logo" src="https://cdn.imgpile.com/f/Yl3ncwx_xl.png" crossorigin="anonymous" referrerpolicy="no-referrer" alt="IDECO Logo" onerror="this.style.display='none'"></div>
-                    <div class="ai-receipt-title"><div style="font-weight:800">CÔNG TY TNHH TM DV KẾT GIAO PHÁT TRIỂN QUỐC TẾ IDECO</div><h2>BIÊN BẢN NHẬN HÀNG</h2><div>BM.06 · Tạo từ phiếu NCC và soi chiếu dữ liệu KHO</div></div>
-                    <div style="min-width:92px"></div>
+                    <div style="width:130px;display:flex;align-items:center;justify-content:flex-start"><img id="ai-receipt-logo" class="ai-receipt-logo" src="https://cdn.imgpile.com/f/Yl3ncwx_xl.png" crossorigin="anonymous" referrerpolicy="no-referrer" alt="IDECO Logo" onerror="this.style.display='none'"></div>
+                    <div class="ai-receipt-title"><div class="company-name">CÔNG TY TNHH TM DV KẾT GIAO PHÁT TRIỂN QUỐC TẾ IDECO</div><h2>BIÊN BẢN NHẬN HÀNG</h2><span class="receipt-form-code">BM.06</span></div>
+                    <div style="min-width:130px"></div>
                 </div>
-                <div id="ai-receipt-meta" class="ai-receipt-meta"></div>
-                <div style="overflow:auto"><table><thead><tr><th>STT</th><th>Mã SP</th><th>Tên hàng</th><th>Hàm lượng/NĐ</th><th>Quy cách</th><th>ĐVT</th><th>Số lô</th><th>Hạn dùng</th><th>SL nhận</th><th>Tình trạng</th></tr></thead><tbody id="ai-receipt-body"></tbody></table></div>
-                <div class="ai-signatures receipt-signatures-3">
-                    <div class="receipt-sign-box"><b>NGƯỜI GIAO HÀNG</b><small>(Lập phiếu)</small><div class="receipt-sign-space"></div><div class="receipt-sign-name" id="ai-sign-delivery"></div></div>
-                    <div class="receipt-sign-box"><b>NGƯỜI NHẬN HÀNG</b><small>(Ký, ghi rõ họ tên)</small><div class="receipt-sign-space"></div><div class="receipt-sign-name" id="ai-sign-receiver"></div></div>
-                    <div class="receipt-sign-box"><b>PHỤ TRÁCH CHUYÊN MÔN</b><small>(Ký, ghi rõ họ tên)</small><div class="receipt-sign-space"></div><div class="receipt-sign-name" id="ai-sign-professional"></div></div>
+                <div class="receipt-section">
+                    <div class="receipt-section-title">Thông tin nhận hàng</div>
+                    <div id="ai-receipt-meta" class="ai-receipt-meta"></div>
+                </div>
+                <div class="receipt-list-section">
+                    <div class="receipt-section-title">Danh mục thuốc nhận hàng</div>
+                    <div class="receipt-table-wrap"><table><thead><tr><th>STT</th><th>Mã SP</th><th>Tên hàng</th><th>Hàm lượng/NĐ</th><th>Quy cách</th><th>ĐVT</th><th>Số lô</th><th>Hạn dùng</th><th>SL nhận</th><th>Tình trạng</th></tr></thead><tbody id="ai-receipt-body"></tbody></table></div>
+                    <div class="ai-signatures receipt-signatures-3">
+                        <div class="receipt-sign-box"><b>NGƯỜI GIAO HÀNG</b><small>(Lập phiếu)</small><div class="receipt-sign-space"></div><div class="receipt-sign-name" id="ai-sign-delivery"></div></div>
+                        <div class="receipt-sign-box"><b>NGƯỜI NHẬN HÀNG</b><small>(Ký, ghi rõ họ tên)</small><div class="receipt-sign-space"></div><div class="receipt-sign-name" id="ai-sign-receiver"></div></div>
+                        <div class="receipt-sign-box"><b>PHỤ TRÁCH CHUYÊN MÔN</b><small>(Ký, ghi rõ họ tên)</small><div class="receipt-sign-space"></div><div class="receipt-sign-name" id="ai-sign-professional"></div></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1565,11 +1600,11 @@ async function callGemini(model, apiKey, contents, generationConfig) {
   const raw = await res.text();
   if (!res.ok) throw new Error(`${res.status} ${raw.slice(0, 400)}`);
   let json;
-  try { json = JSON.parse(raw); } catch (e) { throw new Error("Phản hồi Gemini không hợp lệ"); }
+  try { json = JSON.parse(raw); } catch (e) { throw new Error("Phản hồi AI không hợp lệ"); }
   const cand = (json.candidates || [])[0];
   const parts = (cand && cand.content && cand.content.parts) || [];
   const text = parts.map((p) => p.text || "").join("").trim();
-  if (!text) throw new Error("Gemini trả về rỗng (có thể bị chặn nội dung)");
+  if (!text) throw new Error("AI trả về rỗng (có thể bị chặn nội dung)");
   return text;
 }
 
@@ -1604,6 +1639,7 @@ const sanitizeAiText = (t) => String(t || "")
 
 // ===== AI DÙNG CHUNG VỚI TAB NHẬP HÀNG =====
 const getSharedAI = () => {
+  if (location.protocol === "file:") return null;
   try { return window.parent && window.parent !== window ? (window.parent.IDECO_SHARED_AI || null) : null; } catch (e) { return null; }
 };
 const getSharedAIRoute = () => {
@@ -1626,6 +1662,7 @@ const sharedAIConfigured = () => {
   } catch (e) { return true; }
 };
 const openSharedAISettings = () => {
+  if (location.protocol === "file:") return false;
   try {
     if (window.parent && typeof window.parent.openIDECOSettingsPanel === "function") { window.parent.openIDECOSettingsPanel(); return true; }
   } catch (e) {}
@@ -1657,7 +1694,7 @@ async function runAI(settings, payload, onLog) {
   const qKey = (settings.qwenApiKey || "").trim();
 
   if (!gKey && !qKey) {
-    throw new Error("Chưa cấu hình API KEY. Vào mục ⚙️ CÀI ĐẶT để nhập API KEY Gemini (và Qwen dự phòng).");
+    throw new Error("Chưa cấu hình API KEY. Vào mục ⚙️ CÀI ĐẶT để nhập API KEY AI CHÍNH / AI PHỤ.");
   }
 
   // ---------- Ưu tiên GEMINI ----------
@@ -2040,7 +2077,7 @@ const SettingsModal = ({ settings, onClose, onSave, toast }) => {
                   MÔ HÌNH AI DÙNG CHUNG VỚI TAB NHẬP HÀNG
                 </h4>
                 <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 text-xs text-blue-900 font-semibold">
-                  TAB này dùng <b>cùng API key, model, Vision và tuyến AI</b> đã khai trong Cài đặt AI của TAB Nhập hàng. Không còn cấu hình Gemini/Qwen riêng nên tránh phân tích PDF bằng hai hệ AI khác nhau.
+                  TAB này dùng <b>cùng cấu hình AI CHÍNH / AI PHỤ</b> đã khai trong Cài đặt AI của TAB Nhập hàng, giúp tránh phân tích PDF bằng hai tuyến cấu hình khác nhau.
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <button type="button" onClick={() => switchShared("main")}
@@ -3545,7 +3582,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App />);
         <div id="tab7" class="tab-content">
           <div class="price-agent-shell" id="price-agent-full-shell">
             <div class="price-agent-toolbar">
-              <div><b>🛡️ AI AGENT SOI ĐƠN &amp; GIÁ</b><small>Kiểm soát PDF/ảnh → Master → Giá/CK → Tồn kho → Sẵn sàng đầu ra</small></div>
+              <div><b>🛡️ AI AGENT SOI ĐƠN &amp; GIÁ</b><small>KIỂM TRA GIÁ CNT CHUẨN · PDF/ảnh → Master → Giá/CK → Tồn kho → Sẵn sàng đầu ra</small></div>
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
                 <span class="price-agent-pill">🧪 FIREBASE TEST CHUNG · thunghiem-eeb1f</span>
                 <span class="price-agent-pill" style="background:#dcfce7;color:#166534;border-color:#86efac">🤖 AI CHÍNH / AI PHỤ · dùng chung TAB Nhập hàng</span>
@@ -3686,15 +3723,15 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 <div class="settings-grid">
 <div class="card">
 <h2>AI CHÍNH / AI PHỤ dùng chung</h2>
-<div class="status info"><b>Không khai API riêng trong TAB này.</b> Ứng dụng dùng trực tiếp API key, model và tuyến AI đã cấu hình tại TAB Nhập hàng của hệ sinh thái.</div>
+<div class="status info"><b>Không khai API riêng trong TAB này.</b> Ứng dụng dùng trực tiếp cấu hình AI CHÍNH / AI PHỤ đã thiết lập tại TAB Nhập hàng của hệ sinh thái.</div>
 <div class="row"><button id="settingsRouteMain" class="btn blue">AI CHÍNH</button><button id="settingsRouteBackup" class="btn outline">AI PHỤ</button><button id="settingsOpenSharedAI" class="btn green">⚙️ Mở Cài đặt AI chung</button><button id="settingsTestSharedAI" class="btn outline">🧪 Kiểm tra AI đang dùng</button></div>
 <div id="sharedAISettingStatus" class="small" style="margin-top:9px"></div>
 </div>
 <div class="card" style="display:none">
-<h2>Gemini AI</h2>
-<div class="danger-note"><strong>Lưu ý bảo mật:</strong> Gemini API Key là bí mật. Nếu lưu trực tiếp trong Realtime Database và Rules cho phép đọc công khai, bất kỳ ai cũng có thể lấy key. Bản này chỉ đọc/ghi key tại đường dẫn cấu hình bạn chỉ định; nên khóa Rules hoặc dùng Authentication/App Check.</div>
+<h2>Cấu hình AI</h2>
+<div class="danger-note"><strong>Lưu ý bảo mật:</strong> API Key là bí mật. Nếu lưu trực tiếp trong Realtime Database và Rules cho phép đọc công khai, bất kỳ ai cũng có thể lấy key. Nên khóa Rules hoặc dùng Authentication/App Check.</div>
 <div class="field" style="margin-top:12px">
-<label>Gemini API Key</label>
+<label>API Key AI</label>
 <div class="row" style="gap:8px;align-items:center">
 <input id="geminiKey"
  type="text"
@@ -3713,21 +3750,21 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 </div>
 <div id="geminiKeyInfo" class="small" style="margin-top:6px">Chưa nạp API Key.</div>
 </div>
-<div class="field"><label>Model</label><input id="geminiModel" value="gemini-2.5-flash" /></div>
-<div class="field"><label>Đường dẫn cấu hình Gemini dùng chung trên Firebase RTDB</label><input id="geminiKeyPath" value="app_settings/gemini" readonly /></div>
+<div class="field" style="display:none"><label>Cấu hình nội bộ</label><input id="geminiModel" value="gemini-2.5-flash" /></div>
+<div class="field" style="display:none"><label>Đường dẫn cấu hình AI dùng chung</label><input id="geminiKeyPath" value="app_settings/gemini" readonly /></div>
 <div class="credit-control">
   <label class="switch">
     <input id="allowPriorityT" type="checkbox" checked>
     <span class="slider"></span>
   </label>
   <div>
-    <div><b>Cho phép dùng Gemini 3.7 Flash — ƯU TIÊN T</b></div>
+    <div><b>Cho phép dùng AI ƯU TIÊN T</b></div>
     <div class="small">BGĐ dùng công tắc này để kiểm soát credit. Khi TẮT, nút ƯU TIÊN T ngoài giao diện sẽ bị khóa trên mọi máy dùng chung Firebase.</div>
     <div id="priorityAdminStatus" class="small" style="margin-top:4px"></div>
   </div>
 </div>
-<div class="small" style="margin-top:-4px;margin-bottom:10px">Key và model được lưu tập trung tại <b>app_settings/gemini</b> và tự đồng bộ cho mọi máy dùng cùng Firebase.</div>
-<div class="row"><button id="loadGeminiKey" class="btn outline">⬇️ Đọc key từ Firebase</button><button id="saveGeminiKey" class="btn green">☁️ Lưu key lên Firebase</button><button id="testGemini" class="btn blue">🧪 Kiểm tra Gemini</button></div>
+<div class="small" style="margin-top:-4px;margin-bottom:10px">Cấu hình AI được lưu tập trung và tự đồng bộ cho mọi máy dùng cùng Firebase.</div>
+<div class="row"><button id="loadGeminiKey" class="btn outline">⬇️ Đọc key từ Firebase</button><button id="saveGeminiKey" class="btn green">☁️ Lưu key lên Firebase</button><button id="testGemini" class="btn blue">🧪 Kiểm tra AI</button></div>
 <div id="geminiSettingStatus"></div><div id="fileOriginWarning" class="status warn" style="margin-top:10px;display:none">
 ⚠️ Ứng dụng đang mở bằng <b>file://</b>. Chrome coi file local là security origin riêng. Bản này không dùng localStorage để giữ API Key; API Key phải được xác minh trực tiếp trên Firebase mỗi lần mở.
 </div><div class="small" style="margin-top:8px"><b>Cơ chế mới:</b> khi một máy lưu key, mọi máy khác dùng cùng Firebase sẽ tự tải key từ Realtime Database lúc mở ứng dụng hoặc khi dữ liệu thay đổi.</div>
@@ -3750,7 +3787,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 </div>
 <div class="card">
 <h2>Thông tin triển khai</h2>
-<p class="muted">File HTML có thể mở trực tiếp bằng Chrome/Edge. Các chức năng Firebase, Gemini và thư viện Excel cần kết nối Internet.</p>
+<p class="muted">File HTML có thể mở trực tiếp bằng Chrome/Edge. Các chức năng Firebase, AI và thư viện Excel cần kết nối Internet.</p>
 <div class="code">AI: dùng chung TAB Nhập hàng
 Price data: du_lieu_goc/{ten_bang}
 Master chính thức: excelFiles
@@ -3785,11 +3822,12 @@ let mainConfig={...TEST_FIREBASE_CONFIG};
 let invConfig={...TEST_FIREBASE_CONFIG};
 let mainApp=null,mainDb=null,invApp=null,invDb=null,unsubDatasets=null,unsubInventory=null,unsubGeminiSettings=null;
 let officialMasterData=[],exportHistoryData=[],unsubOfficialMaster=null,unsubExports=null,agentLastAudit=null;
-function getSharedAI(){try{return window.parent&&window.parent!==window?(window.parent.IDECO_SHARED_AI||null):null}catch(e){return null}}
-function sharedRoute(){const a=getSharedAI();try{return a&&typeof a.getRoute==='function'&&a.getRoute()==='backup'?'backup':'main'}catch(e){return 'main'}}
+function getSharedAI(){if(location.protocol==='file:')return null;try{return window.parent&&window.parent!==window?(window.parent.IDECO_SHARED_AI||null):null}catch(e){return null}}
+let standaloneAIRoute='main';
+function sharedRoute(){const a=getSharedAI();if(!a)return standaloneAIRoute;try{return a&&typeof a.getRoute==='function'&&a.getRoute()==='backup'?'backup':'main'}catch(e){return standaloneAIRoute}}
 function sharedRouteLabel(){return sharedRoute()==='backup'?'AI PHỤ':'AI CHÍNH'}
-function setSharedRoute(mode){const a=getSharedAI();if(!a||typeof a.setRoute!=='function')return false;try{return a.setRoute(mode==='backup'?'backup':'main')!==false}catch(e){return false}}
-function openParentAISettings(){try{if(window.parent&&typeof window.parent.openIDECOSettingsPanel==='function'){window.parent.openIDECOSettingsPanel();return true}}catch(e){}return false}
+function setSharedRoute(mode){const wanted=mode==='backup'?'backup':'main';const a=getSharedAI();if(!a){standaloneAIRoute=wanted;return true}if(typeof a.setRoute!=='function')return false;try{return a.setRoute(wanted)!==false}catch(e){return false}}
+function openParentAISettings(){if(location.protocol==='file:'){try{switchMain('settings');return true}catch(e){return false}}try{if(window.parent&&typeof window.parent.openIDECOSettingsPanel==='function'){window.parent.openIDECOSettingsPanel();return true}}catch(e){}try{switchMain('settings');return true}catch(e){}return false}
 function updateSharedAIUI(){const mode=sharedRoute();[['#agentRouteMain','main'],['#agentRouteBackup','backup'],['#settingsRouteMain','main'],['#settingsRouteBackup','backup']].forEach(([sel,m])=>{const e=$(sel);if(e)e.classList.toggle('on',mode===m)});if($('#agentRouteStatus'))$('#agentRouteStatus').textContent=sharedRouteLabel();if($('#aiProviderStatus'))$('#aiProviderStatus').innerHTML='<b>Trợ lý:</b> HUYỀN • '+sharedRouteLabel()+' • dùng chung TAB Nhập hàng';if($('#sharedAISettingStatus'))$('#sharedAISettingStatus').textContent='Đang dùng '+sharedRouteLabel()+' · Cấu hình lấy từ TAB Nhập hàng.'}
 
 const SHARED_GEMINI_PATH='app_settings/gemini';
@@ -3856,7 +3894,7 @@ updatePriorityTUI();
 [['#agentRouteMain','main'],['#settingsRouteMain','main'],['#agentRouteBackup','backup'],['#settingsRouteBackup','backup']].forEach(([sel,mode])=>{const e=$(sel);if(e)e.onclick=()=>{if(!setSharedRoute(mode)){toast($('#aiStatus')||$('#sharedAISettingStatus'),'Không đổi được tuyến AI. Hãy kiểm tra Cài đặt AI chung.','err');return}updateSharedAIUI()}});
 if($('#openSharedAISettings'))$('#openSharedAISettings').onclick=openParentAISettings;
 if($('#settingsOpenSharedAI'))$('#settingsOpenSharedAI').onclick=openParentAISettings;
-if($('#settingsTestSharedAI'))$('#settingsTestSharedAI').onclick=async()=>{try{const a=getSharedAI();if(!a||typeof a.textRequest!=='function')throw new Error('Module AI chung chưa sẵn sàng.');const r=await a.textRequest('Trả lời đúng một từ: OK',{plainText:true,purpose:'AI Agent kiểm tra kết nối'});toast($('#sharedAISettingStatus'),sharedRouteLabel()+' kết nối tốt: '+String(r.text||'').slice(0,40),'ok')}catch(e){toast($('#sharedAISettingStatus'),'Kết nối AI lỗi: '+e.message,'err')}};
+if($('#settingsTestSharedAI'))$('#settingsTestSharedAI').onclick=async()=>{try{const a=getSharedAI();let r;if(a&&typeof a.textRequest==='function')r=await a.textRequest('Trả lời đúng một từ: OK',{plainText:true,purpose:'AI Agent kiểm tra kết nối'});else r=await geminiGenerate([{text:'Trả lời đúng một từ: OK'}],'',false);toast($('#sharedAISettingStatus'),sharedRouteLabel()+' kết nối tốt: '+String(r.text||'').slice(0,40),'ok')}catch(e){toast($('#sharedAISettingStatus'),'Kết nối AI lỗi: '+e.message,'err')}};
 updateSharedAIUI();
 let geminiRuntime={apiKey:'',model:'gemini-3.6-flash',ready:false};
 let geminiFirebaseVerified=false;
@@ -4402,7 +4440,7 @@ $('#geminiKey').oninput=()=>{
  }
 };
 
-$('#testGemini').onclick=async()=>{try{let r=await geminiGenerate([{text:'Trả lời đúng một từ: OK'}],'',false);toast($('#geminiSettingStatus'),'✅ Gemini hoạt động. API Key Firebase hợp lệ • Model: '+($('#geminiModel').value||geminiRuntime.model)+' • Phản hồi: '+r.text.slice(0,80),'ok')}catch(e){toast($('#geminiSettingStatus'),'Gemini lỗi: '+e.message,'err')}};
+$('#testGemini').onclick=async()=>{try{let r=await geminiGenerate([{text:'Trả lời đúng một từ: OK'}],'',false);toast($('#geminiSettingStatus'),'✅ AI hoạt động. API Key Firebase hợp lệ • Phản hồi: '+r.text.slice(0,80),'ok')}catch(e){toast($('#geminiSettingStatus'),'AI lỗi: '+e.message,'err')}};
 
 // ===== AI CHUNG: đọc PDF/ảnh qua đúng AI CHÍNH / AI PHỤ của TAB Nhập hàng =====
 function mergeAIData(parts){
@@ -4411,13 +4449,25 @@ function mergeAIData(parts){
  parts.forEach(d=>{const hs=d.headers||[];(d.rows||[]).forEach(r=>rows.push(headers.map(h=>r[hs.indexOf(h)]??'')));const a=d.audit||{};warnings.push(...(a.warnings||[]));uncertain.push(...(a.uncertainCells||[]));changes.push(...(a.changes||[]));if(a.confidence==='low')confidence='low';else if(a.confidence==='medium'&&confidence==='high')confidence='medium'});
  return {headers,rows,audit:{verified:true,rowCount:rows.length,warnings,uncertainCells:uncertain,changes,confidence,documentCount:parts.length}};
 }
+async function localAgentFileRequest(file,prompt,purpose){
+ const inline={inline_data:{mime_type:file.type||'application/pdf',data:await fileB64(file)}};
+ return await geminiGenerate([inline,{text:prompt}],`Bạn là HUYỀN AI của IDECO. ${purpose||''} Đọc chứng từ chính xác, không bỏ sót dòng và chỉ trả JSON hợp lệ.`,true);
+}
 async function sharedAnalyzeOneFile(file,prompt,strict,doubleCheck){
- const a=getSharedAI();if(!a||typeof a.fileRequest!=='function')throw new Error('Module AI chung chưa sẵn sàng. Mở Cài đặt AI chung để kiểm tra.');
- const basePrompt=`${prompt}\n${strict}\nĐọc TOÀN BỘ chứng từ, không bỏ sót trang/dòng. Trả JSON đúng schema: {"headers":[string],"rows":[[string]],"audit":{"documentCount":number,"rowCount":number,"warnings":[string],"uncertainCells":[{"row":number,"column":string,"value":string,"reason":string}],"notes":[string],"confidence":"high|medium|low"}}. Chỉ JSON, không markdown.`;
- const r1=await a.fileRequest(file,basePrompt,{plainText:true,purpose:'AI Agent · Đọc đơn hàng lượt 1'});let d1=safeJSON(r1.text);if(!Array.isArray(d1.headers)||!Array.isArray(d1.rows))throw new Error('AI lượt 1 trả cấu trúc không hợp lệ.');
+ const a=getSharedAI();
+ const callFile=async(p,purpose)=>a&&typeof a.fileRequest==='function'
+   ? await a.fileRequest(file,p,{plainText:true,purpose})
+   : await localAgentFileRequest(file,p,purpose);
+ const basePrompt=`${prompt}
+${strict}
+Đọc TOÀN BỘ chứng từ, không bỏ sót trang/dòng. Trả JSON đúng schema: {"headers":[string],"rows":[[string]],"audit":{"documentCount":number,"rowCount":number,"warnings":[string],"uncertainCells":[{"row":number,"column":string,"value":string,"reason":string}],"notes":[string],"confidence":"high|medium|low"}}. Chỉ JSON, không markdown.`;
+ const r1=await callFile(basePrompt,'AI Agent · Đọc đơn hàng lượt 1');let d1=safeJSON(r1.text);if(!Array.isArray(d1.headers)||!Array.isArray(d1.rows))throw new Error('AI lượt 1 trả cấu trúc không hợp lệ.');
  if(!doubleCheck)return d1;
- const auditPrompt=`Đây là KẾT QUẢ LƯỢT 1:\n${JSON.stringify(d1)}\n\nĐọc lại TOÀN BỘ chứng từ từ đầu. Kiểm tra từng Mã SP, Tên SP, Giá/Đơn giá, Chiết khấu, Số lượng. Chỉ sửa khi nhìn thấy chứng cứ trên PDF/ảnh; chỗ mờ phải đưa vào uncertainCells. Trả JSON cuối cùng cùng schema, audit.verified=true và audit.changes liệt kê thay đổi so với lượt 1.`;
- const r2=await a.fileRequest(file,auditPrompt,{plainText:true,purpose:'AI Agent · Kiểm tra đơn hàng lượt 2'});let d2=safeJSON(r2.text);if(!Array.isArray(d2.headers)||!Array.isArray(d2.rows))throw new Error('AI lượt 2 trả cấu trúc không hợp lệ.');d2.audit=d2.audit||{};d2.audit.verified=true;return d2;
+ const auditPrompt=`Đây là KẾT QUẢ LƯỢT 1:
+${JSON.stringify(d1)}
+
+Đọc lại TOÀN BỘ chứng từ từ đầu. Kiểm tra từng Mã SP, Tên SP, Giá/Đơn giá, Chiết khấu, Số lượng. Chỉ sửa khi nhìn thấy chứng cứ trên PDF/ảnh; chỗ mờ phải đưa vào uncertainCells. Trả JSON cuối cùng cùng schema, audit.verified=true và audit.changes liệt kê thay đổi so với lượt 1.`;
+ const r2=await callFile(auditPrompt,'AI Agent · Kiểm tra đơn hàng lượt 2');let d2=safeJSON(r2.text);if(!Array.isArray(d2.headers)||!Array.isArray(d2.rows))throw new Error('AI lượt 2 trả cấu trúc không hợp lệ.');d2.audit=d2.audit||{};d2.audit.verified=true;return d2;
 }
 async function runSharedAgentExtraction(){
  if(!aiFiles.length)return toast($('#aiStatus'),'Vui lòng tải ít nhất 1 PDF/ảnh.','err');
@@ -6008,16 +6058,19 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
         const AI_SETTINGS_PASS_HASH = 'f3f929d3'; // FNV-1a của mật khẩu cài đặt
         const AI_ROUTE_LS = 'ideco_ai_route_mode_v1';
         const AI_DEFAULT = {
-            keys:['','',''],
-            baiKey:'sk-i2zxo8byhg6uetizhlz4x6ikq80f5bgs',
-            baiEndpoint:'https://api.b.ai/v1/chat/completions',
-            primaryModel:'bai:deepseek-v4-flash',
-            fallbackModel:'gemini-3.5-flash-lite',
+            keys:['','','',''],
+            kieKey:'6a11cd4b360b77e7cd515b8296a00e6a',
+            kieEndpoint:'https://api.kie.ai/gemini/v1/models/gemini-3-7-flash:streamGenerateContent',
+            primaryModel:'gemini-3.7-flash',
+            fallbackModel:'kie:gemini-3-7-flash',
             timeoutMs:90000,
             analysisMode:'fast',
-            baiVision:true,
-            baiVisionModel:'deepseek-v4-flash',
-            activeKey:0
+            activeKey:0,
+            // Legacy fields retained only so old LocalStorage does not break parsing. They are not used by the active route.
+            baiKey:'',
+            baiEndpoint:'https://api.b.ai/v1/chat/completions',
+            baiVision:false,
+            baiVisionModel:''
         };
         const aiState = { files:[], rawItems:[], rows:[], slipInfo:{}, settings:loadAISettings(), busy:false, lastRoute:'', lastError:'', startedAt:0, timer:null, currentStage:'', attempts:[] };
         let aiRouteModeState=(()=>{try{return localStorage.getItem(AI_ROUTE_LS)==='backup'?'backup':'main'}catch{return 'main'}})();
@@ -6031,8 +6084,17 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
         function safeAIJson(raw){ try{return JSON.parse(raw||'null')}catch{return null} }
         function normalizeAISettings(x){
             x=x&&typeof x==='object'?x:{};
-            const keys=Array.isArray(x.keys)?[x.keys[0]||'',x.keys[1]||'',x.keys[2]||'']:['','',''];
-            return {...AI_DEFAULT,...x,keys};
+            const oldKeys=Array.isArray(x.keys)?x.keys:[];
+            const keys=[oldKeys[0]||'',oldKeys[1]||'',oldKeys[2]||'',oldKeys[3]||''];
+            const out={...AI_DEFAULT,...x,keys};
+            // Migration từ bản DeepSeek/B.AI cũ: Gemini trở thành AI chính, KIE 3.7 trả phí trở thành dự phòng.
+            const p=String(out.primaryModel||'').toLowerCase(), f=String(out.fallbackModel||'').toLowerCase();
+            if(p.startsWith('bai:')||p.includes('deepseek'))out.primaryModel='gemini-3.7-flash';
+            if(f.startsWith('bai:')||f.includes('deepseek'))out.fallbackModel='kie:gemini-3-7-flash';
+            if(!String(out.kieKey||'').trim())out.kieKey=AI_DEFAULT.kieKey;
+            if(!String(out.kieEndpoint||'').trim())out.kieEndpoint=AI_DEFAULT.kieEndpoint;
+            out.baiKey=''; out.baiVision=false;
+            return out;
         }
         function legacySingleGeminiKeys(){
             const names=['triet_gemini_key_v1','geminiApiKey','gemini_api_key','geminiKey','googleAiApiKey','google_ai_api_key'];
@@ -6047,11 +6109,10 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
                 const candidates=[v3,v2].filter(x=>x&&typeof x==='object').map(normalizeAISettings);
                 let best=candidates.sort((a,b)=>(b.keys||[]).filter(Boolean).length-(a.keys||[]).filter(Boolean).length)[0]||normalizeAISettings({});
                 const singles=legacySingleGeminiKeys();
-                if(!(best.keys||[]).some(Boolean)&&singles.length)best={...best,keys:[singles[0]||'',singles[1]||'',singles[2]||'']};
-                // Nếu bản cũ chỉ có B.AI thì ưu tiên DeepSeek; nếu có Gemini vẫn giữ lựa chọn đã lưu.
-                if(!best.keys.some(Boolean)&&best.baiKey&&!String(best.primaryModel||'').startsWith('bai:')){
-                    best={...best,fallbackModel:best.primaryModel||'gemini-3.7-flash',primaryModel:'bai:deepseek-v4-flash'};
-                }
+                if(!(best.keys||[]).some(Boolean)&&singles.length)best={...best,keys:[singles[0]||'',singles[1]||'',singles[2]||'',singles[3]||'']};
+                // Bản mới luôn ưu tiên Gemini; KIE 3.7 trả phí là tuyến dự phòng tự động.
+                if(String(best.primaryModel||'').startsWith('bai:'))best.primaryModel='gemini-3.7-flash';
+                if(!best.fallbackModel||String(best.fallbackModel).startsWith('bai:'))best.fallbackModel='kie:gemini-3-7-flash';
                 return best;
             }catch{return {...AI_DEFAULT,keys:[...AI_DEFAULT.keys]};}
         }
@@ -6090,60 +6151,116 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
                 setTimeout(()=>inp.focus(),20);
             });
         }
-        function aiNotice(msg,type='info'){ showToast(msg,type==='error'?'error':'success'); const p=$ai('ai-progress'); if(p){p.textContent=msg;p.classList.add('show'); if(type!=='busy') setTimeout(()=>{ if(!aiState.busy)p.classList.remove('show'); },4500);} }
+        function publicAIText(msg){
+            return String(msg??'')
+                .replace(/KIE\s*Gemini\s*3(?:\.7)?\s*Flash|Gemini\s*3(?:\.7)?\s*Flash\s*·?\s*KIE|KIE\s*3(?:\.7)?|KIE/gi,'AI PHỤ')
+                .replace(/DeepSeek(?:[_ -]v?4(?:[_ -]flash)?)?|B\.AI(?:\s*Vision)?|Gemini(?:\s*3(?:\.7|\.6|\.5|\.1)?(?:\s*Flash(?:-Lite)?)?)?/gi,'AI CHÍNH')
+                .replace(/gemini-3-7-flash|gemini-3\.7-flash|gemini-3\.6-flash|gemini-3\.5-flash-lite|gemini-3\.1-flash-lite|gemini-2\.5-flash(?:-lite)?/gi,'AI CHÍNH')
+                .replace(/deepseek_v4_flash(?:_vision_exp)?|deepseek-v4-flash(?:-vision-exp)?/gi,'AI CHÍNH');
+        }
+        function aiNotice(msg,type='info'){ const safe=publicAIText(msg); showToast(safe,type==='error'?'error':'success'); const p=$ai('ai-progress'); if(p){p.textContent=safe;p.classList.add('show'); if(type!=='busy') setTimeout(()=>{ if(!aiState.busy)p.classList.remove('show'); },4500);} }
         function fmtAIBytes(n){ if(n<1024)return n+' B'; if(n<1048576)return (n/1024).toFixed(1)+' KB'; return (n/1048576).toFixed(1)+' MB'; }
         function currentAIKeys(){ return (aiState.settings.keys||[]).map((key,index)=>({key:String(key||'').trim(),index})).filter(x=>x.key); }
         function isBai(model){ return String(model||'').startsWith('bai:'); }
+        function isKie(model){ return String(model||'').startsWith('kie:'); }
+        function hasKieAI(){ return !!String(aiState.settings.kieKey||'').trim(); }
+        function hasAnyAI(){ return currentAIKeys().length>0 || hasKieAI(); }
         function activeAIRoute(){ return aiRouteModeState==='backup'?'backup':'main'; }
         function updateAIRouteUI(){
-            if(aiRouteModeState==='backup'&&!currentAIKeys().length){
+            if(aiRouteModeState==='backup'&&!hasKieAI()&&!currentAIKeys().length){
                 aiRouteModeState='main';
                 try{localStorage.setItem(AI_ROUTE_LS,'main')}catch{}
             }
             const main=document.getElementById('ai-route-main-btn'), backup=document.getElementById('ai-route-backup-btn'), status=document.getElementById('ai-route-status');
             if(main){main.classList.toggle('active-main',activeAIRoute()==='main');main.setAttribute('aria-pressed',String(activeAIRoute()==='main'));}
-            if(backup){backup.classList.toggle('active-backup',activeAIRoute()==='backup');backup.setAttribute('aria-pressed',String(activeAIRoute()==='backup'));backup.title=currentAIKeys().length?'Bật AI PHỤ':'AI PHỤ chưa được cấu hình trong Cài đặt AI';}
-            if(status)status.textContent=activeAIRoute()==='backup'?'ĐANG DÙNG AI PHỤ':'ĐANG DÙNG AI CHÍNH';
+            if(backup){backup.classList.toggle('active-backup',activeAIRoute()==='backup');backup.setAttribute('aria-pressed',String(activeAIRoute()==='backup'));backup.title=hasKieAI()?'Ép dùng AI PHỤ trả phí':'Chưa có API key AI PHỤ';}
+            if(status){status.style.display='inline';status.textContent=activeAIRoute()==='backup'?'ĐANG DÙNG AI PHỤ':'AI CHÍNH · TỰ DỰ PHÒNG';}
+            updateKieCreditBadge();
         }
         function setAIRoute(mode,{silent=false}={}){
             mode=mode==='backup'?'backup':'main';
-            if(mode==='backup'&&!currentAIKeys().length){
+            if(mode==='backup'&&!hasKieAI()){
                 updateAIRouteUI();
-                if(!silent)aiNotice('AI PHỤ chưa thể bật vì chưa được cấu hình. Vào Cài đặt AI để kiểm tra trước.','error');
+                if(!silent)aiNotice('AI PHỤ chưa thể bật vì chưa có API key AI PHỤ. Vào Cài đặt AI để kiểm tra.','error');
                 return false;
             }
             aiRouteModeState=mode;
             try{localStorage.setItem(AI_ROUTE_LS,mode)}catch{}
             aiResultCache.clear();
             updateAIRouteUI();
-            if(!silent) aiNotice(mode==='backup'?'Đã bật AI PHỤ cho toàn bộ chức năng phân tích.':'Đã bật AI CHÍNH cho toàn bộ chức năng phân tích.');
+            if(!silent) aiNotice(mode==='backup'?'Đã bật AI PHỤ trả phí cho toàn bộ chức năng phân tích.':'Đã bật AI CHÍNH; nếu lỗi/quota sẽ tự chuyển AI PHỤ.');
             return true;
         }
         const GEMINI_ECO_CHAIN=['gemini-3.5-flash-lite','gemini-3.1-flash-lite','gemini-2.5-flash-lite','gemini-2.5-flash','gemini-3.6-flash','gemini-3.7-flash'];
         function isFastAI(){ return String(aiState.settings.analysisMode||'fast')!=='thorough'; }
         function aiAttemptTimeout(){ const n=Number(aiState.settings.timeoutMs)||90000; return isFastAI()?Math.min(n,35000):n; }
         function baiAttemptTimeout(){ return isFastAI()?Math.max(42000,Math.min(Number(aiState.settings.timeoutMs)||90000,45000)):aiAttemptTimeout(); }
-        function configuredAIModels(){
-            const primary=aiState.settings.primaryModel||AI_DEFAULT.primaryModel, fallback=aiState.settings.fallbackModel;
-            if(activeAIRoute()==='backup'){
-                // AI PHỤ được bật thủ công: Gemini trở thành tuyến chính và bỏ qua DeepSeek ở lượt xử lý này.
-                const selected=[fallback,primary].filter(m=>m&&!isBai(m));
-                const chain=isFastAI()?['gemini-3.1-flash-lite','gemini-2.5-flash-lite','gemini-3.5-flash-lite']:GEMINI_ECO_CHAIN;
-                return [...new Set([...selected,...chain].filter(Boolean))].slice(0,isFastAI()?4:10);
+        let baiCatalogCache={ids:[],at:0};
+        function normalizeBaiModelId(v){
+            let x=String(v||'').replace(/^bai:/i,'').trim();
+            // Known legacy mistake in older IDECO builds: underscores were synthesized even though B.AI requires exact IDs.
+            if(/^deepseek_v4_flash$/i.test(x))x='deepseek-v4-flash';
+            if(/^deepseek_v4_flash_vision_exp$/i.test(x))x='deepseek-v4-flash-vision-exp';
+            return x;
+        }
+        async function getBaiModelIds(force=false){
+            if(!force&&baiCatalogCache.ids.length&&Date.now()-baiCatalogCache.at<5*60*1000)return baiCatalogCache.ids.slice();
+            const key=String(aiState.settings.baiKey||'').trim(); if(!key)return [];
+            const raw=String(aiState.settings.baiEndpoint||AI_DEFAULT.baiEndpoint).trim();
+            const origin=(raw.match(/^https?:\/\/[^/]+/i)||[])[0]||'https://api.b.ai';
+            const url=origin.replace(/\/+$/,'')+'/v1/models';
+            const authModes=[
+                {label:'Bearer',headers:{Authorization:'Bearer '+key}},
+                {label:'x-api-key',headers:{'x-api-key':key}}
+            ];
+            let last=null;
+            for(const auth of authModes){
+                try{
+                    const res=await fetchAI(url,{method:'GET',headers:auth.headers},9000);
+                    const data=await res.json().catch(()=>({}));
+                    if(!res.ok){const er=new Error(data?.error?.message||data?.message||`HTTP ${res.status}`);er.status=res.status;throw er}
+                    const ids=(Array.isArray(data?.data)?data.data:[]).map(x=>String(x?.id||'').trim()).filter(Boolean);
+                    if(ids.length){baiCatalogCache={ids:[...new Set(ids)],at:Date.now()};return baiCatalogCache.ids.slice();}
+                }catch(e){last=e;if(!shouldRetryAltAuthAI(e?.status||0,e?.message||'')&&e?.status!==401)break;}
             }
-            // AI CHÍNH là tuyến riêng: chỉ dùng cấu hình AI CHÍNH. Không tự chuyển sang AI PHỤ khi người dùng chưa bấm AI PHỤ.
-            const a=[...(aiState.settings.baiKey?['bai:deepseek-v4-flash']:[]),...(isBai(primary)?[primary]:[])].filter(Boolean);
-            return [...new Set(a)].slice(0,4);
+            if(last)console.warn('Không đọc được B.AI model catalog:',last.message||last);
+            return [];
+        }
+        function appendBaiFallbackModels(queue,ids,vision=false){
+            const preferred=vision
+                ? ['deepseek-v4-flash-vision-exp']
+                : ['deepseek-v4-flash','deepseek-v3.2','hy3'];
+            const available=(ids||[]).map(String);
+            for(const want of preferred){
+                const found=available.find(x=>x.toLowerCase()===want.toLowerCase()) || (!available.length?want:'');
+                if(found&&!queue.some(x=>x.toLowerCase()===found.toLowerCase()))queue.push(found);
+            }
+            return queue;
+        }
+
+        function configuredAIModels(){
+            const primary=aiState.settings.primaryModel||AI_DEFAULT.primaryModel;
+            const fallback=aiState.settings.fallbackModel||AI_DEFAULT.fallbackModel;
+            if(activeAIRoute()==='backup'){
+                const list=[];
+                if(hasKieAI())list.push(isKie(fallback)?fallback:'kie:gemini-3-7-flash');
+                if(currentAIKeys().length && !isKie(fallback) && !isBai(fallback))list.push(fallback);
+                return [...new Set(list.filter(Boolean))];
+            }
+            // AI CHÍNH: Gemini trước. KIE trả phí tự động tiếp quản nếu Gemini lỗi/quota/model.
+            const list=[];
+            if(currentAIKeys().length && !isKie(primary) && !isBai(primary))list.push(primary);
+            if(hasKieAI())list.push('kie:gemini-3-7-flash');
+            if(currentAIKeys().length && fallback && !isKie(fallback) && !isBai(fallback))list.push(fallback);
+            return [...new Set(list.filter(Boolean))];
         }
         function geminiEconomyModels(){
-            const selected=[aiState.settings.fallbackModel,aiState.settings.primaryModel].filter(m=>m&&!isBai(m));
-            const fastStable=['gemini-3.1-flash-lite','gemini-2.5-flash-lite'];
-            const list=activeAIRoute()==='backup'
-                ? [...new Set([...selected,...fastStable,...GEMINI_ECO_CHAIN])]
-                : (isFastAI()?[...new Set([...fastStable,...selected])]:[...new Set([...selected,...GEMINI_ECO_CHAIN])]);
+            const selected=[aiState.settings.primaryModel,aiState.settings.fallbackModel].filter(m=>m&&!isBai(m)&&!isKie(m));
+            const fastStable=['gemini-3.7-flash','gemini-3.6-flash','gemini-2.5-flash'];
+            const list=[...new Set([...selected,...fastStable,...GEMINI_ECO_CHAIN])];
             return isFastAI()?list.slice(0,4):list;
         }
-        function aiCacheKey(file,purpose){ return `${activeAIRoute()}|${purpose||'AI'}|${file?.name||''}|${file?.size||0}|${file?.lastModified||0}`; }
+        function aiCacheKey(file,purpose){ return `${activeAIRoute()}|${aiState.settings.primaryModel}|${aiState.settings.fallbackModel}|${purpose||'AI'}|${file?.name||''}|${file?.size||0}|${file?.lastModified||0}`; }
         async function fetchAI(url,options,ms){ const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),ms||aiAttemptTimeout()); try{return await fetch(url,{...options,signal:ctl.signal});} finally{clearTimeout(t);} }
         function extractAIJson(text){ let s=String(text||'').trim(); const m=s.match(/```(?:json)?\s*([\s\S]*?)\s*```/i); if(m)s=m[1].trim(); return JSON.parse(s); }
         function parseAINumber(v){ if(v===null||v===undefined||v==='')return null; if(typeof v==='number')return Number.isFinite(v)?v:null; let s=String(v).trim().replace(/\s/g,''); if(/^[-+]?\d{1,3}(\.\d{3})+(,\d+)?$/.test(s))s=s.replace(/\./g,'').replace(',','.'); else if(/^[-+]?\d+(,\d+)$/.test(s))s=s.replace(',','.'); else s=s.replace(/,/g,''); const n=Number(s); return Number.isFinite(n)?n:null; }
@@ -6155,10 +6272,10 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
         function shouldRetryAltAuthAI(status,msg){const s=String(msg||'').toLowerCase();return status===401||s.includes('invalid api key')||s.includes('missing api key')||s.includes('unauthenticated')||s.includes('invalid token')||s.includes('missing token')}
         function isModelErrorAI(status,msg){const s=String(msg||'').toLowerCase();return status===404||(status===400&&(s.includes('model')||s.includes('not found')||s.includes('not supported')))}
         async function geminiAI(parts,{jsonSchema=null,plainText=false,modelOverride=null,modelList=null,purpose='AI'}={}){
-            const keys=currentAIKeys(); if(!keys.length)throw new Error('Chưa có Gemini API key dự phòng. Nếu đã chọn DeepSeek V4 Flash Vision, ứng dụng vẫn có thể chạy bằng B.AI.');
+            const keys=currentAIKeys(); if(!keys.length)throw new Error('Chưa có API key AI CHÍNH. Hệ thống sẽ dùng AI PHỤ nếu đã được cấu hình.');
             const models=(modelList&&modelList.length?modelList:(modelOverride?[modelOverride]:geminiEconomyModels())).filter((x,i,a)=>x&&!isBai(x)&&a.indexOf(x)===i);
             const start=Number(aiState.settings.activeKey)||0;
-            const ordered=[...keys].sort((a,b)=>((a.index-start+3)%3)-((b.index-start+3)%3));
+            const keyCount=Math.max(keys.length,1); const ordered=[...keys].sort((a,b)=>((a.index-start+keyCount)%keyCount)-((b.index-start+keyCount)%keyCount));
             let last=null;
             for(const model of models){
                 for(const item of ordered){
@@ -6181,11 +6298,11 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
                         const data=await res.json().catch(()=>({}));
                         if(!res.ok){const er=new Error(data?.error?.message||`HTTP ${res.status}`);er.status=res.status;throw er}
                         const out=(data?.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('').trim();
-                        if(!out)throw new Error('Gemini trả nội dung rỗng.');
+                        if(!out)throw new Error('AI CHÍNH trả nội dung rỗng.');
                         aiState.settings.activeKey=item.index; aiState.lastRoute=`Gemini · ${model} · Key ${item.index+1}`; aiState.lastError=''; saveAISettings();
                         return {text:out,provider:'gemini',model,keyIndex:item.index,raw:data};
                     }catch(e){
-                        const status=e?.status||0; const msg=e?.name==='AbortError'?'Hết thời gian chờ Gemini':(e?.message||String(e));
+                        const status=e?.status||0; const msg=e?.name==='AbortError'?'Hết thời gian chờ AI CHÍNH':(e?.message||String(e));
                         last=new Error(msg); last.status=status; aiState.lastError=msg; aiState.attempts.push(`${model}/Key${item.index+1}: ${msg}`);
                         if(isModelErrorAI(status,msg))break;
                         if(isRetryableAI(status,msg)||isAuthErrorAI(status,msg)){await sleepAI(150);continue}
@@ -6194,21 +6311,85 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
                     }
                 }
             }
-            throw last||new Error(`${purpose}: không gọi được Gemini với các key/model đã cấu hình.`);
+            throw last||new Error(`${purpose}: AI CHÍNH chưa phản hồi với các key đã cấu hình.`);
         }
+        let kieCreditState={value:null,at:0,error:''};
+        function updateKieCreditBadge(){
+            const badge=$ai('kie-credit-badge'), box=$ai('kie-credit-settings');
+            const active=activeAIRoute()==='backup'||String(aiState.lastRoute||'').includes('KIE');
+            const v=kieCreditState.value;
+            let text=v===null?'💳 Credit AI PHỤ: ...':`💳 Credit AI PHỤ hiện hành: ${Number(v).toLocaleString('vi-VN')}`;
+            if(active)text+=' · ĐANG DÙNG';
+            if(kieCreditState.error&&v===null)text='💳 Credit AI PHỤ: chưa đọc được';
+            if(badge){badge.textContent=text;badge.classList.toggle('active',active);badge.classList.toggle('low',v!==null&&Number(v)<=10);}
+            if(box){box.textContent=v===null?(kieCreditState.error?'Credit hiện hành: chưa đọc được · '+kieCreditState.error:'Credit hiện hành: đang kiểm tra...'):`Credit hiện hành: ${Number(v).toLocaleString('vi-VN')}${active?' · AI PHỤ ĐANG ĐƯỢC DÙNG':''}`;}
+        }
+        async function refreshKieCredit(force=false){
+            if(!hasKieAI()){kieCreditState={value:null,at:Date.now(),error:'Chưa có API key AI PHỤ'};updateKieCreditBadge();return null;}
+            if(!force&&kieCreditState.value!==null&&Date.now()-kieCreditState.at<60000){updateKieCreditBadge();return kieCreditState.value;}
+            try{
+                const res=await fetchAI('https://api.kie.ai/api/v1/chat/credit',{method:'GET',headers:{Authorization:'Bearer '+String(aiState.settings.kieKey||'').trim()}},12000);
+                const data=await res.json().catch(()=>({}));
+                if(!res.ok||data?.code!==200)throw new Error(data?.msg||`HTTP ${res.status}`);
+                kieCreditState={value:Number(data.data),at:Date.now(),error:''};
+                updateKieCreditBadge();
+                return kieCreditState.value;
+            }catch(e){
+                kieCreditState={value:kieCreditState.value,at:Date.now(),error:e?.message||String(e)};
+                updateKieCreditBadge();
+                return kieCreditState.value;
+            }
+        }
+        function kieExtractTextFromPayload(payload){
+            let text='';
+            const arr=Array.isArray(payload)?payload:[payload];
+            for(const chunk of arr){
+                const parts=chunk?.candidates?.[0]?.content?.parts||[];
+                for(const p of parts){ if(p?.text && !p?.thought) text+=p.text; }
+            }
+            return text;
+        }
+        async function readKieAIResponse(res){
+            const raw=await res.text();
+            let text='',chunks=[];
+            try{const j=JSON.parse(raw);text=kieExtractTextFromPayload(j);return {text:text.trim(),raw:j};}catch{}
+            for(const line of raw.split(/\r?\n/)){
+                const v=line.trim(); if(!v.startsWith('data:'))continue;
+                const payload=v.slice(5).trim(); if(!payload||payload==='[DONE]')continue;
+                try{const j=JSON.parse(payload);chunks.push(j);text+=kieExtractTextFromPayload(j);}catch{}
+            }
+            return {text:text.trim(),raw:chunks};
+        }
+        async function kieAI(parts,{jsonSchema=null,plainText=false,purpose='AI KIE'}={}){
+            const key=String(aiState.settings.kieKey||'').trim(); if(!key)throw new Error('Chưa có API key AI PHỤ.');
+            const endpoint=String(aiState.settings.kieEndpoint||AI_DEFAULT.kieEndpoint).trim()||AI_DEFAULT.kieEndpoint;
+            const generationConfig={temperature:0,maxOutputTokens:plainText?14000:16384,thinkingConfig:{includeThoughts:true,thinkingLevel:'high'}};
+            if(jsonSchema){generationConfig.responseMimeType='application/json';generationConfig.responseSchema=jsonSchema;}
+            const body={stream:true,contents:[{role:'user',parts}],generationConfig};
+            setAIProgress('💳 Huyền đang dùng AI PHỤ trả phí để kiểm tra kỹ...',true);
+            const res=await fetchAI(endpoint,{method:'POST',headers:{Authorization:'Bearer '+key,'Content-Type':'application/json'},body:JSON.stringify(body)},Math.max(90000,Number(aiState.settings.timeoutMs)||90000));
+            if(!res.ok){let msg=await res.text().catch(()=> '');const er=new Error(`AI PHỤ HTTP ${res.status}${msg?' · '+msg.slice(0,500):''}`);er.status=res.status;throw er;}
+            const out=await readKieAIResponse(res);
+            if(!out.text)throw new Error('AI PHỤ trả nội dung rỗng.');
+            aiState.lastRoute='AI PHỤ trả phí'; aiState.lastError='';
+            updateAIRouteUI(); refreshKieCredit(true).catch(()=>{});
+            return {text:out.text,provider:'kie',model:'gemini-3-7-flash',keyIndex:-1,raw:out.raw};
+        }
+
         async function baiAI(text,{jsonSchema=null,plainText=false,model='bai:deepseek-v4-flash',purpose='AI'}={}){
             const key=String(aiState.settings.baiKey||'').trim(); if(!key)throw new Error('AI CHÍNH chưa có API key trong Cài đặt.');
             let content=String(text||'').trim();
             if(jsonSchema)content+=`\n\nYÊU CẦU ĐẦU RA: Chỉ trả JSON hợp lệ, không Markdown, không giải thích. JSON phải tuân theo schema:\n${JSON.stringify(jsonSchema)}`;
-            const requested=String(model||'deepseek-v4-flash').replace(/^bai:/,'').trim()||'deepseek-v4-flash';
-            const modelCandidates=[...new Set([requested,requested.replace(/_/g,'-'),requested.replace(/-/g,'_'),'deepseek-v4-flash','deepseek_v4_flash'].filter(Boolean))];
+            const requested=normalizeBaiModelId(model)||'deepseek-v4-flash';
+            const modelCandidates=[requested];
             const endpoint=baiChatEndpoint();
             const authModes=[
                 {label:'x-api-key',headers:{'x-api-key':key,'Content-Type':'application/json'}},
                 {label:'Bearer',headers:{Authorization:'Bearer '+key,'Content-Type':'application/json'}}
             ];
-            let last=null;
-            for(const modelName of modelCandidates){
+            let last=null, catalogExpanded=false;
+            for(let mi=0;mi<modelCandidates.length;mi++){
+                const modelName=modelCandidates[mi];
                 const body={model:modelName,messages:[
                     {role:'system',content:jsonSchema?'Bạn là AI trích xuất chứng từ dược phẩm cực kỳ chính xác. Không bỏ sót dòng. SỐ LÔ, HSD/EXP, ĐVT và SỐ LƯỢNG là dữ liệu trọng yếu. Chỉ trả JSON hợp lệ.':'Bạn là trợ lý phân tích dữ liệu chính xác.'},
                     {role:'user',content}
@@ -6232,16 +6413,22 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
                             last=new Error(msg); last.status=status; aiState.lastError=msg; aiState.attempts.push(`AI CHÍNH/${modelName}/${auth.label}: ${msg}`);
                             const transient=status===0||status===408||status===429||status>=500||/network|failed to fetch|timeout|timed out|connection|abort/i.test(msg);
                             if(transient && retry===0){retry++;await sleepAI(350);continue}
-                            retry=2;
-                            break;
+                            retry=2; break;
                         }
                     }
                     if(last && shouldRetryAltAuthAI(last.status||0,last.message||'') && ai===0){await sleepAI(80);continue;}
                     break;
                 }
                 const lm=String(last?.message||'').toLowerCase();
-                const modelProblem=isModelErrorAI(last?.status||0,lm)||/no access to model|model access|unknown model|invalid model/.test(lm);
-                if(modelProblem)continue;
+                const modelProblem=isModelErrorAI(last?.status||0,lm)||/does not exist|no access to model|model access|unknown model|invalid model/.test(lm);
+                if(modelProblem){
+                    if(!catalogExpanded){
+                        catalogExpanded=true;
+                        const ids=await getBaiModelIds(true).catch(()=>[]);
+                        appendBaiFallbackModels(modelCandidates,ids,false);
+                    }
+                    continue;
+                }
                 if(isAuthErrorAI(last?.status||0,lm)||last?.status===429||last?.status>=500||/network|failed to fetch|timeout|connection/.test(lm))break;
             }
             throw last||new Error('AI CHÍNH không phản hồi.');
@@ -6302,11 +6489,11 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             if(jsonSchema)instruction+=`\n\nYÊU CẦU ĐẦU RA: Chỉ trả JSON hợp lệ, không Markdown, không giải thích. JSON phải tuân theo schema:\n${JSON.stringify(jsonSchema)}`;
             const imageBlocks=await fileToBaiVisionBlocks(file);
             const systemText=jsonSchema?'Bạn là AI Vision trích xuất chứng từ dược phẩm cực kỳ chính xác. Không bỏ sót dòng. Số lô, HSD/EXP và số lượng là dữ liệu trọng yếu. Chỉ trả JSON hợp lệ.':'Bạn là trợ lý Vision đọc chứng từ chính xác.';
-            const configured=String(aiState.settings.baiVisionModel||'deepseek-v4-flash').trim();
-            const aliases=[configured,configured.replace(/_/g,'-'),configured.replace(/-/g,'_'),'deepseek-v4-flash','deepseek_v4_flash'];
-            // Nếu runtime DeepSeek của tài khoản chưa nhận ảnh, dùng model multimodal trên B.AI bằng CÙNG B.AI key.
-            // Không yêu cầu người dùng phải nhập thêm Google Gemini API key.
-            const modelCandidates=[...new Set(aliases.filter(Boolean))].filter(m=>!baiVisionRejectedModels.has(m));
+            let configured=normalizeBaiModelId(aiState.settings.baiVisionModel||'deepseek-v4-flash-vision-exp');
+            if(/^deepseek-v4-flash$/i.test(configured))configured='deepseek-v4-flash-vision-exp';
+            // Dùng đúng model Vision hiện hành. Không tự tạo alias bằng dấu gạch dưới vì B.AI yêu cầu exact model ID.
+            const ids=await getBaiModelIds(false).catch(()=>[]);
+            const modelCandidates=appendBaiFallbackModels([configured],ids,true).filter(m=>!baiVisionRejectedModels.has(m));
             const authModes=[
                 {label:'x-api-key',headers:{'x-api-key':key,'Content-Type':'application/json'}},
                 {label:'Bearer',headers:{Authorization:'Bearer '+key,'Content-Type':'application/json'}}
@@ -6324,20 +6511,20 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
                         if(!res.ok){const er=new Error(data?.error?.message||data?.message||`HTTP ${res.status}`);er.status=res.status;throw er}
                         const out=(Array.isArray(data?.content)?data.content:[]).filter(x=>x&&x.type==='text').map(x=>x.text||'').join('').trim();
                         if(!out)throw new Error('B.AI Vision trả nội dung rỗng.');
-                        if(/^deepseek[-_]v4[-_]flash$/i.test(model)){
+                        if(/^deepseek-v4-flash-vision-exp$/i.test(model)){
                             aiState.settings.baiVisionModel=model;
                             baiVisionRejectedModels.delete(model);
                             saveAISettings();
                         }
                         aiState.lastRoute=`B.AI Vision · ${model} · Messages · ${auth.label}`; aiState.lastError='';
-                        return {text:out,provider:'bai-vision',model,keyIndex:-1,raw:data,visionProtocol:'Messages Vision',visionBridge:!/^deepseek[-_]v4[-_]flash$/i.test(model)};
+                        return {text:out,provider:'bai-vision',model,keyIndex:-1,raw:data,visionProtocol:'Messages Vision',visionBridge:!/^deepseek-v4-flash-vision-exp$/i.test(model)};
                     }catch(e){
                         const status=e?.status||0, msg=e?.name==='AbortError'?'Hết thời gian chờ B.AI Vision':(e?.message||String(e));
                         last=new Error(msg); last.status=status; aiState.lastError=msg; aiState.attempts.push(`B.AI Vision/${model}/Messages/${auth.label}: ${msg}`);
                         if(ai===0 && shouldRetryAltAuthAI(status,msg)){await sleepAI(60);continue}
                         const lm=msg.toLowerCase();
                         const rejectsImage=(status===400||status===404||status===422)&&(/image|vision|multimodal|media|content block|not support|unsupported|text[- ]?only|model/.test(lm));
-                        if(rejectsImage && /^deepseek[-_]v4[-_]flash$/i.test(model))baiVisionRejectedModels.add(model);
+                        if(rejectsImage && /^deepseek-v4-flash-vision-exp$/i.test(model))baiVisionRejectedModels.add(model);
                         break;
                     }
                 }
@@ -6398,8 +6585,8 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             const isPdf=file.type==='application/pdf'||String(file.name||'').toLowerCase().endsWith('.pdf');
             if(isPdf){
                 const info=await getAIPdfTextInfo(file);
-                if(info.chars>=120&&info.quality>=3){aiState.lastRoute=`PDF text ${info.quality}/4 → DeepSeek`;return info.text}
-                if(info.chars>=120&&!currentAIKeys().length){aiState.lastRoute=`PDF text ${info.quality}/4 (không Gemini) → DeepSeek`;return info.text}
+                if(info.chars>=120&&info.quality>=3){aiState.lastRoute=`PDF text ${info.quality}/4 → AI CHÍNH`;return info.text}
+                if(info.chars>=120&&!currentAIKeys().length){aiState.lastRoute=`PDF text ${info.quality}/4 → AI CHÍNH`;return info.text}
             }
             return await ocrAIFile(file,purpose);
         }
@@ -6417,7 +6604,7 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             return [part,{text:prompt}];
         }
         async function aiFileRequest(file,prompt,{jsonSchema=null,plainText=false,purpose='Phiếu NCC'}={}){
-            if(!aiState.settings.baiKey&&!currentAIKeys().length)throw new Error(activeAIRoute()==='main'?'AI CHÍNH chưa có API key. Mở Cài đặt AI để kiểm tra.':'AI PHỤ chưa có API key. Mở Cài đặt AI để kiểm tra.');
+            if(!hasAnyAI())throw new Error('Chưa có API key AI. Hãy nhập key AI CHÍNH hoặc AI PHỤ trong Cài đặt AI.');
             const cacheKey=aiCacheKey(file,purpose);
             if(aiResultCache.has(cacheKey)){
                 setAIProgress(`⚡ Huyền đã có kết quả phân tích của ${file.name} trong phiên này · đang dùng lại...`,true);
@@ -6425,68 +6612,34 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             }
             let last=null; const failures=[]; aiState.attempts=[];
             const isPdf=file.type==='application/pdf'||String(file.name||'').toLowerCase().endsWith('.pdf');
-            let pdfInfo=null;
-            if(isFastAI()&&isPdf){ try{pdfInfo=await getAIPdfTextInfo(file);}catch{} }
-            const needsVision=!isPdf||(pdfInfo&&pdfInfo.chars<120);
-            let baiVisionTried=false;
-            // Ảnh/PDF scan: ở chế độ NHANH thử B.AI Vision trực tiếp trước (1 lượt).
-            // Nếu B.AI Vision không nhận ảnh hoặc lỗi, tự chuyển Gemini Vision dự phòng.
-            if(activeAIRoute()==='main'&&needsVision&&baiVisionEnabled()&&(isFastAI()||isBai(aiState.settings.primaryModel))){
-                baiVisionTried=true;
-                try{
-                    setAIProgress(`👁️ Huyền đang đọc trực tiếp ${file.name} và tổng hợp dữ liệu...`,true);
-                    const r=await baiVisionAI(file,prompt,{jsonSchema,plainText,purpose});
-                    const out={...r,sourceText:''}; aiResultCache.set(cacheKey,{text:r.text,sourceText:'',model:r.model,keyIndex:-1});
-                    return out;
-                }catch(e){ last=e; failures.push(`B.AI Vision: ${e?.message||e}`); setAIProgress('⏳ Huyền đang thử phương án phân tích dự phòng... bạn ráng chờ chút nhé',true); }
-            }
-            if(activeAIRoute()==='backup'&&isFastAI()&&needsVision&&currentAIKeys().length){
-                try{
-                    setAIProgress(`👁️ Huyền đang đọc trực tiếp ${file.name} và tổng hợp dữ liệu...`,true);
-                    const part=await fileToAIPart(file);
-                    const models=geminiEconomyModels();
-                    const r=await geminiAI([part,{text:prompt}],{jsonSchema,plainText,modelList:models,purpose});
-                    const out={...r,sourceText:''}; aiResultCache.set(cacheKey,{text:r.text,sourceText:'',model:r.model,keyIndex:r.keyIndex});
-                    return out;
-                }catch(e){ last=e; failures.push(`Gemini Vision: ${e?.message||e}`); }
-            }
+            let pdfInfo=null; if(isPdf){try{pdfInfo=await getAIPdfTextInfo(file)}catch{}}
             for(const model of configuredAIModels()){
                 try{
-                    if(isBai(model)){
-                        if(!String(aiState.settings.baiKey||'').trim())continue;
-                        if(needsVision&&baiVisionTried){failures.push(`${model}: Vision đã thử ở tuyến trước, không lặp lại để tránh chờ lâu.`);continue;}
-                        const txt=(pdfInfo&&pdfInfo.chars>=120)?pdfInfo.text:await textForBai(file,purpose);
-                        const r=await baiAI(`${prompt}
-
-NỘI DUNG TÀI LIỆU (đã giữ thứ tự dòng/cột tối đa):
-${txt}`,{jsonSchema,plainText,model,purpose});
-                        aiResultCache.set(cacheKey,{text:r.text,sourceText:txt,model:r.model,keyIndex:r.keyIndex});
-                        return {...r,sourceText:txt};
+                    const parts=(pdfInfo&&pdfInfo.chars>=120)?[{text:`${prompt}\n\nNỘI DUNG PDF ĐÃ TRÍCH XUẤT THEO DÒNG/CỘT:\n${pdfInfo.text}`}]:await geminiPartsForFile(file,prompt,purpose);
+                    let r;
+                    if(isKie(model)){
+                        r=await kieAI(parts,{jsonSchema,plainText,purpose});
+                    }else{
+                        if(!currentAIKeys().length)continue;
+                        r=await geminiAI(parts,{jsonSchema,plainText,modelOverride:model,purpose});
                     }
-                    if(!currentAIKeys().length)continue;
-                    const parts=(pdfInfo&&pdfInfo.chars>=120)?[{text:`${prompt}
-
-NỘI DUNG PDF ĐÃ TRÍCH XUẤT THEO DÒNG/CỘT:
-${pdfInfo.text}`}]:await geminiPartsForFile(file,prompt,purpose);
-                    const r=await geminiAI(parts,{jsonSchema,plainText,modelOverride:model,purpose});
                     aiResultCache.set(cacheKey,{text:r.text,sourceText:pdfInfo?.text||'',model:r.model,keyIndex:r.keyIndex});
-                    return r;
+                    return {...r,sourceText:pdfInfo?.text||''};
                 }catch(e){
-                    last=e; const msg=e?.message||String(e); aiState.lastError=msg; failures.push(`${model}: ${msg}`);
-                    setAIProgress('⏳ Huyền đang thử phương án phân tích dự phòng... bạn ráng chờ chút nhé',true);
+                    last=e; const msg=publicAIText(e?.message||String(e)); aiState.lastError=msg; failures.push(`${model}: ${msg}`); aiState.attempts.push(`${model}: ${msg}`);
+                    setAIProgress(isKie(model)?'AI PHỤ chưa thành công · đang kiểm tra tuyến còn lại...':'AI CHÍNH chưa thành công · đang tự chuyển AI PHỤ trả phí...',true);
                 }
             }
-            const detail=failures.slice(-3).join(' | ');
-            const er=new Error(detail?`Các tuyến AI nhanh chưa thành công: ${detail}`:'Không có AI phù hợp để xử lý file.');
-            er.cause=last; throw er;
+            const detail=failures.slice(-4).join(' | ');
+            const er=new Error(detail?`Các tuyến AI chưa thành công: ${detail}`:'Không có AI phù hợp để xử lý file.'); er.cause=last; throw er;
         }
         async function aiTextRequest(prompt,{jsonSchema=null,plainText=false,purpose='Đối chiếu Master'}={}){
             let last=null;
             for(const model of configuredAIModels()){
                 try{
-                    if(isBai(model)&&aiState.settings.baiKey)return await baiAI(prompt,{jsonSchema,plainText,model,purpose});
-                    if(!isBai(model)&&currentAIKeys().length)return await geminiAI([{text:prompt}],{jsonSchema,plainText,modelOverride:model,purpose});
-                }catch(e){last=e}
+                    if(isKie(model))return await kieAI([{text:prompt}],{jsonSchema,plainText,purpose});
+                    if(currentAIKeys().length)return await geminiAI([{text:prompt}],{jsonSchema,plainText,modelOverride:model,purpose});
+                }catch(e){last=e;aiState.attempts.push(`${model}: ${e?.message||e}`)}
             }
             throw last||new Error('Không có AI text khả dụng.');
         }
@@ -7082,9 +7235,33 @@ YÊU CẦU BẮT BUỘC:
             const tab=document.querySelector('.nav-tab[onclick*="tab1"]'); switchTab('tab1',tab);
             setTimeout(()=>document.getElementById('preview-box')?.scrollIntoView({behavior:'smooth',block:'start'}),100);
         }
-        function renderReceipt(){ const el=$ai('ai-receipt'); if(!aiState.rows.length){el.style.display='none';return;} el.style.display='block'; const supplier=$ai('ai-supplier').value||aiState.slipInfo.nhaCungCap||''; const invoice=$ai('ai-invoice').value||aiState.slipInfo.soPhieu||aiState.slipInfo.theoHoaDonSo||''; const date=$ai('ai-receive-date').value||new Date().toISOString().slice(0,10); const receiver=$ai('ai-receiver').value||''; const professionalReceiver=$ai('ai-professional-receiver')?.value||''; const deliveryPerson=$ai('ai-delivery-person')?.value||'Công ty TM DP Cao Mai';
-            $ai('ai-receipt-meta').innerHTML=`<div><b>Nhà cung cấp:</b><br>${escAI(supplier||'Chưa khai báo')}</div><div><b>Số phiếu/Hóa đơn:</b><br>${escAI(invoice||'Chưa khai báo')}</div><div><b>Ngày nhận:</b><br>${escAI(date)}</div><div><b>Người giao hàng (lập phiếu):</b><br>${escAI(deliveryPerson)}</div><div><b>Người nhận hàng:</b><br>${escAI(receiver||'Chưa khai báo')}</div><div><b>Phụ trách chuyên môn:</b><br>${escAI(professionalReceiver||'Chưa khai báo')}</div><div><b>Kho nhận:</b><br>${escAI(aiState.slipInfo.nhapTaiKho||'IDECO')}</div>`;
-            const sd=$ai('ai-sign-delivery'); if(sd)sd.textContent=deliveryPerson; const sr=$ai('ai-sign-receiver'); if(sr)sr.textContent=receiver; const sp=$ai('ai-sign-professional'); if(sp)sp.textContent=professionalReceiver;
+        function renderReceipt(){
+            const el=$ai('ai-receipt');
+            if(!aiState.rows.length){el.style.display='none';return;}
+            el.style.display='block';
+            const supplier=$ai('ai-supplier')?.value||aiState.slipInfo.nhaCungCap||'';
+            const invoice=$ai('ai-invoice')?.value||aiState.slipInfo.soPhieu||aiState.slipInfo.theoHoaDonSo||'';
+            const contract=$ai('ai-contract')?.value||'';
+            const date=$ai('ai-receive-date')?.value||new Date().toISOString().slice(0,10);
+            const time=$ai('ai-receive-time')?.value||'';
+            const place=$ai('ai-receive-place')?.value||aiState.slipInfo.nhapTaiKho||'IDECO';
+            const testResult=$ai('ai-test-result')?.value||'';
+            const receiver=$ai('ai-receiver')?.value||'';
+            const professionalReceiver=$ai('ai-professional-receiver')?.value||'';
+            const deliveryPerson=$ai('ai-delivery-person')?.value||'Công ty TM DP Cao Mai';
+            const fmtDate=v=>{const m=String(v||'').match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?`${m[3]}/${m[2]}/${m[1]}`:String(v||'')};
+            const field=(label,value,cls='')=>`<div class="receipt-field ${cls}"><label>${escAI(label)}</label><div class="receipt-value">${escAI(value||'')}</div></div>`;
+            $ai('ai-receipt-meta').innerHTML=
+                field('Tên nhà cung cấp',supplier)+
+                field('Hóa đơn',invoice)+
+                field('Số hợp đồng',contract)+
+                field('Nơi nhận hàng',place)+
+                field('Ngày nhận',fmtDate(date))+
+                field('Giờ nhận',time)+
+                `<div class="receipt-field full"><label>Kết quả kiểm nghiệm</label><div class="receipt-value multiline">${escAI(testResult||'')}</div></div>`;
+            const sd=$ai('ai-sign-delivery'); if(sd)sd.textContent=deliveryPerson;
+            const sr=$ai('ai-sign-receiver'); if(sr)sr.textContent=receiver;
+            const sp=$ai('ai-sign-professional'); if(sp)sp.textContent=professionalReceiver;
             $ai('ai-receipt-body').innerHTML=aiState.rows.map((r,i)=>{const p=rowWarehouseProduct(r);return `<tr><td>${i+1}</td><td>${escAI(p.code||'')}</td><td><b>${escAI(p.name||r.sourceName)}</b><div style="font-size:.7rem;color:#64748b">Phiếu: ${escAI(r.sourceName)}</div></td><td>${escAI(p.strength||'')}</td><td>${escAI(p.packSpec||'')}</td><td>${escAI(p.unit||r.sourceUnit)}</td><td>${escAI(r.lotNumber)}</td><td>${escAI(r.expiryRaw)}</td><td>${escAI(r.quantity??'')}</td><td>${r.status==='blocked'?'Thiếu điều kiện nhập kho':r.status==='new'?'CHƯA KHỚP TÊN MASTER - KHÔNG NHẬP KHO':r.matchMethod==='smart-auto'?'KHỚP THÔNG MINH MASTER':r.status==='warning'?'ĐÃ KHỚP MASTER - CÓ THÔNG TIN THAM KHẢO':'ĐÃ KHỚP TÊN MASTER'}</td></tr>`;}).join('');
         }
         async function saveReceiptPDF(){
@@ -7099,7 +7276,7 @@ YÊU CẦU BẮT BUỘC:
             }catch(e){aiNotice('Lỗi tạo PDF: '+e.message,'error');}
         }
 
-        async function analyzeFiles(){ if(aiState.busy)return; if(!aiState.files.length)return aiNotice('Vui lòng chọn phiếu NCC trước.','error'); if(!masterData.length)return aiNotice('CHƯA CÓ MASTER KHO. Hãy nạp Dữ Liệu Gốc trước khi AI phân tích phiếu NCC; ứng dụng không dùng dữ liệu tồn kho để thay Master.','error'); if(!aiState.settings.baiKey&&!currentAIKeys().length)return aiNotice('Chưa có API key AI. Mở Cài đặt AI để nhập key.','error'); aiState.busy=true; $ai('ai-analyze-btn').disabled=true; aiState.rawItems=[]; aiState.slipInfo={}; startAIProcessing(isFastAI()?'⚡ Huyền đang phân tích nhanh phiếu NCC...':'🛡️ Huyền đang kiểm tra kỹ phiếu NCC...'); try{
+        async function analyzeFiles(){ if(aiState.busy)return; if(!aiState.files.length)return aiNotice('Vui lòng chọn phiếu NCC trước.','error'); if(!masterData.length)return aiNotice('CHƯA CÓ MASTER KHO. Hãy nạp Dữ Liệu Gốc trước khi AI phân tích phiếu NCC; ứng dụng không dùng dữ liệu tồn kho để thay Master.','error'); if(!hasAnyAI())return aiNotice('Chưa có API key AI. Mở Cài đặt AI để nhập key AI CHÍNH hoặc AI PHỤ.','error'); const errBox=$ai('ai-analysis-error'); if(errBox){errBox.style.display='none';errBox.innerHTML='';} aiState.busy=true; $ai('ai-analyze-btn').disabled=true; aiState.rawItems=[]; aiState.slipInfo={}; startAIProcessing(isFastAI()?'⚡ Huyền đang phân tích nhanh phiếu NCC...':'🛡️ Huyền đang kiểm tra kỹ phiếu NCC...'); try{
             for(let i=0;i<aiState.files.length;i++){
                 const f=aiState.files[i];
                 setAIProgress(`📄 Huyền đang đọc phiếu ${i+1}/${aiState.files.length}: ${f.name}...`,true);
@@ -7124,71 +7301,77 @@ YÊU CẦU BẮT BUỘC:
                   ready=aiState.rows.filter(isWarehouseReady).length;
             updateWarehouseButton();
             setAIProgress(`✅ Đã soi Master: ${ready} dòng đủ điều kiện có thể LOAD sang Nhập kho khi người dùng bấm nút. Chưa khớp/cần chỉnh tên: ${unmatched}; cảnh báo tham khảo: ${warn}; thiếu điều kiện bắt buộc: ${bad}. Hệ thống KHÔNG tự load kho.`,true);
-        }catch(e){const msg=e?.message||String(e);aiState.lastError=msg;console.warn('Chi tiết tuyến AI:',msg);aiNotice('Huyền chưa phân tích được phiếu. Bạn kiểm tra kết nối/API trong Cài đặt hoặc mở NHẬP THỦ CÔNG DỰ PHÒNG để tiếp tục.','error');const tr=$ai('ai-test-result');if(tr){const tech=[...(aiState.attempts||[])].slice(-5).map(escAI).join('<br>');tr.innerHTML=`<div style="color:#b91c1c"><b>❌ Huyền chưa phân tích được phiếu.</b> Mở Cài đặt → Kiểm tra AI.</div>${tech?`<details style="margin-top:6px"><summary>Chi tiết tuyến kỹ thuật</summary><div style="font-size:.72rem;margin-top:5px;color:#64748b">${tech}</div></details>`:''}`;}const fb=$ai('manual-fallback-details');if(fb)fb.open=true;}finally{aiState.busy=false;stopAIProcessing();$ai('ai-analyze-btn').disabled=false;} }
-        function clearAI(){ stopAIProcessing(); aiState.busy=false;aiState.files=[];aiState.rawItems=[];aiState.rows=[];aiState.slipInfo={};aiState.currentStage=''; if($ai('ai-professional-receiver'))$ai('ai-professional-receiver').value=''; renderAIFiles();$ai('ai-compare-root').innerHTML='<div style="padding:45px;text-align:center;color:#94a3b8">Tải phiếu NCC và bấm AI PHÂN TÍCH.</div>';$ai('ai-match-summary').innerHTML='<span class="ai-pill ai-info">Chưa có dữ liệu</span>';$ai('ai-block-note').style.display='none';$ai('ai-receipt').style.display='none';$ai('ai-rematch-btn').disabled=true;if($ai('ai-sync-master-btn'))$ai('ai-sync-master-btn').disabled=true;if($ai('auto-master-run-btn'))$ai('auto-master-run-btn').disabled=true;$ai('ai-to-warehouse-btn').disabled=true;$ai('ai-receipt-pdf-btn').disabled=true;setAutoMasterStatus('AI sẽ chỉ tự chọn khi Tên + Hàm lượng/NĐ + Quy cách cùng khớp an toàn. Nếu chỉ gần giống hoặc lệch dữ liệu, hệ thống sẽ cảnh báo để chỉnh sửa/chọn Master; không tự load kho.');setAIProgress('',false);}
+        }catch(e){
+            const msg=e?.message||String(e); aiState.lastError=msg; console.warn('Chi tiết tuyến AI:',msg);
+            aiNotice('Huyền chưa phân tích được phiếu. Bạn kiểm tra kết nối/API trong Cài đặt hoặc mở NHẬP THỦ CÔNG DỰ PHÒNG để tiếp tục.','error');
+            // TUYỆT ĐỐI KHÔNG ghi lỗi kỹ thuật vào ô “Kết quả kiểm nghiệm” của Biên bản nhận hàng.
+            const tech=[...(aiState.attempts||[])].slice(-5);
+            const box=$ai('ai-analysis-error');
+            if(box){
+                box.style.display='block';
+                box.innerHTML=`<b>❌ Lỗi tuyến AI — không liên quan nội dung Biên bản nhận hàng.</b><div style="margin-top:4px">${escAI(msg)}</div>${tech.length?`<details style="margin-top:6px"><summary>Chi tiết kỹ thuật</summary><div style="font-size:.72rem;margin-top:5px;color:#64748b">${tech.map(x=>escAI(publicAIText(x))).join('<br>')}</div></details>`:''}`;
+            }
+            const tr=$ai('ai-connection-test-result');
+            if(tr)tr.innerHTML=`<div style="color:#b91c1c"><b>❌ Lần phân tích gần nhất lỗi.</b> Bấm “Kiểm tra AI” để chẩn đoán riêng.</div>`;
+            const fb=$ai('manual-fallback-details');if(fb)fb.open=true;
+        }finally{aiState.busy=false;stopAIProcessing();$ai('ai-analyze-btn').disabled=false;} }
+        function clearAI(){ stopAIProcessing(); aiState.busy=false;aiState.files=[];aiState.rawItems=[];aiState.rows=[];aiState.slipInfo={};aiState.currentStage=''; if($ai('ai-professional-receiver'))$ai('ai-professional-receiver').value=''; renderAIFiles();$ai('ai-compare-root').innerHTML='<div style="padding:45px;text-align:center;color:#94a3b8">Tải phiếu NCC và bấm AI PHÂN TÍCH.</div>';$ai('ai-match-summary').innerHTML='<span class="ai-pill ai-info">Chưa có dữ liệu</span>';$ai('ai-block-note').style.display='none';$ai('ai-receipt').style.display='none';$ai('ai-rematch-btn').disabled=true;if($ai('ai-sync-master-btn'))$ai('ai-sync-master-btn').disabled=true;if($ai('auto-master-run-btn'))$ai('auto-master-run-btn').disabled=true;$ai('ai-to-warehouse-btn').disabled=true;$ai('ai-receipt-pdf-btn').disabled=true;setAutoMasterStatus('AI sẽ chỉ tự chọn khi Tên + Hàm lượng/NĐ + Quy cách cùng khớp an toàn. Nếu chỉ gần giống hoặc lệch dữ liệu, hệ thống sẽ cảnh báo để chỉnh sửa/chọn Master; không tự load kho.');const eb=$ai('ai-analysis-error');if(eb){eb.style.display='none';eb.innerHTML='';}setAIProgress('',false);}
         function fillAISettings(){
             const s=aiState.settings;
-            [1,2,3].forEach((n,i)=>$ai('ai-key-'+n).value=s.keys?.[i]||'');
-            $ai('ai-bai-key').value=s.baiKey||'';
-            $ai('ai-bai-endpoint').value=s.baiEndpoint||AI_DEFAULT.baiEndpoint;
-            if($ai('ai-bai-vision-model'))$ai('ai-bai-vision-model').value=s.baiVisionModel||'deepseek-v4-flash';
-            $ai('ai-primary-model').value=s.primaryModel||AI_DEFAULT.primaryModel;
-            $ai('ai-fallback-model').value=s.fallbackModel||AI_DEFAULT.fallbackModel;
+            [1,2,3,4].forEach((n,i)=>{const el=$ai('ai-key-'+n);if(el)el.value=s.keys?.[i]||''});
+            if($ai('ai-kie-key'))$ai('ai-kie-key').value=s.kieKey||AI_DEFAULT.kieKey;
+            if($ai('ai-kie-endpoint'))$ai('ai-kie-endpoint').value=s.kieEndpoint||AI_DEFAULT.kieEndpoint;
+            $ai('ai-primary-model').value=(!isKie(s.primaryModel)&&!isBai(s.primaryModel)?s.primaryModel:AI_DEFAULT.primaryModel);
+            $ai('ai-fallback-model').value=(isKie(s.fallbackModel)||(!isBai(s.fallbackModel)&&s.fallbackModel))?s.fallbackModel:AI_DEFAULT.fallbackModel;
             if($ai('ai-analysis-mode'))$ai('ai-analysis-mode').value=s.analysisMode||'fast';
-            if($ai('ai-bai-vision'))$ai('ai-bai-vision').checked=s.baiVision!==false;
             const g=currentAIKeys().length;
-            $ai('ai-settings-status').textContent=(g?`${g} Gemini key · `:'0 Gemini key · ')+(s.baiKey?`B.AI đã có key · Vision ${s.baiVision!==false?'BẬT':'TẮT'} · ${s.baiVisionModel||'deepseek-v4-flash'}`:'B.AI chưa có key');
-            updateAIRouteUI();
+            $ai('ai-settings-status').textContent=`AI CHÍNH: ${g} key · AI PHỤ: ${hasKieAI()?'đã có key':'chưa có key'}`;
+            updateAIRouteUI(); refreshKieCredit(false).catch(()=>{});
         }
         function collectAISettings(){
-            aiState.settings.keys=[1,2,3].map(n=>$ai('ai-key-'+n).value.trim());
-            aiState.settings.baiKey=$ai('ai-bai-key').value.trim();
-            aiState.settings.baiEndpoint=$ai('ai-bai-endpoint').value.trim()||AI_DEFAULT.baiEndpoint;
-            if($ai('ai-bai-vision-model'))aiState.settings.baiVisionModel=$ai('ai-bai-vision-model').value.trim()||'deepseek-v4-flash';
+            aiState.settings.keys=[1,2,3,4].map(n=>$ai('ai-key-'+n)?.value.trim()||'');
+            aiState.settings.kieKey=$ai('ai-kie-key')?.value.trim()||'';
+            aiState.settings.kieEndpoint=$ai('ai-kie-endpoint')?.value.trim()||AI_DEFAULT.kieEndpoint;
             aiState.settings.primaryModel=$ai('ai-primary-model').value;
             aiState.settings.fallbackModel=$ai('ai-fallback-model').value;
             if($ai('ai-analysis-mode'))aiState.settings.analysisMode=$ai('ai-analysis-mode').value||'fast';
-            if($ai('ai-bai-vision'))aiState.settings.baiVision=!!$ai('ai-bai-vision').checked;
-            baiVisionRejectedModels.clear();
-            saveAISettings(); fillAISettings(); aiNotice('Đã lưu cài đặt AI trên trình duyệt này.');
+            aiState.settings.baiKey=''; aiState.settings.baiVision=false;
+            saveAISettings(); fillAISettings(); aiNotice('Đã lưu cấu hình AI CHÍNH và AI PHỤ.');
         }
         function restoreLegacyAISettings(){
             const before=currentAIKeys().length, loaded=loadAISettings();
-            const merged=[...(aiState.settings.keys||[])];
+            const merged=[...(aiState.settings.keys||[])]; while(merged.length<4)merged.push('');
             (loaded.keys||[]).forEach(k=>{if(k&&!merged.includes(k)){const slot=merged.findIndex(x=>!x);if(slot>=0)merged[slot]=k}});
-            aiState.settings={...aiState.settings,...loaded,keys:merged.slice(0,3),baiKey:aiState.settings.baiKey||loaded.baiKey||AI_DEFAULT.baiKey};
+            aiState.settings={...aiState.settings,...loaded,keys:merged.slice(0,4),kieKey:aiState.settings.kieKey||loaded.kieKey||AI_DEFAULT.kieKey,primaryModel:'gemini-3.7-flash',fallbackModel:'kie:gemini-3-7-flash',baiKey:'',baiVision:false};
             saveAISettings(); fillAISettings();
             const after=currentAIKeys().length;
-            const el=$ai('ai-test-result');
-            if(el)el.innerHTML=after>before?`<span style="color:#15803d"><b>✅ Đã khôi phục ${after-before} Gemini key cũ.</b></span>`:`<span style="color:#b45309"><b>⚠️ Không tìm thấy thêm Gemini key trong LocalStorage của file này.</b> Nếu file NHAP cũ mở ở một file:// khác, Chrome có thể tách vùng lưu trữ; hãy dán key một lần rồi Lưu.</span>`;
+            const el=$ai('ai-connection-test-result');
+            if(el)el.innerHTML=after>before?`<span style="color:#15803d"><b>✅ Đã khôi phục ${after-before} API key cũ.</b></span>`:`<span style="color:#b45309"><b>ℹ️ Không tìm thấy thêm API key cũ.</b> AI PHỤ trả phí vẫn được giữ làm dự phòng.</span>`;
         }
         async function testAISettings(){
             collectAISettings();
-            const el=$ai('ai-test-result'); el.innerHTML='⏳ Đang kiểm tra cấu hình AI...';
+            const el=$ai('ai-connection-test-result'); if(el)el.innerHTML='⏳ Đang kiểm tra AI CHÍNH + AI PHỤ...';
             const results=[];
             if(currentAIKeys().length){
                 try{
-                    const r=await geminiAI([{text:'Trả lời đúng một từ: OK'}],{plainText:true,modelList:geminiEconomyModels(),purpose:'Kiểm tra Gemini + fallback'});
-                    results.push(`✅ Gemini hoạt động (${r.model}, Key ${Number(r.keyIndex)+1})`);
-                }catch(e){results.push(`❌ Gemini: ${e.message}`)}
-            }else results.push('⚠️ Gemini: chưa có key');
-            if(aiState.settings.baiKey){
-                try{const r=await baiAI('Trả lời đúng một từ: OK',{plainText:true,model:'bai:deepseek-v4-flash',purpose:'Kiểm tra B.AI Text'});results.push(`✅ B.AI Text hoạt động (${r.model})`)}catch(e){results.push(`❌ B.AI Text: ${e.message}`)}
-                if(aiState.settings.baiVision!==false){
-                    try{
-                        const tf=await makeBaiVisionTestFile();
-                        const r=await baiVisionAI(tf,'Đọc chính xác dòng chữ trong ảnh. Nếu thấy IDECO VISION TEST 2026 thì chỉ trả đúng: VISION_OK',{plainText:true,purpose:'Kiểm tra B.AI Vision'});
-                        if(/VISION_OK/i.test(r.text)||/IDECO\s+VISION\s+TEST\s+2026/i.test(r.text)){
-                            results.push(`✅ B.AI Vision hoạt động (${r.model} · ${r.visionProtocol||'Vision'})`);
-                            if(r.visionBridge)results.push('ℹ️ DeepSeek runtime chưa nhận ảnh ở lượt thử; ứng dụng đã dùng B.AI multimodal Vision dự phòng bằng cùng B.AI key.');
-                        }else results.push('⚠️ B.AI Vision có phản hồi nhưng chưa đọc đúng ảnh thử');
-                    }catch(e){results.push(`❌ B.AI Vision: ${e.message}`)}
-                }else results.push('⚠️ B.AI Vision: đang tắt trong Cài đặt');
-            }else results.push('⚠️ B.AI: chưa có key');
-            el.innerHTML=results.map(x=>`<div style="margin:3px 0;${x.startsWith('✅')?'color:#15803d':x.startsWith('❌')?'color:#b91c1c':'color:#b45309'}">${escAI(x)}</div>`).join('');
+                    const model=$ai('ai-primary-model')?.value||'gemini-3.7-flash';
+                    const r=await geminiAI([{text:'Trả lời đúng một từ: OK'}],{plainText:true,modelOverride:model,purpose:'Kiểm tra AI CHÍNH'});
+                    results.push(`✅ AI CHÍNH hoạt động · Key ${Number(r.keyIndex)+1}`);
+                }catch(e){results.push(`❌ AI CHÍNH: ${e.message}`)}
+            }else results.push('⚠️ AI CHÍNH: chưa có API key');
+            if(hasKieAI()){
+                try{
+                    const r=await kieAI([{text:'Trả lời đúng một từ: OK'}],{plainText:true,purpose:'Kiểm tra AI PHỤ'});
+                    const credit=await refreshKieCredit(true);
+                    results.push(`✅ AI PHỤ hoạt động${credit!==null?` · Credit ${Number(credit).toLocaleString('vi-VN')}`:''}`);
+                }catch(e){results.push(`❌ AI PHỤ: ${e.message}`)}
+            }else results.push('⚠️ AI PHỤ: chưa có API key');
+            if(el)el.innerHTML=results.map(x=>`<div style="margin:3px 0;${x.startsWith('✅')?'color:#15803d':x.startsWith('❌')?'color:#b91c1c':'color:#b45309'}">${escAI(x)}</div>`).join('');
         }
         function bindAI(){
-            $ai('ai-receive-date').value=new Date().toISOString().slice(0,10);
+            const _nowLocal=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString();
+            $ai('ai-receive-date').value=_nowLocal.slice(0,10);
+            if($ai('ai-receive-time'))$ai('ai-receive-time').value=_nowLocal.slice(11,16);
             fillAISettings();
             const details=$ai('ai-settings-details'),summary=$ai('ai-settings-summary');
             if(details&&!isAISettingsUnlocked())details.open=false;
@@ -7202,6 +7385,9 @@ YÊU CẦU BẮT BUỘC:
             $ai('ai-test-settings').onclick=testAISettings;
             $ai('ai-restore-settings').onclick=restoreLegacyAISettings;
             $ai('ai-lock-settings').onclick=lockAISettingsAccess;
+            if($ai('kie-credit-refresh'))$ai('kie-credit-refresh').onclick=()=>refreshKieCredit(true);
+            if($ai('ai-primary-model'))$ai('ai-primary-model').onchange=()=>{collectAISettings();updateAIRouteUI();};
+            if($ai('ai-fallback-model'))$ai('ai-fallback-model').onchange=()=>{collectAISettings();updateAIRouteUI();};
             const drop=$ai('ai-drop'),input=$ai('ai-files');
             drop.onclick=()=>input.click();
             input.onchange=()=>{addAIFiles(input.files);input.value='';};
@@ -7215,7 +7401,7 @@ YÊU CẦU BẮT BUỘC:
             if($ai('auto-master-run-btn'))$ai('auto-master-run-btn').onclick=async()=>{await runMasterReview({allowBusy:false,fromButton:true});};
             $ai('ai-to-warehouse-btn').onclick=goWarehouse;
             $ai('ai-receipt-pdf-btn').onclick=saveReceiptPDF;
-            ['ai-supplier','ai-invoice','ai-receive-date','ai-receiver','ai-professional-receiver','ai-delivery-person'].forEach(id=>{const el=$ai(id);if(el)el.oninput=renderReceipt;});
+            ['ai-supplier','ai-invoice','ai-contract','ai-receive-date','ai-receive-time','ai-receive-place','ai-test-result','ai-receiver','ai-professional-receiver','ai-delivery-person'].forEach(id=>{const el=$ai(id);if(el)el.oninput=renderReceipt;});
         }
         // Keep AI rows updated if Master changes in realtime.
         try{ refs.master.on('value',()=>{ if(aiState.rawItems.length&&!aiState.busy)setTimeout(()=>rematchAll(false),100); }); }catch(e){}
@@ -7784,6 +7970,18 @@ initFirebase();renderHistory();renderArchive();
     const key='ideco_'+buttonId+'_collapsed';
     const setState=(collapsed)=>{
       shell.classList.toggle('is-collapsed',collapsed);
+      // Bảng soi Master có min-width lớn; khi quay lại giao diện 2 cột phải ép track phải co trong container.
+      if(shellId==='ai-grid-shell'){
+        shell.style.width='100%';
+        shell.style.minWidth='0';
+        shell.style.gridTemplateColumns=collapsed
+          ? 'minmax(0,1fr)'
+          : 'minmax(340px,1fr) minmax(0,1.45fr)';
+        if(!collapsed){
+          const wrap=document.getElementById('ai-compare-root');
+          if(wrap) wrap.scrollLeft=0;
+        }
+      }
       btn.textContent=collapsed?collapsedText:expandedText;
       btn.setAttribute('aria-expanded',String(!collapsed));
       if(restore)restore.style.display=collapsed?'inline-flex':'none';
@@ -7797,6 +7995,12 @@ initFirebase();renderHistory();renderArchive();
   }
   function init(){
     applyToggle('toggle-ai-left-panel','ai-grid-shell','↔ Hiện khung nhập PDF · Thu hẹp bảng','↔ Ẩn khung nhập PDF · Mở rộng bảng','ai-restore-layout-btn');
+    const aiRescue=document.getElementById('ai-restore-layout-btn-2');
+    const aiRescueBar=document.getElementById('ai-layout-rescue-bar');
+    const aiShell=document.getElementById('ai-grid-shell');
+    const syncAiRescue=()=>{if(aiRescueBar)aiRescueBar.style.display=aiShell?.classList.contains('is-collapsed')?'flex':'none';};
+    if(aiRescue)aiRescue.onclick=()=>{registry['ai-grid-shell']?.setState(false);syncAiRescue();};
+    if(aiShell){new MutationObserver(syncAiRescue).observe(aiShell,{attributes:true,attributeFilter:['class']});syncAiRescue();}
     applyToggle('toggle-xk-upload-panel','xk-ai-top-shell','↔ Hiện khung tải phiếu','↔ Ẩn khung tải phiếu · Mở rộng bảng','xk-restore-layout-btn');
     const extra=document.getElementById('xk-restore-layout-top-btn');
     if(extra){extra.onclick=()=>registry['xk-ai-top-shell']?.setState(false);const sh=document.getElementById('xk-ai-top-shell');extra.style.display=sh?.classList.contains('is-collapsed')?'inline-flex':'none';const obs=new MutationObserver(()=>{extra.style.display=sh.classList.contains('is-collapsed')?'inline-flex':'none'});if(sh)obs.observe(sh,{attributes:true,attributeFilter:['class']});}
@@ -7901,13 +8105,22 @@ async function exportCleanElementPDF(sourceEl, fileName, orientation='p'){
 <script id="price-agent-tab-loader">
 (()=>{
   let priceAgentLoaded=false;
-  function loadPriceAgent(force=false){
+  function sourcePriceAgentHtml(){
     const src=document.getElementById('price-agent-src');
+    if(!src)return '';
+    return String(src.textContent||'').replace(/<\\\/script>/gi,'<\/script>');
+  }
+  function loadPriceAgent(force=false){
     const frame=document.getElementById('price-agent-iframe');
-    if(!src||!frame)return;
+    if(!frame)return;
     if(priceAgentLoaded&&!force)return;
-    frame.srcdoc=src.textContent||'';
+    const html=sourcePriceAgentHtml();
+    if(!html){
+      frame.srcdoc='<div style="font-family:Arial;padding:24px;color:#b91c1c"><b>Không tìm thấy mã KIỂM TRA GIÁ CNT CHUẨN.</b><br>Hãy bấm Khởi động lại tab.</div>';
+      return;
+    }
     priceAgentLoaded=true;
+    frame.srcdoc=html;
   }
   window.initPriceAgentTab=()=>loadPriceAgent(false);
   window.reloadPriceAgentTab=()=>{

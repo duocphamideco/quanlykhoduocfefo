@@ -480,7 +480,7 @@
             <label class="app-remember"><input id="app-login-remember" type="checkbox" checked> Ghi nhớ đăng nhập trên máy này (LocalStorage)</label>
             <div id="app-login-error" class="app-login-error">Mật khẩu không đúng. Vui lòng kiểm tra lại.</div>
             <button id="app-login-submit" type="button" class="btn btn-primary" style="width:100%;padding:10px 14px;font-size:.92rem">🔓 ĐĂNG NHẬP</button>
-            <div class="app-security-note">Mật khẩu mặc định ban đầu do BGĐ thiết lập. Có thể đổi trong <b>⚙️ Cài đặt AI</b> sau khi mở khóa Cài đặt.</div>
+            <div class="app-security-note">Mọi khu vực <b>⚙️ Cài đặt</b> đều được khóa bằng mật khẩu BGĐ và không ghi nhớ trạng thái mở khóa.</div>
         </div>
     </div>
 
@@ -497,7 +497,7 @@
                     <button id="ai-route-main-btn" class="ai-route-btn" type="button" onclick="window.IDECOAIRoute&&window.IDECOAIRoute.set('main')">AI CHÍNH</button>
                     <button id="ai-route-backup-btn" class="ai-route-btn" type="button" onclick="window.IDECOAIRoute&&window.IDECOAIRoute.set('backup')">AI PHỤ</button>
                     <span id="ai-route-status" class="ai-route-status" style="display:none">Đang khởi tạo...</span>
-                    <span id="kie-credit-badge" class="kie-credit-badge" title="Credit AI PHỤ hiện hành">💳 Bạn đang tiêu diền nè: ...</span>
+                    <span id="kie-credit-badge" class="kie-credit-badge" title="Credit AI PHỤ hiện hành">💳 Credit AI PHỤ: ...</span>
                 </div>
                 <button class="btn btn-primary" type="button" onclick="openIDECOSettingsPanel()">⚙️ Cài đặt</button>
                 <button class="btn btn-guide" type="button" onclick="openUserGuide()">📘 Hướng dẫn sử dụng</button>
@@ -1058,7 +1058,7 @@
                     </details>
 
                     <details class="ai-settings" id="ai-settings-details">
-                        <summary id="ai-settings-summary">🔐 ⚙️ Cài đặt AI · yêu cầu mật khẩu</summary>
+                        <summary id="ai-settings-summary">🔐 ⚙️ Cài đặt AI · xác thực mỗi lần mở</summary>
                         <div class="ai-settings-body">
                             <div><label>API Key AI CHÍNH 1</label><div style="display:flex;gap:6px"><input type="password" id="ai-key-1" autocomplete="off"><button class="btn btn-primary ai-key-eye" type="button" data-eye-target="ai-key-1" style="width:auto;padding:6px 9px">👁️</button></div></div>
                             <div><label>API Key AI CHÍNH 2 · dự phòng</label><div style="display:flex;gap:6px"><input type="password" id="ai-key-2" autocomplete="off"><button class="btn btn-primary ai-key-eye" type="button" data-eye-target="ai-key-2" style="width:auto;padding:6px 9px">👁️</button></div></div>
@@ -1290,9 +1290,11 @@ if (window.pdfjsLib) {
   pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 }
 
+const IDECO_SETTINGS_PASSWORD = "minhtriet1973";
+
 const DEFAULT_SETTINGS = {
   loginPassword: "ideco@2026",
-  settingsPassword: "minhtriet1973",
+  settingsPassword: IDECO_SETTINGS_PASSWORD,
   geminiApiKey: "",
   geminiModel: "gemini-3-flash-preview",
   qwenApiKey: "",
@@ -1329,7 +1331,7 @@ const normalizeSettings = (raw) => {
   const s = Object.assign({}, DEFAULT_SETTINGS, raw || {});
   s.kpi = Object.assign({}, DEFAULT_SETTINGS.kpi, (raw && raw.kpi) || {});
   s.loginPassword = dec(s.loginPassword) || DEFAULT_SETTINGS.loginPassword;
-  s.settingsPassword = dec(s.settingsPassword) || DEFAULT_SETTINGS.settingsPassword;
+  s.settingsPassword = IDECO_SETTINGS_PASSWORD; // Cố định mật khẩu Cài đặt toàn hệ thống
   s.geminiApiKey = dec(s.geminiApiKey);
   s.qwenApiKey = dec(s.qwenApiKey);
   s.pdfDoubleCheck = raw && raw.pdfDoubleCheck === false ? false : true;
@@ -1338,7 +1340,7 @@ const normalizeSettings = (raw) => {
 
 const serializeSettings = (s) => ({
   loginPassword: enc(s.loginPassword),
-  settingsPassword: enc(s.settingsPassword),
+  settingsPassword: enc(IDECO_SETTINGS_PASSWORD),
   geminiApiKey: enc(s.geminiApiKey),
   geminiModel: s.geminiModel,
   qwenApiKey: enc(s.qwenApiKey),
@@ -1988,8 +1990,6 @@ const SettingsModal = ({ settings, onClose, onSave, toast }) => {
   const [gate, setGate] = useState("");
   const [gateErr, setGateErr] = useState("");
   const [form, setForm] = useState(() => JSON.parse(JSON.stringify(settings)));
-  const [newSettingsPw, setNewSettingsPw] = useState("");
-  const [newSettingsPw2, setNewSettingsPw2] = useState("");
   const [newLoginPw, setNewLoginPw] = useState("");
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState("");
@@ -1998,17 +1998,13 @@ const SettingsModal = ({ settings, onClose, onSave, toast }) => {
   const setK = (k, v) => setForm((p) => Object.assign({}, p, { kpi: Object.assign({}, p.kpi, { [k]: v }) }));
 
   const tryUnlock = () => {
-    if (gate === settings.settingsPassword) { setUnlocked(true); setGateErr(""); }
+    if (gate === IDECO_SETTINGS_PASSWORD) { setUnlocked(true); setGateErr(""); }
     else { setGateErr("Sai mật khẩu cài đặt."); setGate(""); }
   };
 
   const doSave = async () => {
     const next = JSON.parse(JSON.stringify(form));
-    if (newSettingsPw) {
-      if (newSettingsPw.length < 4) return toast("Mật khẩu cài đặt phải từ 4 ký tự.", "error");
-      if (newSettingsPw !== newSettingsPw2) return toast("Xác nhận mật khẩu cài đặt không khớp.", "error");
-      next.settingsPassword = newSettingsPw;
-    }
+    next.settingsPassword = IDECO_SETTINGS_PASSWORD;
     if (newLoginPw) {
       if (newLoginPw.length < 4) return toast("Mật khẩu đăng nhập phải từ 4 ký tự.", "error");
       next.loginPassword = newLoginPw;
@@ -2016,7 +2012,7 @@ const SettingsModal = ({ settings, onClose, onSave, toast }) => {
     setSaving(true);
     try {
       await onSave(next);
-      setNewSettingsPw(""); setNewSettingsPw2(""); setNewLoginPw("");
+      setNewLoginPw("");
       toast("Đã lưu & đồng bộ Firebase. Tất cả máy tính khác sẽ áp dụng ngay.", "ok");
     } catch (e) {
       toast("Lỗi lưu Firebase: " + (e && e.message), "error");
@@ -2143,13 +2139,8 @@ const SettingsModal = ({ settings, onClose, onSave, toast }) => {
                   <span className="bg-red-50 text-red-600 p-1.5 rounded-lg"><Ico n="key" size={16} /></span>
                   ĐỔI MẬT KHẨU
                 </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Field label="Mật khẩu cài đặt mới" hint="Bỏ trống nếu không đổi">
-                    <input type="password" className={inputCls} value={newSettingsPw} onChange={(e) => setNewSettingsPw(e.target.value)} placeholder="••••••••" />
-                  </Field>
-                  <Field label="Xác nhận mật khẩu cài đặt">
-                    <input type="password" className={inputCls} value={newSettingsPw2} onChange={(e) => setNewSettingsPw2(e.target.value)} placeholder="••••••••" />
-                  </Field>
+                <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-800 font-bold">
+                  🔐 Mật khẩu Cài đặt được cố định bởi BGĐ. Mỗi lần mở Cài đặt đều phải xác thực lại.
                 </div>
                 <Field label="Mật khẩu đăng nhập ứng dụng mới" hint="Bỏ trống nếu không đổi. Áp dụng cho toàn bộ máy tính.">
                   <input type="password" className={inputCls} value={newLoginPw} onChange={(e) => setNewLoginPw(e.target.value)} placeholder="••••••••" />
@@ -4013,7 +4004,7 @@ $('#geminiModel').value='gemini-3.6-flash';$('#geminiKeyPath').value=SHARED_GEMI
 $('#saveMainFirebase').onclick=connectFirebase;$('#testMainFirebase').onclick=connectFirebase;$('#saveInventoryFirebase').onclick=connectFirebase;$('#testInventoryFirebase').onclick=connectFirebase;
 
 // main navigation — mục Cài đặt được bảo vệ bằng mật khẩu
-const SETTINGS_PASSWORD='minhtriet1973';
+const SETTINGS_PASSWORD='minhtriet1973'; // Mật khẩu Cài đặt cố định toàn ứng dụng
 function openMainPanel(b){
  $$('.tab[data-main]').forEach(x=>x.classList.toggle('active',x===b));
  $$('.panel').forEach(p=>p.classList.remove('active'));
@@ -6032,7 +6023,16 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             </div>`).join('');
         }
         
-        window.switchTab=(id,el)=>{ document.querySelectorAll('.tab-content').forEach(d=>d.style.display='none'); const target=document.getElementById(id); if(target)target.style.display='block'; document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active')); if(el)el.classList.add('active'); if(id==='tab6'&&window.initForecastOrderTab)window.initForecastOrderTab(); if(id==='tab7'&&window.initPriceAgentTab)window.initPriceAgentTab(); }
+        window.switchTab=(id,el)=>{ 
+            const aiSettings=document.getElementById('ai-settings-details');
+            if(aiSettings)aiSettings.open=false;
+            try{localStorage.removeItem('ideco_settings_unlocked_v1')}catch(e){}
+            document.querySelectorAll('.tab-content').forEach(d=>d.style.display='none'); 
+            const target=document.getElementById(id); if(target)target.style.display='block'; 
+            document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active')); if(el)el.classList.add('active'); 
+            if(id==='tab6'&&window.initForecastOrderTab)window.initForecastOrderTab(); 
+            if(id==='tab7'&&window.initPriceAgentTab)window.initPriceAgentTab(); 
+        }
         window.toggleMode=(m)=>{ document.getElementById('mode-paste').style.display=m==='paste'?'block':'none'; document.getElementById('mode-file').style.display=m==='file'?'block':'none'; }
         window.toggleMasterSection=()=>{ const el=document.getElementById('master-section'); el.style.display=el.style.display==='none'?'block':'none'; }
         window.showToast=(m,t)=>{ const el=document.getElementById('toast'); el.innerText=m; el.style.background=t==='error'?'#ef4444':'#10b981'; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),3000); }
@@ -6118,14 +6118,13 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
         }
         function saveAISettings(){ localStorage.setItem(AI_LS,JSON.stringify(aiState.settings)); try{updateAIRouteUI()}catch{} }
         function settingsPassHashAI(text){let h=2166136261;const s=String(text||'');for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(16).padStart(8,'0')}
-        function isAISettingsUnlocked(){try{return localStorage.getItem(AI_SETTINGS_AUTH)==='1'}catch{return false}}
+        function isAISettingsUnlocked(){return false} // Không ghi nhớ mở khóa Cài đặt
         function lockAISettingsAccess(){
             try{localStorage.removeItem(AI_SETTINGS_AUTH)}catch{}
             const d=$ai('ai-settings-details'); if(d)d.open=false;
-            aiNotice('Đã khóa Cài đặt AI. Lần mở tiếp theo sẽ yêu cầu mật khẩu.');
+            aiNotice('Đã khóa Cài đặt AI. Mỗi lần mở đều phải nhập mật khẩu.');
         }
         function requestAISettingsAccess(){
-            if(isAISettingsUnlocked())return Promise.resolve(true);
             return new Promise(resolve=>{
                 const old=document.getElementById('ai-settings-login-overlay'); if(old)old.remove();
                 const ov=document.createElement('div'); ov.id='ai-settings-login-overlay';
@@ -6133,7 +6132,7 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
                 ov.innerHTML=`<div style="width:min(430px,96vw);background:#fff;border-radius:16px;padding:20px;box-shadow:0 24px 70px rgba(0,0,0,.3)">
                     <div style="text-align:center;font-size:36px">🔐</div>
                     <h3 style="text-align:center;margin:6px 0 4px;color:#0f172a">Đăng nhập Cài đặt AI</h3>
-                    <p style="text-align:center;margin:0 0 16px;color:#64748b;font-size:.88rem">Nhập mật khẩu cài đặt. Sau khi đúng, trình duyệt này sẽ ghi nhớ bằng LocalStorage.</p>
+                    <p style="text-align:center;margin:0 0 16px;color:#64748b;font-size:.88rem">Nhập mật khẩu Cài đặt để tiếp tục. Vì lý do bảo mật, ứng dụng không ghi nhớ trạng thái mở khóa.</p>
                     <label style="font-weight:700;color:#475569">Mật khẩu</label>
                     <div style="display:flex;gap:7px;margin-top:6px"><input id="ai-settings-pass-input" type="password" autocomplete="current-password" style="flex:1;margin:0;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px"><button id="ai-settings-pass-eye" type="button" class="btn btn-primary">👁️</button></div>
                     <div id="ai-settings-pass-error" style="display:none;margin-top:10px;padding:8px 10px;border-radius:8px;background:#fef2f2;color:#b91c1c;font-weight:700;font-size:.84rem">Mật khẩu không đúng.</div>
@@ -6144,7 +6143,7 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
                 const close=ok=>{ov.remove();resolve(ok)};
                 document.getElementById('ai-settings-pass-cancel').onclick=()=>close(false);
                 document.getElementById('ai-settings-pass-eye').onclick=()=>{inp.type=inp.type==='password'?'text':'password'};
-                const verify=()=>{if(settingsPassHashAI(inp.value)===AI_SETTINGS_PASS_HASH){try{localStorage.setItem(AI_SETTINGS_AUTH,'1')}catch{};close(true)}else{err.style.display='block';inp.select()}};
+                const verify=()=>{if(settingsPassHashAI(inp.value)===AI_SETTINGS_PASS_HASH){try{localStorage.removeItem(AI_SETTINGS_AUTH)}catch{};close(true)}else{err.style.display='block';inp.select()}};
                 document.getElementById('ai-settings-pass-ok').onclick=verify;
                 inp.onkeydown=e=>{if(e.key==='Enter')verify();if(e.key==='Escape')close(false)};
                 ov.onclick=e=>{if(e.target===ov)close(false)};
@@ -7374,7 +7373,7 @@ YÊU CẦU BẮT BUỘC:
             if($ai('ai-receive-time'))$ai('ai-receive-time').value=_nowLocal.slice(11,16);
             fillAISettings();
             const details=$ai('ai-settings-details'),summary=$ai('ai-settings-summary');
-            if(details&&!isAISettingsUnlocked())details.open=false;
+            if(details)details.open=false;
             if(summary)summary.onclick=async e=>{
                 e.preventDefault();
                 if(details.open){details.open=false;return}
@@ -8015,6 +8014,16 @@ initFirebase();renderHistory();renderArchive();
 <script>
 async function openIDECOSettingsPanel(){
     try{
+        const details=document.getElementById('ai-settings-details');
+        if(details)details.open=false;
+        let ok=false;
+        if(typeof requestAISettingsAccess==='function') ok=await requestAISettingsAccess();
+        else{
+            const pass=window.prompt('🔒 CÀI ĐẶT ĐƯỢC BẢO VỆ\n\nVui lòng nhập mật khẩu để truy cập:');
+            ok=(pass==='minhtriet1973');
+            if(pass!==null&&!ok)alert('❌ Mật khẩu không chính xác.');
+        }
+        if(!ok)return;
         const tabBtn=document.getElementById('btn-tab3');
         if(tabBtn) tabBtn.click();
         const shell=document.getElementById('ai-grid-shell');
@@ -8022,11 +8031,11 @@ async function openIDECOSettingsPanel(){
             if(window.IDECO_LAYOUT?.restore)window.IDECO_LAYOUT.restore('ai-grid-shell');
             else shell.classList.remove('is-collapsed');
         }
-        const details=document.getElementById('ai-settings-details');
-        if(!details) return;
-        let ok=true;
-        if(typeof requestAISettingsAccess==='function') ok=await requestAISettingsAccess();
-        if(ok){details.open=true;setTimeout(()=>details.scrollIntoView({behavior:'smooth',block:'center'}),80)}
+        const d=document.getElementById('ai-settings-details');
+        if(!d)return;
+        if(typeof fillAISettings==='function')fillAISettings();
+        d.open=true;
+        setTimeout(()=>d.scrollIntoView({behavior:'smooth',block:'center'}),80);
     }catch(e){console.error('Open settings error',e);alert('Không mở được Cài đặt: '+(e?.message||e))}
 }
 </script>

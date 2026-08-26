@@ -1065,8 +1065,20 @@
                             <div><label>API Key AI CHÍNH 3 · dự phòng</label><div style="display:flex;gap:6px"><input type="password" id="ai-key-3" autocomplete="off"><button class="btn btn-primary ai-key-eye" type="button" data-eye-target="ai-key-3" style="width:auto;padding:6px 9px">👁️</button></div></div>
                             <div><label>API Key AI CHÍNH 4 · dự phòng thêm</label><div style="display:flex;gap:6px"><input type="password" id="ai-key-4" autocomplete="off"><button class="btn btn-primary ai-key-eye" type="button" data-eye-target="ai-key-4" style="width:auto;padding:6px 9px">👁️</button></div></div>
                             <div class="full"><label>API Key AI PHỤ · tuyến trả phí</label><div style="display:flex;gap:6px"><input type="password" id="ai-kie-key" autocomplete="off"><button class="btn btn-primary ai-key-eye" type="button" data-eye-target="ai-kie-key" style="width:auto;padding:6px 9px">👁️</button></div><div style="font-size:.72rem;color:#64748b;margin-top:3px">Dùng làm tuyến trả phí ổn định khi AI CHÍNH lỗi/quota, và có thể bật trực tiếp bằng nút AI PHỤ.</div></div>
-                            <div><label>Tuyến chính</label><div style="padding:9px 10px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc;font-weight:900;color:#1d4ed8">AI CHÍNH</div><select id="ai-primary-model" style="display:none"><option value="gemini-2.5-flash" selected>AI CHÍNH</option></select></div>
-                            <div><label>Tuyến phụ / trả phí</label><div style="padding:9px 10px;border:1px solid #cbd5e1;border-radius:8px;background:#f0fdf4;font-weight:900;color:#166534">AI PHỤ</div><select id="ai-fallback-model" style="display:none"><option value="kie:gemini-3-7-flash">AI PHỤ</option><option value="gemini-3.7-flash">AI PHỤ</option><option value="gemini-3.6-flash">AI PHỤ</option><option value="gemini-3.5-flash-lite">AI PHỤ</option><option value="gemini-3.1-flash-lite">AI PHỤ</option><option value="gemini-2.5-flash">AI PHỤ</option></select></div>
+                            <div>
+                                <label>AI CHÍNH · Model Google AI Studio</label>
+                                <select id="ai-primary-model">
+                                    <option value="gemini-2.5-flash" selected>Gemini 2.5 Flash</option>
+                                </select>
+                                <div style="font-size:.72rem;color:#64748b;margin-top:3px">Dùng 4 API key AI CHÍNH phía trên. Bản này khóa model chính về Gemini 2.5 Flash để tránh gọi nhầm model không tương thích.</div>
+                            </div>
+                            <div>
+                                <label>AI PHỤ · Model tuyến trả phí</label>
+                                <select id="ai-fallback-model">
+                                    <option value="kie:gemini-3-7-flash" selected>Gemini 3.7 Flash</option>
+                                </select>
+                                <div style="font-size:.72rem;color:#64748b;margin-top:3px">Dùng API key AI PHỤ. Khi AI CHÍNH lỗi/quota/503, hệ thống tự chuyển sang tuyến này.</div>
+                            </div>
                             <div><label>Chế độ phân tích</label><select id="ai-analysis-mode"><option value="fast">⚡ NHANH · khuyên dùng</option><option value="thorough">🛡️ KIỂM TRA KỸ</option></select></div>
                             <div><label>Chiến lược ổn định</label><div style="padding:9px 10px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc;color:#475569;font-size:.82rem"><b>AI CHÍNH:</b> dùng lần lượt các key đã nhập. Nếu không thành công, hệ thống tự chuyển <b>AI PHỤ trả phí</b>. Nút AI PHỤ sẽ ép dùng tuyến phụ ngay.</div></div>
                             <div class="full" style="display:none"><label>AI PHỤ Endpoint</label><input id="ai-kie-endpoint" value="https://api.kie.ai/gemini/v1/models/gemini-3-7-flash:streamGenerateContent" readonly></div>
@@ -1081,6 +1093,9 @@
                                 <span id="ai-settings-status" style="font-size:.82rem;color:#64748b"></span>
                             </div>
                             <div class="full" id="ai-firebase-sync-status" style="font-size:.78rem;color:#475569;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:8px 10px">☁️ Đang kiểm tra cấu hình AI dùng chung trên Firebase Realtime...</div>
+                            <div class="full" style="font-size:.78rem;color:#1e3a8a;background:#eef2ff;border:1px solid #c7d2fe;border-radius:8px;padding:9px 10px">
+                                <b>Thiết lập model chuẩn:</b> AI CHÍNH = Gemini 2.5 Flash (Google AI Studio) · AI PHỤ = Gemini 3.7 Flash (tuyến trả phí). Tên model chỉ hiển thị bên trong Cài đặt đã khóa mật khẩu.
+                            </div>
                             <div class="full app-password-settings">
                                 <h4>🔐 Bảo mật đăng nhập ứng dụng</h4>
                                 <p>Mật khẩu mở toàn bộ ứng dụng là lớp riêng với mật khẩu Cài đặt <b>minhtriet1973</b>. Mật khẩu mới được lưu dạng hash trong LocalStorage của máy này.</p>
@@ -6157,7 +6172,7 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
                 kieKey:String(s.kieKey||'').trim(),
                 kieEndpoint:String(s.kieEndpoint||AI_DEFAULT.kieEndpoint).trim(),
                 primaryModel:'gemini-2.5-flash',
-                fallbackModel:String(s.fallbackModel||AI_DEFAULT.fallbackModel),
+                fallbackModel:'kie:gemini-3-7-flash',
                 analysisMode:String(s.analysisMode||'fast'),
                 timeoutMs:Number(s.timeoutMs)||90000,
                 activeKey:Number(s.activeKey)||0,
@@ -7653,7 +7668,7 @@ YÊU CẦU BẮT BUỘC:
             if($ai('ai-kie-key'))$ai('ai-kie-key').value=s.kieKey||AI_DEFAULT.kieKey;
             if($ai('ai-kie-endpoint'))$ai('ai-kie-endpoint').value=s.kieEndpoint||AI_DEFAULT.kieEndpoint;
             $ai('ai-primary-model').value='gemini-2.5-flash';
-            $ai('ai-fallback-model').value=(isKie(s.fallbackModel)||(!isBai(s.fallbackModel)&&s.fallbackModel))?s.fallbackModel:AI_DEFAULT.fallbackModel;
+            $ai('ai-fallback-model').value='kie:gemini-3-7-flash';
             if($ai('ai-analysis-mode'))$ai('ai-analysis-mode').value=s.analysisMode||'fast';
             const g=currentAIKeys().length;
             $ai('ai-settings-status').textContent=`AI CHÍNH: ${g} key · AI PHỤ: ${hasKieAI()?'đã có key':'chưa có key'}`;
@@ -7663,8 +7678,12 @@ YÊU CẦU BẮT BUỘC:
             aiState.settings.keys=[1,2,3,4].map(n=>$ai('ai-key-'+n)?.value.trim()||'');
             aiState.settings.kieKey=$ai('ai-kie-key')?.value.trim()||'';
             aiState.settings.kieEndpoint=$ai('ai-kie-endpoint')?.value.trim()||AI_DEFAULT.kieEndpoint;
-            aiState.settings.primaryModel='gemini-2.5-flash';
-            aiState.settings.fallbackModel=$ai('ai-fallback-model').value;
+            const chosenMain=$ai('ai-primary-model')?.value||'gemini-2.5-flash';
+            const chosenBackup=$ai('ai-fallback-model')?.value||'kie:gemini-3-7-flash';
+            if(chosenMain!=='gemini-2.5-flash')throw new Error('AI CHÍNH chỉ cho phép Gemini 2.5 Flash trong bản này.');
+            if(chosenBackup!=='kie:gemini-3-7-flash')throw new Error('AI PHỤ chỉ cho phép Gemini 3.7 Flash tuyến trả phí trong bản này.');
+            aiState.settings.primaryModel=chosenMain;
+            aiState.settings.fallbackModel=chosenBackup;
             if($ai('ai-analysis-mode'))aiState.settings.analysisMode=$ai('ai-analysis-mode').value||'fast';
             aiState.settings.baiKey=''; aiState.settings.baiVision=false;
             saveAISettings(); fillAISettings();

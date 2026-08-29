@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="data:,">
-    <title>Quản Lý Kho Dược GDP - IDECO</title>
+    <title>Quản Lý Kho Dược GDP - IDECO V57 Master Code</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -491,7 +491,7 @@
     <div class="container">
         <header>
             <div style="min-width:0">
-                <h1>QUẢN LÝ KHO DƯỢC GDP - IDECO</h1>
+                <h1>QUẢN LÝ KHO DƯỢC GDP - IDECO <span style="font-size:.72rem;opacity:.9">V57</span></h1>
                 <div style="margin-top:5px;display:inline-flex;align-items:center;gap:6px;background:#fef3c7;color:#92400e;border:1px solid #f59e0b;border-radius:999px;padding:4px 9px;font-size:.75rem;font-weight:800;letter-spacing:.2px">🧪 FIREBASE TEST · thunghiem-eeb1f</div>
             </div>
             <div class="header-actions">
@@ -502,6 +502,7 @@
                     <span id="kie-credit-badge" class="kie-credit-badge" title="Credit AI PHỤ hiện hành">💳 Credit AI PHỤ: ...</span>
                 </div>
                 <button class="btn btn-primary" type="button" onclick="openIDECOSettingsPanel()">⚙️ Cài đặt</button>
+                <button class="btn btn-success" type="button" onclick="window.runIDECOSystemAudit&&window.runIDECOSystemAudit()" title="Kiểm tra AI, Master, tồn kho, lô/HSD và lịch sử xuất trên Firebase hiện tại">🩺 Kiểm tra hệ thống</button>
                 <button class="btn btn-guide" type="button" onclick="openUserGuide()">📘 Hướng dẫn sử dụng</button>
                 <button class="btn btn-warning" type="button" onclick="toggleMasterSection()">📂 Dữ Liệu Gốc (Master)</button>
                 <button class="btn btn-danger" type="button" onclick="window.IDECOAppAuth&&window.IDECOAppAuth.logout()">🔒 Đăng xuất</button>
@@ -1035,10 +1036,10 @@
                     <details class="manual-fallback" id="manual-fallback-details">
                         <summary>🚨 AI / Internet lỗi? NHẬP THỦ CÔNG DỰ PHÒNG <span id="fallback-network-badge" class="network-badge">Đang kiểm tra mạng...</span></summary>
                         <div class="manual-fallback-body">
-                            <div class="manual-warning"><b>Chế độ dự phòng:</b> dùng khi AI/API không phân tích được hoặc Internet gián đoạn. Nhân viên phải đối chiếu trực tiếp phiếu NCC/nhãn hàng. <b>Tên sản phẩm + Quy cách bắt buộc chọn từ Master</b>; Số lô + Hạn dùng + Số lượng bắt buộc nhập. Mã SP/Hàm lượng/ĐVT là thông tin tham khảo từ Master. Nếu sản phẩm chưa có Master, phải cập nhật Master trước.</div>
+                            <div class="manual-warning"><b>Chế độ dự phòng:</b> dùng khi AI/API không phân tích được hoặc Internet gián đoạn. Nhân viên phải đối chiếu trực tiếp phiếu NCC/nhãn hàng. <b>Mã SP + Tên sản phẩm + Quy cách bắt buộc lấy từ Master</b>; Số lô + Hạn dùng + Số lượng bắt buộc nhập. Hàm lượng/ĐVT là thông tin bổ sung từ Master. Nếu sản phẩm chưa có Master, phải cập nhật Master trước.</div>
                             <div class="manual-grid">
                                 <div class="wide" style="position:relative"><label>Tên sản phẩm / Mã SP trong Master (*)</label><input id="fallback-product" placeholder="Gõ tên hoặc mã để chọn đúng Master" autocomplete="off"><div id="fallback-suggest" class="autocomplete-items"></div></div>
-                                <div><label>Mã SP · tham khảo</label><input id="fallback-code" class="manual-ref" readonly></div>
+                                <div><label>Mã SP MASTER (*)</label><input id="fallback-code" class="manual-ref" readonly></div>
                                 <div><label>Hàm lượng/Nồng độ · tham khảo</label><input id="fallback-strength" class="manual-ref" readonly></div>
                                 <div><label>ĐVT · tham khảo</label><input id="fallback-unit" class="manual-ref" readonly></div>
                                 <div><label>Quy cách MASTER (*)</label><input id="fallback-pack" class="manual-ref" readonly></div>
@@ -1664,14 +1665,63 @@ const isOpaqueLocalAIFrame = () => {
       location.origin === "null" || String(location.href||"").startsWith("about:srcdoc");
   } catch (e) { return true; }
 };
+// ===== CẦU NỐI AI CHUNG QUA postMessage =====
+// Khi ứng dụng mở bằng file://, Chrome coi từng frame là một security origin riêng.
+// Vì vậy iframe không được đọc trực tiếp window.parent.IDECO_SHARED_AI.
+// RPC này chuyển lời gọi AI qua postMessage nên chạy được cả file://, http:// và https://.
+const IDECO_AI_RPC_NS = "IDECO_SHARED_AI_RPC_V1";
+let _idecoAiRpcSeq = 0;
+let _idecoAiRpcRoute = "main";
+let _idecoAiRpcState = {ready:false,configuredMain:false,configuredBackup:false};
+const _idecoAiRpcPending = new Map();
+window.addEventListener("message", (ev) => {
+  const d = ev && ev.data;
+  if (!d || d.__idecoAiRpc !== IDECO_AI_RPC_NS || d.type !== "response") return;
+  const p = _idecoAiRpcPending.get(d.id);
+  if (!p) return;
+  _idecoAiRpcPending.delete(d.id);
+  clearTimeout(p.timer);
+  if (d.result && d.result.route) _idecoAiRpcRoute = d.result.route === "backup" ? "backup" : "main";
+  if(d.result && (Object.prototype.hasOwnProperty.call(d.result,'configuredMain')||Object.prototype.hasOwnProperty.call(d.result,'configuredBackup')))_idecoAiRpcState={ready:true,configuredMain:!!d.result.configuredMain,configuredBackup:!!d.result.configuredBackup};
+  if (d.ok) p.resolve(d.result); else p.reject(new Error(d.error || "Lỗi cầu nối AI chung"));
+});
+function idecoParentAIRpc(action, args = {}, timeoutMs = 120000) {
+  return new Promise((resolve, reject) => {
+    if (!window.parent || window.parent === window) return reject(new Error("Không có ứng dụng cha để dùng AI chung."));
+    const id = `ai_rpc_${Date.now()}_${++_idecoAiRpcSeq}`;
+    const timer = setTimeout(() => { _idecoAiRpcPending.delete(id); reject(new Error("AI chung không phản hồi kịp thời.")); }, timeoutMs);
+    _idecoAiRpcPending.set(id, { resolve, reject, timer });
+    try { window.parent.postMessage({ __idecoAiRpc: IDECO_AI_RPC_NS, type: "request", id, action, args }, "*"); }
+    catch (e) { clearTimeout(timer); _idecoAiRpcPending.delete(id); reject(e); }
+  });
+}
+const _idecoSharedAIProxy = {
+  __rpcProxy: true,
+  textRequest: (prompt, opts) => idecoParentAIRpc("textRequest", { prompt, opts: opts || {} }, 150000),
+  fileRequest: (file, prompt, opts) => idecoParentAIRpc("fileRequest", { file, prompt, opts: opts || {} }, 240000),
+  getRoute: () => _idecoAiRpcRoute,
+  setRoute: (mode) => {
+    _idecoAiRpcRoute = mode === "backup" ? "backup" : "main";
+    idecoParentAIRpc("setRoute", { mode: _idecoAiRpcRoute }, 15000).catch(() => {});
+    return true;
+  },
+  // Chỉ báo cấu hình thật từ app cha; tuyệt đối không chuyển API key xuống iframe.
+  getState: () => ({ settings: { keys: _idecoAiRpcState.configuredMain ? ["shared-via-rpc"] : [], kieKey: _idecoAiRpcState.configuredBackup ? "shared-via-rpc" : "" }, bridgeReady:_idecoAiRpcState.ready })
+};
 const getSharedAI = () => {
-  // iframe srcdoc/about:srcdoc vẫn có thể truy cập parent khi không sandbox.
-  // Không chặn theo location.origin === "null" vì chính điều kiện này làm TAB Đặt hàng/Dự báo mất AI chung.
   try { if (window.IDECO_SHARED_AI) return window.IDECO_SHARED_AI; } catch (e) {}
-  try { if (window.parent && window.parent !== window && window.parent.IDECO_SHARED_AI) return window.parent.IDECO_SHARED_AI; } catch (e) {}
-  try { if (window.top && window.top !== window && window.top.IDECO_SHARED_AI) return window.top.IDECO_SHARED_AI; } catch (e) {}
+  // Tránh chạm trực tiếp thuộc tính parent/top khi file:// để Chrome không ném SecurityError/Unsafe attempt.
+  const opaque = isOpaqueLocalAIFrame();
+  if (!opaque) {
+    try { if (window.parent && window.parent !== window && window.parent.IDECO_SHARED_AI) return window.parent.IDECO_SHARED_AI; } catch (e) {}
+    try { if (window.top && window.top !== window && window.top.IDECO_SHARED_AI) return window.top.IDECO_SHARED_AI; } catch (e) {}
+  }
+  // file:// hoặc iframe opaque origin: dùng cầu nối RPC thay vì truy cập trực tiếp parent.
+  try { if (window.parent && window.parent !== window) return _idecoSharedAIProxy; } catch (e) {}
   return null;
 };
+// Đồng bộ tuyến AI hiện hành từ app cha ngay khi iframe khởi động.
+try { idecoParentAIRpc("hello", {}, 12000).then(r => { if (r && r.route) _idecoAiRpcRoute = r.route === "backup" ? "backup" : "main"; if(r)_idecoAiRpcState={ready:true,configuredMain:!!r.configuredMain,configuredBackup:!!r.configuredBackup}; }).catch(() => {_idecoAiRpcState.ready=false;}); } catch (e) {}
 const getSharedAIRoute = () => {
   const ai = getSharedAI();
   try { return ai && typeof ai.getRoute === "function" && ai.getRoute() === "backup" ? "backup" : "main"; } catch (e) { return "main"; }
@@ -1692,12 +1742,15 @@ const sharedAIConfigured = () => {
   } catch (e) { return true; }
 };
 const openSharedAISettings = () => {
-  try {
-    if (window.parent && typeof window.parent.openIDECOSettingsPanel === "function") { window.parent.openIDECOSettingsPanel(); return true; }
-  } catch (e) {}
-  try {
-    if (window.top && typeof window.top.openIDECOSettingsPanel === "function") { window.top.openIDECOSettingsPanel(); return true; }
-  } catch (e) {}
+  if (!isOpaqueLocalAIFrame()) {
+    try {
+      if (window.parent && typeof window.parent.openIDECOSettingsPanel === "function") { window.parent.openIDECOSettingsPanel(); return true; }
+    } catch (e) {}
+    try {
+      if (window.top && typeof window.top.openIDECOSettingsPanel === "function") { window.top.openIDECOSettingsPanel(); return true; }
+    } catch (e) {}
+  }
+  try { if (window.parent && window.parent !== window) { idecoParentAIRpc("openSettings", {}, 15000).catch(() => {}); return true; } } catch (e) {}
   return false;
 };
 
@@ -3837,6 +3890,13 @@ const toast=(el,msg,type='info')=>{el.innerHTML=`<div class="status ${type}">${e
 const downloadBlob=(blob,name)=>{let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)};
 const exportXlsx=(rows,name,sheet='Data')=>{if(!rows?.length)return alert('Không có dữ liệu để xuất.');let ws=XLSX.utils.json_to_sheet(rows),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,sheet);XLSX.writeFile(wb,name.endsWith('.xlsx')?name:name+'.xlsx')};
 
+// ===== RPC AI CHUNG CHO IFRAME SOI GIÁ KHI MỞ file:// =====
+const __IDECO_RPC_NS='IDECO_SHARED_AI_RPC_V1';let __idecoRpcSeq=0,__idecoRpcRoute='main',__idecoRpcState={ready:false,configuredMain:false,configuredBackup:false};const __idecoRpcPending=new Map();
+window.addEventListener('message',ev=>{const d=ev&&ev.data;if(!d||d.__idecoAiRpc!==__IDECO_RPC_NS||d.type!=='response')return;const p=__idecoRpcPending.get(d.id);if(!p)return;__idecoRpcPending.delete(d.id);clearTimeout(p.timer);if(d.result&&d.result.route)__idecoRpcRoute=d.result.route==='backup'?'backup':'main';if(d.result&&(Object.prototype.hasOwnProperty.call(d.result,'configuredMain')||Object.prototype.hasOwnProperty.call(d.result,'configuredBackup')))__idecoRpcState={ready:true,configuredMain:!!d.result.configuredMain,configuredBackup:!!d.result.configuredBackup};d.ok?p.resolve(d.result):p.reject(new Error(d.error||'Lỗi cầu nối AI chung'))});
+window.__IDECO_RPC_CALL_PARENT=function(action,args={},timeoutMs=120000){return new Promise((resolve,reject)=>{if(!window.parent||window.parent===window)return reject(new Error('Không có ứng dụng cha để dùng AI chung.'));const id='ai_rpc_'+Date.now()+'_'+(++__idecoRpcSeq),timer=setTimeout(()=>{__idecoRpcPending.delete(id);reject(new Error('AI chung không phản hồi kịp thời.'))},timeoutMs);__idecoRpcPending.set(id,{resolve,reject,timer});try{window.parent.postMessage({__idecoAiRpc:__IDECO_RPC_NS,type:'request',id,action,args},'*')}catch(e){clearTimeout(timer);__idecoRpcPending.delete(id);reject(e)}})};
+window.__IDECO_RPC_SHARED_AI_PROXY={__rpcProxy:true,textRequest:(prompt,opts)=>window.__IDECO_RPC_CALL_PARENT('textRequest',{prompt,opts:opts||{}},150000),fileRequest:(file,prompt,opts)=>window.__IDECO_RPC_CALL_PARENT('fileRequest',{file,prompt,opts:opts||{}},240000),getRoute:()=>__idecoRpcRoute,setRoute:(mode)=>{__idecoRpcRoute=mode==='backup'?'backup':'main';window.__IDECO_RPC_CALL_PARENT('setRoute',{mode:__idecoRpcRoute},15000).catch(()=>{});return true},getState:()=>({settings:{keys:__idecoRpcState.configuredMain?['shared-via-rpc']:[],kieKey:__idecoRpcState.configuredBackup?'shared-via-rpc':''},bridgeReady:__idecoRpcState.ready})};
+try{window.__IDECO_RPC_CALL_PARENT('hello',{},12000).then(r=>{if(r&&r.route)__idecoRpcRoute=r.route==='backup'?'backup':'main';if(r)__idecoRpcState={ready:true,configuredMain:!!r.configuredMain,configuredBackup:!!r.configuredBackup}}).catch(()=>{__idecoRpcState.ready=false})}catch(e){}
+
 const TEST_FIREBASE_CONFIG={apiKey:'AIzaSyArwL_z1HJgoF1VSI2cUy7dDum_kmWuuCc',authDomain:'thunghiem-eeb1f.firebaseapp.com',databaseURL:'https://thunghiem-eeb1f-default-rtdb.firebaseio.com',projectId:'thunghiem-eeb1f',storageBucket:'thunghiem-eeb1f.firebasestorage.app',messagingSenderId:'136411195211',appId:'1:136411195211:web:553beff72c3988eb39eace',measurementId:'G-QRGS6JETKV'};
 const DEFAULT_MAIN={...TEST_FIREBASE_CONFIG};
 const DEFAULT_INV={...TEST_FIREBASE_CONFIG};
@@ -3845,12 +3905,12 @@ let invConfig={...TEST_FIREBASE_CONFIG};
 let mainApp=null,mainDb=null,invApp=null,invDb=null,unsubDatasets=null,unsubInventory=null,unsubGeminiSettings=null;
 let officialMasterData=[],exportHistoryData=[],unsubOfficialMaster=null,unsubExports=null,agentLastAudit=null;
 function isOpaqueLocalPriceFrame(){try{return location.protocol==='file:'||location.protocol==='about:'||location.origin==='null'||String(location.href||'').startsWith('about:srcdoc')}catch(e){return true}}
-function getSharedAI(){try{if(window.IDECO_SHARED_AI)return window.IDECO_SHARED_AI}catch(e){}try{if(window.parent&&window.parent!==window&&window.parent.IDECO_SHARED_AI)return window.parent.IDECO_SHARED_AI}catch(e){}try{if(window.top&&window.top!==window&&window.top.IDECO_SHARED_AI)return window.top.IDECO_SHARED_AI}catch(e){}return null}
+function getSharedAI(){try{if(window.IDECO_SHARED_AI)return window.IDECO_SHARED_AI}catch(e){}if(!isOpaqueLocalPriceFrame()){try{if(window.parent&&window.parent!==window&&window.parent.IDECO_SHARED_AI)return window.parent.IDECO_SHARED_AI}catch(e){}try{if(window.top&&window.top!==window&&window.top.IDECO_SHARED_AI)return window.top.IDECO_SHARED_AI}catch(e){}}try{if(window.parent&&window.parent!==window)return window.__IDECO_RPC_SHARED_AI_PROXY||null}catch(e){}return null}
 let standaloneAIRoute='main';
 function sharedRoute(){const a=getSharedAI();if(!a)return standaloneAIRoute;try{return a&&typeof a.getRoute==='function'&&a.getRoute()==='backup'?'backup':'main'}catch(e){return standaloneAIRoute}}
 function sharedRouteLabel(){return sharedRoute()==='backup'?'AI PHỤ':'AI CHÍNH'}
 function setSharedRoute(mode){const wanted=mode==='backup'?'backup':'main';const a=getSharedAI();if(!a){standaloneAIRoute=wanted;return true}if(typeof a.setRoute!=='function')return false;try{return a.setRoute(wanted)!==false}catch(e){return false}}
-function openParentAISettings(){try{if(window.parent&&typeof window.parent.openIDECOSettingsPanel==='function'){window.parent.openIDECOSettingsPanel();return true}}catch(e){}try{if(window.top&&typeof window.top.openIDECOSettingsPanel==='function'){window.top.openIDECOSettingsPanel();return true}}catch(e){}try{switchMain('settings');return true}catch(e){}return false}
+function openParentAISettings(){if(!isOpaqueLocalPriceFrame()){try{if(window.parent&&typeof window.parent.openIDECOSettingsPanel==='function'){window.parent.openIDECOSettingsPanel();return true}}catch(e){}try{if(window.top&&typeof window.top.openIDECOSettingsPanel==='function'){window.top.openIDECOSettingsPanel();return true}}catch(e){}}try{if(window.__IDECO_RPC_CALL_PARENT){window.__IDECO_RPC_CALL_PARENT('openSettings',{},15000).catch(()=>{});return true}}catch(e){}try{switchMain('settings');return true}catch(e){}return false}
 function updateSharedAIUI(){const mode=sharedRoute();[['#agentRouteMain','main'],['#agentRouteBackup','backup'],['#settingsRouteMain','main'],['#settingsRouteBackup','backup']].forEach(([sel,m])=>{const e=$(sel);if(e)e.classList.toggle('on',mode===m)});if($('#agentRouteStatus'))$('#agentRouteStatus').textContent=sharedRouteLabel();if($('#aiProviderStatus'))$('#aiProviderStatus').innerHTML='<b>Trợ lý:</b> HUYỀN • '+sharedRouteLabel()+' • dùng chung TAB Nhập hàng';if($('#sharedAISettingStatus'))$('#sharedAISettingStatus').textContent='Đang dùng '+sharedRouteLabel()+' · Cấu hình lấy từ TAB Nhập hàng.'}
 
 const SHARED_GEMINI_PATH='app_settings/gemini';
@@ -4542,15 +4602,15 @@ $$('[data-result-tab]').forEach(b=>b.onclick=()=>{$$('[data-result-tab]').forEac
 
 // ===== AI AGENT CONTROL: Master chính thức + Giá chuẩn + Tồn + Lịch sử xuất =====
 function deepCollectMasterRows(v,out=[]){if(Array.isArray(v)){v.forEach(x=>deepCollectMasterRows(x,out));return out}if(!v||typeof v!=='object')return out;const name=String(v.name||v.productName||v['Tên SP']||v['Tên Sản Phẩm']||'').trim(),code=String(v.code||v.productCode||v['Mã SP']||'').trim();if(name&&(v.packSpec!==undefined||v.unit!==undefined||v.strength!==undefined||code))out.push({code,name,unit:String(v.unit||'').trim(),strength:String(v.strength||'').trim(),packSpec:String(v.packSpec||'').trim()});Object.values(v).forEach(x=>{if(x&&typeof x==='object')deepCollectMasterRows(x,out)});return out}
-function dedupeOfficialMaster(rows){const m=new Map();rows.forEach(x=>{const k=(x.code?'C:'+x.code.toLowerCase():'N:'+x.name.toLowerCase());if(!m.has(k))m.set(k,x)});return [...m.values()]}
+function dedupeOfficialMaster(rows){const m=new Map();rows.forEach(x=>{const k=[String(x.code||'').trim().toLowerCase(),normAgent(x.name),normAgent(x.packSpec),normAgent(x.unit),normAgent(x.strength)].join('|');if(!m.has(k))m.set(k,x)});return [...m.values()]}
 function subscribeOfficialMaster(){if(!mainDb)return;if(unsubOfficialMaster)unsubOfficialMaster();unsubOfficialMaster=onValue(ref(mainDb,'excelFiles'),s=>{officialMasterData=dedupeOfficialMaster(deepCollectMasterRows(s.val()||{}));renderAgentGate()},e=>console.warn('Master TEST',e))}
 function subscribeExports(){if(!mainDb)return;if(unsubExports)unsubExports();unsubExports=onValue(ref(mainDb,'exports'),s=>{const d=s.val()||{};exportHistoryData=Object.values(d).filter(Boolean);renderAgentGate()},e=>console.warn('Exports TEST',e))}
 function normAgent(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').toLowerCase().replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim()}
-function findOfficialMaster(code,name){const c=String(code||'').trim().toLowerCase();if(c){const x=officialMasterData.find(m=>String(m.code||'').trim().toLowerCase()===c);if(x)return x}const n=normAgent(name);if(n){const exact=officialMasterData.filter(m=>normAgent(m.name)===n);if(exact.length===1)return exact[0]}return null}
-function inventoryFor(code,name){const c=String(code||'').trim().toLowerCase(),n=normAgent(name);let hit=c?inventoryGrouped.filter(x=>String(x.productCode||'').trim().toLowerCase()===c):[];if(!hit.length&&n)hit=inventoryGrouped.filter(x=>normAgent(x.productName)===n);return hit.reduce((s,x)=>s+(Number(x.totalQty)||0),0)}
-function exportedFor(code,name){const c=String(code||'').trim().toLowerCase(),n=normAgent(name);let hit=c?exportHistoryData.filter(x=>String(x.productCode||'').trim().toLowerCase()===c):[];if(!hit.length&&n)hit=exportHistoryData.filter(x=>normAgent(x.productName)===n);return hit.reduce((s,x)=>s+(Number(x.quantity)||0),0)}
+function findOfficialMaster(code,name){const c=String(code||'').trim().toLowerCase();if(!c)return null;const hits=officialMasterData.filter(m=>String(m.code||'').trim().toLowerCase()===c);return hits.length===1?hits[0]:null}
+function inventoryFor(code,name){const c=String(code||'').trim().toLowerCase();if(!c)return 0;const hit=inventoryGrouped.filter(x=>String(x.productCode||'').trim().toLowerCase()===c);return hit.reduce((s,x)=>s+(Number(x.totalQty)||0),0)}
+function exportedFor(code,name){const c=String(code||'').trim().toLowerCase();if(!c)return 0;const hit=exportHistoryData.filter(x=>String(x.productCode||'').trim().toLowerCase()===c);return hit.reduce((s,x)=>s+(Number(x.boxQuantity??x.quantity)||0),0)}
 function orderObjectsForAgent(){if(orderRows.length&&orderMap.ma_sp&&orderMap.ten_sp)return orderRows.map((o,i)=>({idx:i+1,code:String(o[orderMap.ma_sp]||'').trim(),name:String(o[orderMap.ten_sp]||'').trim(),price:parseNumber(o[orderMap.gia_xuat]),priceRaw:o[orderMap.gia_xuat],qty:parseQty(o[orderMap.so_luong])||0,ck:getCK(o,orderMap.chiet_khau)}));if(aiData&&aiData.headers?.length){const find=(arr)=>aiData.headers.find(h=>arr.some(k=>String(h).toLowerCase().includes(k)))||'';const hc=find(['mã sản phẩm','mã (item','mã sp','item product','mã']),hn=find(['tên sản phẩm','product name','tên thuốc','tên sp']),hp=find(['giá xuất','gía bán','giá bán','unit price','đơn giá']),hq=find(['sản lượng','số lượng','quantity','sl đặt']),hck=find(['chiết khấu','discount']);return aiData.rows.map((r,i)=>{const o=Object.fromEntries(aiData.headers.map((h,j)=>[h,r[j]??'']));return {idx:i+1,code:String(o[hc]||'').trim(),name:String(o[hn]||'').trim(),price:parseNumber(o[hp]),priceRaw:o[hp],qty:parseQty(o[hq])||0,ck:getCK(o,hck)}})}return []}
-function buildAgentGate(){const rows=orderObjectsForAgent();if(!rows.length)return {rows:[],state:'warn',summary:{total:0,pass:0,warn:0,block:0},message:'Chưa có dữ liệu đơn để Agent soi.'};const priceMap=new Map(masterData.map(x=>[normCode(x.ma_sp),x]));let pass=0,warn=0,block=0;const result=rows.map(r=>{const priceMaster=priceMap.get(normCode(r.code)),off=findOfficialMaster(r.code,r.name),stock=inventoryFor(r.code,r.name),exported=exportedFor(r.code,r.name);let priceOk=null,ckOk=null,issues=[],warnings=[];if(!off)issues.push('Không khớp Master chính thức');else if(r.name&&normAgent(off.name)!==normAgent(r.name))warnings.push('Tên đơn khác cách viết Master');if(!priceMaster)issues.push('Không có mã trong bảng giá chuẩn');else{const std=compareAgainst==='gia_xuat_hd'?parseNumber(priceMaster.gia_xuat_hd):parseNumber(priceMaster.gia_ban);priceOk=Math.abs((Number(r.price)||0)-std)<1;if(!priceOk)issues.push('Giá không khớp chuẩn');if(orderMap.chiet_khau){ckOk=Math.abs((Number(r.ck)||0)-parseNumber(priceMaster.chiet_khau))<.1;if(!ckOk)issues.push('Chiết khấu không khớp')}}if(r.qty<=0)issues.push('Số lượng không hợp lệ');if(r.qty>stock)warnings.push(`Thiếu tồn ${r.qty-stock}`);const uncertain=(aiData?.audit?.uncertainCells||[]).some(u=>Number(u.row)===r.idx||Number(u.row)===r.idx-1);if(uncertain)issues.push('AI đánh dấu ô chưa chắc chắn');let status=issues.length?'BLOCK':warnings.length?'CHECK':'PASS';if(status==='PASS')pass++;else if(status==='CHECK')warn++;else block++;return {...r,priceMaster,official:off,stock,exported,priceOk,ckOk,issues,warnings,status}});return {rows:result,state:block?'bad':warn?'warn':'good',summary:{total:result.length,pass,warn,block},message:block?'Có dòng bị CHẶN — chưa nên phát hành đầu ra.':warn?'Có dòng cần kiểm tra trước khi phát hành.':'Tất cả cổng kiểm soát đạt — có thể chuyển sang bước xuất/đơn bán sau xác nhận của người phụ trách.'}}
+function buildAgentGate(){const rows=orderObjectsForAgent();if(!rows.length)return {rows:[],state:'warn',summary:{total:0,pass:0,warn:0,block:0},message:'Chưa có dữ liệu đơn để Agent soi.'};const priceMap=new Map(masterData.map(x=>[normCode(x.ma_sp),x]));let pass=0,warn=0,block=0;const result=rows.map(r=>{const priceMaster=priceMap.get(normCode(r.code)),masterHits=String(r.code||'').trim()?officialMasterData.filter(m=>String(m.code||'').trim().toLowerCase()===String(r.code).trim().toLowerCase()):[],off=masterHits.length===1?masterHits[0]:null,stock=inventoryFor(r.code,r.name),exported=exportedFor(r.code,r.name);let priceOk=null,ckOk=null,issues=[],warnings=[];if(!String(r.code||'').trim())issues.push('Thiếu Mã SP — khóa Master bắt buộc');else if(masterHits.length>1)issues.push('Mã SP bị trùng trong Master chính thức');else if(!off)issues.push('Mã SP không tồn tại trong Master chính thức');else if(r.name&&normAgent(off.name)!==normAgent(r.name))issues.push('Tên đơn không khớp Tên Master của Mã SP');if(!priceMaster)issues.push('Không có mã trong bảng giá chuẩn');else{const std=compareAgainst==='gia_xuat_hd'?parseNumber(priceMaster.gia_xuat_hd):parseNumber(priceMaster.gia_ban);priceOk=Math.abs((Number(r.price)||0)-std)<1;if(!priceOk)issues.push('Giá không khớp chuẩn');if(orderMap.chiet_khau){ckOk=Math.abs((Number(r.ck)||0)-parseNumber(priceMaster.chiet_khau))<.1;if(!ckOk)issues.push('Chiết khấu không khớp')}}if(r.qty<=0)issues.push('Số lượng không hợp lệ');if(r.qty>stock)warnings.push(`Thiếu tồn ${r.qty-stock}`);const uncertain=(aiData?.audit?.uncertainCells||[]).some(u=>Number(u.row)===r.idx||Number(u.row)===r.idx-1);if(uncertain)issues.push('AI đánh dấu ô chưa chắc chắn');let status=issues.length?'BLOCK':warnings.length?'CHECK':'PASS';if(status==='PASS')pass++;else if(status==='CHECK')warn++;else block++;return {...r,priceMaster,official:off,stock,exported,priceOk,ckOk,issues,warnings,status}});return {rows:result,state:block?'bad':warn?'warn':'good',summary:{total:result.length,pass,warn,block},message:block?'Có dòng bị CHẶN — chưa nên phát hành đầu ra.':warn?'Có dòng cần kiểm tra trước khi phát hành.':'Tất cả cổng kiểm soát đạt — có thể chuyển sang bước xuất/đơn bán sau xác nhận của người phụ trách.'}}
 function renderAgentGate(){const box=$('#agentGateResult');if(!box)return;const g=buildAgentGate();agentLastAudit=g;box.className='agent-gate '+g.state;const s=g.summary;$('#agentGateStatus').textContent=g.message;box.innerHTML=`<b>${g.state==='good'?'✅':g.state==='bad'?'⛔':'⚠️'} ${esc(g.message)}</b><div class="agent-gate-grid"><div><small>Tổng dòng</small><strong>${s.total}</strong></div><div><small>PASS</small><strong style="color:#15803d">${s.pass}</strong></div><div><small>Cần kiểm tra</small><strong style="color:#b45309">${s.warn}</strong></div><div><small>CHẶN</small><strong style="color:#b91c1c">${s.block}</strong></div><div><small>Master chính thức</small><strong>${officialMasterData.length}</strong></div></div>${g.rows.length?`<div class="agent-table-wrap"><table><thead><tr><th>TT</th><th>Trạng thái</th><th>Mã</th><th>Tên đơn</th><th>Master</th><th>Giá</th><th>SL đơn</th><th>Tồn TEST</th><th>Đã xuất</th><th>Ghi chú</th></tr></thead><tbody>${g.rows.map(r=>`<tr><td>${r.idx}</td><td><span class="pill ${r.status==='PASS'?'ok':r.status==='CHECK'?'warn':'bad'}">${r.status}</span></td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td>${esc(r.official?.name||'CHƯA KHỚP')}</td><td>${r.priceOk===false?'<span class="pill bad">SAI GIÁ</span>':r.priceOk===true?'<span class="pill ok">ĐÚNG</span>':'--'}</td><td class="num">${fmt(r.qty)}</td><td class="num">${fmt(r.stock)}</td><td class="num">${fmt(r.exported)}</td><td>${esc([...r.issues,...r.warnings].join(' · ')||'Đạt')}</td></tr>`).join('')}</tbody></table></div>`:''}`;return g}
 $('#runAgentGate').onclick=()=>renderAgentGate();
 $('#saveAgentAudit').onclick=async()=>{const g=renderAgentGate();if(!g.rows.length)return alert('Chưa có dữ liệu để lưu biên bản Agent.');if(!mainDb)return alert('Firebase TEST chưa kết nối.');const id=Date.now()+'_'+Math.random().toString(36).slice(2,8);const payload={createdAt:new Date().toISOString(),dataset:selectedDataset||'',compareAgainst,route:sharedRouteLabel(),summary:g.summary,message:g.message,rows:g.rows.map(r=>({idx:r.idx,code:r.code,name:r.name,qty:r.qty,stock:r.stock,exported:r.exported,status:r.status,issues:r.issues,warnings:r.warnings,officialCode:r.official?.code||'',officialName:r.official?.name||''}))};try{await set(ref(mainDb,'order_price_agent_audits/'+id),payload);toast($('#agentGateStatus'),'✅ Đã lưu biên bản Agent lên Firebase TEST.','ok')}catch(e){toast($('#agentGateStatus'),'Lỗi lưu biên bản: '+e.message,'err')}};
@@ -4792,7 +4852,7 @@ if(!getSharedAI())(async()=>{
             <input type="hidden" id="edit-ex-old-qty">
             <label>Tên Hàng Hóa</label>
             <input type="text" id="edit-ex-name" disabled style="background:#eee">
-            <label>Số Lượng Xuất</label>
+            <label>Số Lượng Xuất (theo ĐVT kho / hộp)</label>
             <input type="number" id="edit-ex-qty">
             <label>Nơi Nhận</label>
             <input type="text" id="edit-ex-dest">
@@ -4896,6 +4956,7 @@ if(!getSharedAI())(async()=>{
         };
 
         let stockData=[], exportData=[], masterData=[], previewData=[], currentExportLot=null;
+        let masterDuplicateCodes=[]; // V57: Mã SP Master phải duy nhất để làm khóa kiểm soát kho.
         const MASTER_CACHE_KEY='ideco_kho_master_cache_v1';
         const OFFLINE_QUEUE_KEY='ideco_kho_offline_import_queue_v1';
         let firebaseConnected=false;
@@ -4938,11 +4999,12 @@ if(!getSharedAI())(async()=>{
             setOfflineQueue(q);
         }
         function queuedMasterCheck(d){
-            let m=null; const c=String(d.masterCode||d.productCode||'').trim(), n=String(d.masterName||d.productName||'').trim();
-            if(c)m=masterData.find(x=>x.code&&cleanCode(x.code)===cleanCode(c));
-            if(!m&&n)m=masterData.find(x=>vnNorm(x.name)===vnNorm(n));
-            if(!m)return {ok:false,reason:`${n}: không còn trong Master`};
-            if(String(m.name||'').trim()!==String(d.productName||'').trim()||String(m.packSpec||'').trim()!==String(d.packSpec||'').trim())return {ok:false,reason:`${n}: Tên/Quy cách đã thay đổi trong Master`};
+            const c=String(d.masterCode||d.productCode||'').trim(), n=String(d.masterName||d.productName||'').trim();
+            if(!c)return {ok:false,reason:`${n||'Dòng hàng'}: thiếu Mã SP Master – không được đồng bộ Offline`};
+            const hits=masterData.filter(x=>x.code&&cleanCode(x.code)===cleanCode(c));
+            if(hits.length!==1)return {ok:false,reason:hits.length?`Mã SP ${c} không duy nhất trong Master`:`Mã SP ${c} không còn trong Master`};
+            const m=hits[0];
+            if(String(m.name||'').trim()!==String(d.productName||'').trim()||String(m.packSpec||'').trim()!==String(d.packSpec||'').trim())return {ok:false,reason:`${c} · ${n}: Tên/Quy cách đã thay đổi trong Master`};
             return {ok:true,master:m};
         }
         async function syncOfflineQueue(){
@@ -4963,6 +5025,53 @@ if(!getSharedAI())(async()=>{
         db.ref('.info/connected').on('value',s=>{firebaseConnected=!!s.val();updateNetworkUI();});
         window.addEventListener('online',()=>{updateNetworkUI();showToast('Internet đã kết nối lại. Kiểm tra Hàng đợi Offline nếu có.','success');});
         window.addEventListener('offline',()=>{updateNetworkUI();showToast('Mất Internet. Có thể dùng Nhập thủ công dự phòng; dữ liệu sẽ lưu Offline.','error');});
+
+        // ===== V57 · KIỂM TRA TOÀN HỆ THỐNG KHÔNG TỰ SỬA DỮ LIỆU =====
+        window.runIDECOSystemAudit = async () => {
+            const btnText='🩺 KIỂM TRA HỆ THỐNG';
+            try{
+                showToast('Đang kiểm tra AI + Master + Tồn kho + Lịch sử xuất trên Firebase...','success');
+                const [ms,ss,es]=await Promise.all([refs.master.once('value'),refs.items.once('value'),refs.exports.once('value')]);
+                const rawMaster=[];
+                Object.entries(ms.val()||{}).forEach(([fileId,f])=>{const d=f&&f.data;if(!d)return;(Array.isArray(d)?d:Object.values(d)).forEach(r=>{const m=masterRecordFromRow(r);if(m.name||m.code)rawMaster.push({...m,source:f.fileName||fileId})})});
+                const codeMap=new Map();rawMaster.forEach(m=>{const c=cleanCode(m.code||'');if(c){if(!codeMap.has(c))codeMap.set(c,[]);codeMap.get(c).push(m)}});
+                const dupCodes=[...codeMap.entries()].filter(([,a])=>a.length>1);
+                const badMaster=rawMaster.filter(m=>!String(m.code||'').trim()||!String(m.name||'').trim()||!String(m.packSpec||'').trim());
+                const uniqueCodes=new Set([...codeMap.entries()].filter(([,a])=>a.length===1).map(([c])=>c));
+                const stocks=Object.entries(ss.val()||{}).map(([id,r])=>({id,...(r||{})}));
+                const badStock=stocks.filter(r=>!String(r.productCode||'').trim()||!String(r.productName||'').trim()||!String(r.lotNumber||'').trim()||!String(r.expiryDate||'').trim()||Number(r.quantity)<0);
+                const orphanStock=stocks.filter(r=>String(r.productCode||'').trim()&&!uniqueCodes.has(cleanCode(r.productCode)));
+                const stockKeyMap=new Map();stocks.forEach(r=>{const k=`${cleanCode(r.productCode||'')}|${inventoryLotKey(r.lotNumber)}|${inventoryExpiryKey(r.expiryDate)}`;if(!stockKeyMap.has(k))stockKeyMap.set(k,[]);stockKeyMap.get(k).push(r)});
+                const dupLots=[...stockKeyMap.entries()].filter(([k,a])=>k.split('|')[0]&&a.length>1);
+                const exports=Object.entries(es.val()||{}).map(([id,r])=>({id,...(r||{})}));
+                const badExports=exports.filter(r=>!String(r.productCode||'').trim()||!String(r.lotNumber||'').trim()||!String(r.expiryDate||'').trim()||Number(r.quantity)<=0);
+                const orphanExports=exports.filter(r=>String(r.productCode||'').trim()&&!uniqueCodes.has(cleanCode(r.productCode)));
+                const offlineCount=(getOfflineQueue?.()||[]).length;
+                let aiLine='⚠️ Không xác định được cấu hình AI',aiOK=false;
+                try{
+                    const mainOK=currentAIKeys().length>0,backupOK=hasKieAI(),route=activeAIRoute();
+                    aiLine=`${mainOK?'✅':'⚠️'} AI CHÍNH ${mainOK?'đã cấu hình':'chưa có key'} · ${backupOK?'✅':'⚠️'} AI PHỤ ${backupOK?'đã cấu hình':'chưa có key'} · Tuyến: ${route==='backup'?'AI PHỤ':'AI CHÍNH'}`;
+                    const shared=window.IDECO_SHARED_AI;
+                    if(shared&&typeof shared.textRequest==='function'&&(mainOK||backupOK)){
+                        try{const rr=await shared.textRequest('Trả lời đúng một từ: OK',{plainText:true,purpose:'Kiểm tra sức khỏe hệ thống'});aiOK=/\bOK\b/i.test(String(rr?.text||''));aiLine+=aiOK?' · 🟢 gọi AI thực tế OK':' · 🟠 AI có phản hồi nhưng không đúng mẫu';}catch(e){aiLine+=` · 🔴 gọi AI lỗi: ${String(e?.message||e).slice(0,120)}`;}
+                    }
+                }catch(e){aiLine=`🔴 Kiểm tra AI lỗi: ${String(e?.message||e).slice(0,120)}`}
+                const critical=badMaster.length+dupCodes.length+badStock.length+orphanStock.length+dupLots.length+badExports.length+orphanExports.length;
+                const lines=[
+                    `${critical===0?'✅':'⛔'} KẾT QUẢ: ${critical===0?'Không phát hiện lỗi dữ liệu khóa':'Phát hiện '+critical+' nhóm/dòng cần xử lý'}`,
+                    aiLine,
+                    `MASTER: ${rawMaster.length} dòng · thiếu Mã/Tên/Quy cách ${badMaster.length} · Mã SP trùng ${dupCodes.length}`,
+                    `TỒN KHO: ${stocks.length} lô · dòng thiếu/sai trường khóa ${badStock.length} · Mã không có Master duy nhất ${orphanStock.length} · trùng Mã+Lô+HSD ${dupLots.length}`,
+                    `LỊCH SỬ XUẤT: ${exports.length} dòng · thiếu Mã/Lô/HSD/SL ${badExports.length} · Mã không có Master duy nhất ${orphanExports.length}`,
+                    `OFFLINE QUEUE: ${offlineCount} dòng chờ đồng bộ`,
+                    '',
+                    critical===0?'Hệ thống đủ điều kiện dữ liệu để vận hành. Mã SP Master đang là khóa đối chiếu chính.':'KHÔNG nên nhập/xuất tiếp các mã bị báo lỗi cho đến khi làm sạch Master/tồn kho. Hệ thống V57 sẽ chặn các giao dịch mới có Mã SP thiếu, không duy nhất hoặc sai Master.'
+                ];
+                window.IDECO_SYSTEM_AUDIT_LAST={at:new Date().toISOString(),critical,aiOK,badMaster,duplicateMasterCodes:dupCodes.map(([code,a])=>({code,count:a.length})),badStock,orphanStock,duplicateStockLots:dupLots.map(([key,a])=>({key,count:a.length})),badExports,orphanExports,offlineCount};
+                alert(btnText+'\n\n'+lines.join('\n'));
+                if(critical===0)showToast('✅ Kiểm tra hệ thống hoàn tất: dữ liệu khóa không phát hiện lỗi.','success');else showToast(`⛔ Kiểm tra hệ thống phát hiện ${critical} vấn đề. Xem hộp kết quả và Console/IDECO_SYSTEM_AUDIT_LAST.`,'error');
+            }catch(e){console.error('System audit',e);showToast('Không kiểm tra được hệ thống: '+(e?.message||e),'error');alert(btnText+'\n\nLỗi: '+(e?.message||e));}
+        };
 
         // INIT DATE
         const today = new Date().toISOString().split('T')[0];
@@ -5036,28 +5145,29 @@ if(!getSharedAI())(async()=>{
         }
 
         function refreshMasterData(files) {
-            // MASTER CHÍNH THỨC: chỉ lấy từ Dữ Liệu Gốc đã khai/upload. KHÔNG lấy bù từ tồn kho.
-            const map = new Map();
+            // MASTER CHÍNH THỨC: Mã SP là khóa nghiệp vụ bắt buộc và phải duy nhất.
+            const map = new Map(), codeCounts=new Map();
             files.forEach(f => { if(f.data) (Array.isArray(f.data)?f.data:Object.values(f.data)).forEach(r => {
                 const rec = masterRecordFromRow(r);
                 const {name,code,unit,strength,packSpec} = rec;
-                // Dòng minh họa của Template không bao giờ được xem là Master thật,
-                // kể cả đã lỡ được lưu trên Firebase từ phiên bản cũ.
                 const isTemplateSample = String(code||'').trim().toUpperCase()==='TH_VIDU_01' &&
                     String(name||'').trim().toUpperCase().includes('TÊN SẢN PHẨM MẪU');
                 if(name && !isTemplateSample) {
-                    const k=cleanStr(name), identity=code ? `code:${cleanCode(code)}` : `name:${k}`;
+                    const k=cleanStr(name), ck=cleanCode(code||'');
+                    if(ck)codeCounts.set(ck,(codeCounts.get(ck)||0)+1);
+                    const identity=ck ? `code:${ck}` : `name:${k}`;
                     map.set(identity, {name,code:code||'',unit:unit||'',strength:strength||'',packSpec:packSpec||'',searchKey:k,masterSource:f.fileName||'MASTER'});
                 }
             }); });
+            masterDuplicateCodes=[...codeCounts.entries()].filter(([,n])=>n>1).map(([c])=>c);
             masterData = Array.from(map.values());
             if(masterData.length) cacheMasterData();
             else if(!firebaseConnected && restoreMasterCache()) return;
             else if(firebaseConnected){ try{localStorage.removeItem(MASTER_CACHE_KEY);}catch(e){} }
-            const missingRequired=masterData.filter(m=>!m.name||!m.packSpec).length;
-            const missingReference=masterData.filter(m=>!m.code||!m.unit||!m.strength).length;
-            document.getElementById('master-status').innerText = `✅ MASTER chính thức: ${masterData.length} sản phẩm${missingRequired?` · ⛔ ${missingRequired} dòng thiếu Tên/Quy cách`:''}${missingReference?` · ℹ️ ${missingReference} dòng thiếu Mã/ĐVT/Hàm lượng (chỉ tham khảo)`:''}.`;
-            document.getElementById('master-code-list').innerHTML = masterData.filter(m => m.code).map(m => `<option value="${m.code}">${m.name}</option>`).join('');
+            const missingRequired=masterData.filter(m=>!m.code||!m.name||!m.packSpec).length;
+            const missingReference=masterData.filter(m=>!m.unit||!m.strength).length;
+            document.getElementById('master-status').innerText = `${missingRequired||masterDuplicateCodes.length?'⛔':'✅'} MASTER chính thức: ${masterData.length} sản phẩm${missingRequired?` · ⛔ ${missingRequired} dòng thiếu Mã SP/Tên/Quy cách`:''}${masterDuplicateCodes.length?` · ⛔ ${masterDuplicateCodes.length} Mã SP bị trùng nguồn`:''}${missingReference?` · ℹ️ ${missingReference} dòng thiếu ĐVT/Hàm lượng`:''}. Mã SP là khóa đối chiếu chính.`;
+            document.getElementById('master-code-list').innerHTML = masterData.filter(m => m.code&&!masterDuplicateCodes.includes(cleanCode(m.code))).map(m => `<option value="${m.code}">${m.name}</option>`).join('');
         }
 
         function findBestMatch(inputName) { if (!inputName) return null; const cleanInput = cleanStr(inputName); const exact = masterData.filter(m => m.searchKey === cleanInput); if (exact.length === 1) return exact[0]; const partial = masterData.filter(m => cleanInput.includes(m.searchKey) || m.searchKey.includes(cleanInput)); return partial.length === 1 ? partial[0] : null; }
@@ -5172,29 +5282,26 @@ if(!getSharedAI())(async()=>{
         window.removePreviewItem = (i) => { previewData.splice(i, 1); renderPreviewTable(); }
         function verifyMasterLockedPreview(d){
             if(!d.masterLocked)return {ok:true};
-            // Mã SP có thể trống trong Master, vì vậy ưu tiên mã nếu có và fallback theo Tên Master đã xác nhận.
-            let m=null;
-            const refCode=String(d.masterCode||'').trim();
-            const refName=String(d.masterName||d.productName||'').trim();
-            if(refCode)m=masterData.find(x=>x.code&&cleanCode(x.code)===cleanCode(refCode));
-            if(!m&&refName)m=masterData.find(x=>vnNorm(x.name)===vnNorm(refName));
-            if(!m)return {ok:false,reason:`Tên sản phẩm “${refName||d.productName||'?'}” không còn tồn tại trong Master`};
+            const refCode=String(d.masterCode||d.productCode||'').trim();
+            if(!refCode)return {ok:false,reason:`Dòng “${d.productName||'?'}” thiếu Mã SP Master`};
+            const hits=masterData.filter(x=>x.code&&cleanCode(x.code)===cleanCode(refCode));
+            if(hits.length!==1)return {ok:false,reason:hits.length?`Mã SP ${refCode} không duy nhất trong Master`:`Mã SP ${refCode} không tồn tại trong Master`};
+            if(masterDuplicateCodes.includes(cleanCode(refCode)))return {ok:false,reason:`Mã SP ${refCode} đang bị trùng trong dữ liệu Master nguồn`};
+            const m=hits[0];
             if(!String(m.name||'').trim())return {ok:false,reason:'Master thiếu Tên sản phẩm'};
             if(!String(m.packSpec||'').trim())return {ok:false,reason:`Master của “${m.name}” chưa có Quy cách`};
             const same=(a,b)=>String(a??'').trim()===String(b??'').trim();
-            // Chỉ Tên và Quy cách là dữ liệu Master bắt buộc phải giữ nguyên ở bước nhập kho.
-            if(!same(d.productName,m.name)||!same(d.packSpec,m.packSpec)){
-                return {ok:false,reason:`Tên/Quy cách trung gian không còn trùng Master cho ${m.code||'--'} · ${m.name}. Hãy load lại từ tab AI.`};
+            if(cleanCode(d.productCode||'')!==cleanCode(m.code||'')||!same(d.productName,m.name)||!same(d.packSpec,m.packSpec)){
+                return {ok:false,reason:`Mã SP/Tên/Quy cách không còn trùng Master ${m.code} · ${m.name}. Hãy load lại từ tab AI.`};
             }
-            // Mã SP, Hàm lượng/NĐ và ĐVT là tham khảo; thiếu hoặc được bổ sung không làm chặn nhập kho.
             return {ok:true,master:m};
         }
         window.syncData = async () => {
             if(previewData.length === 0) return showToast('Không có dòng để nhập kho!', 'error');
             const masterErrors=previewData.map((d,i)=>({i,...verifyMasterLockedPreview(d)})).filter(x=>!x.ok);
             if(masterErrors.length) return showToast(`CHẶN ĐỒNG BỘ: ${masterErrors.length} dòng không còn đúng Master. ${masterErrors[0].reason}`, 'error');
-            const invalidCritical = previewData.filter(d => !d.productName || !d.packSpec || !d.lotNumber || !d.expiryDate || !d.quantity || parseInt(d.quantity) <= 0);
-            if(invalidCritical.length > 0) return showToast(`Có ${invalidCritical.length} dòng thiếu Tên SP / Quy cách / Số lô / Hạn dùng / Số lượng. Không cho phép đồng bộ!`, 'error');
+            const invalidCritical = previewData.filter(d => !d.productCode || !d.productName || !d.packSpec || !d.lotNumber || !d.expiryDate || !d.quantity || parseInt(d.quantity) <= 0);
+            if(invalidCritical.length > 0) return showToast(`Có ${invalidCritical.length} dòng thiếu Mã SP / Tên SP / Quy cách / Số lô / Hạn dùng / Số lượng. Không cho phép đồng bộ!`, 'error');
             const validItems = [...previewData];
             const ok = await openSafetyVerification({
                 title: networkReady()?'KIỂM TRA TRƯỚC KHI ĐỒNG BỘ NHẬP KHO':'KIỂM TRA TRƯỚC KHI LƯU OFFLINE',
@@ -5238,54 +5345,47 @@ if(!getSharedAI())(async()=>{
                 inventoryExpiryKey(a.expiryDate)===inventoryExpiryKey(b.expiryDate);
         }
         async function saveToInventory(item) {
-            const tx=String(item.sourceTransactionId||'').trim();
-            // GDP: chỉ cộng dồn khi đồng thời trùng Mã SP + Tên SP + Số lô + HSD.
-            const exist = stockData.find(s => sameInventoryIdentity(s,item));
-            const iCode=inventoryCodeKey(item.productCode), iName=inventoryNameKey(item.productName), iLot=inventoryLotKey(item.lotNumber), iExp=inventoryExpiryKey(item.expiryDate);
-            const conflict=stockData.find(s=>{
-                const sCode=inventoryCodeKey(s.productCode), sName=inventoryNameKey(s.productName), sameBatch=inventoryLotKey(s.lotNumber)===iLot&&inventoryExpiryKey(s.expiryDate)===iExp;
-                if(!sameBatch)return false;
-                if(iCode&&sCode&&iCode===sCode&&sName!==iName)return true;
-                if(iName&&sName===iName&&iCode&&sCode&&iCode!==sCode)return true;
-                return false;
-            });
-            if(conflict) throw new Error(`XUNG ĐỘT GDP: ${item.productName} · Lô ${item.lotNumber} · HSD ${item.expiryDate} có Mã/Tên không đồng nhất với dữ liệu kho. Không cộng dồn; hãy kiểm tra Master và phiếu gốc.`);
-
-            if(exist) {
-                let didAdd=false;
-                const txResult=await refs.items.child(exist.id).transaction(cur=>{
-                    didAdd=false;
-                    if(!cur)return;
-                    // Kiểm tra lại 4 khóa GDP ngay trong transaction để tránh dữ liệu bị thay đổi giữa lúc tìm và lúc cộng.
-                    if(!sameInventoryIdentity(cur,item))return;
-                    cur.appliedTransactions=cur.appliedTransactions||{};
-                    if(tx && cur.appliedTransactions[tx])return cur;
-                    cur.quantity=(parseInt(cur.quantity)||0)+(parseInt(item.quantity)||0);
-                    cur.unit=item.unit||cur.unit||'';
-                    cur.productStrength=item.productStrength||cur.productStrength||'';
-                    cur.packSpec=item.packSpec||cur.packSpec||'';
-                    cur.productCode=item.productCode||cur.productCode||'';
-                    // Giữ mốc nhập SỚM NHẤT của lô để FIFO không bị đảo khi cùng lô được nhập bổ sung nhiều lần.
-                    const incomingImport=item.importDate||new Date().toISOString().split('T')[0];
-                    const incomingCreated=item.createdAt||new Date().toISOString();
-                    if(!cur.importDate || incomingImport < cur.importDate) cur.importDate=incomingImport;
-                    if(!cur.createdAt || incomingCreated < cur.createdAt) cur.createdAt=incomingCreated;
-                    cur.lastImportAt=incomingCreated;
-                    cur.sourceType=item.sourceType||cur.sourceType||'';
-                    cur.sourceNote=item.sourceNote||cur.sourceNote||'';
-                    if(tx)cur.appliedTransactions[tx]=new Date().toISOString();
-                    didAdd=true;return cur;
+            const txId=String(item.sourceTransactionId||'').trim();
+            const code=String(item.productCode||'').trim();
+            if(!code)throw new Error(`CHẶN NHẬP KHO: “${item.productName||'?'}” thiếu Mã SP Master.`);
+            const mh=masterData.filter(m=>m.code&&cleanCode(m.code)===cleanCode(code));
+            if(mh.length!==1||masterDuplicateCodes.includes(cleanCode(code)))throw new Error(`CHẶN NHẬP KHO: Mã SP ${code} không tồn tại duy nhất trong Master.`);
+            const master=mh[0];
+            if(String(item.productName||'').trim()!==String(master.name||'').trim()||String(item.packSpec||'').trim()!==String(master.packSpec||'').trim())throw new Error(`CHẶN NHẬP KHO: ${code} có Tên/Quy cách không khớp Master.`);
+            const qty=parseInt(item.quantity)||0;if(qty<=0)throw new Error('Số lượng nhập phải > 0.');
+            const lotKey=inventoryLotKey(item.lotNumber),expKey=inventoryExpiryKey(item.expiryDate),codeKey=inventoryCodeKey(code);
+            if(!lotKey||!expKey)throw new Error('Số lô và HSD là bắt buộc.');
+            const newKey=refs.items.push().key;
+            let action='';
+            const txResult=await refs.items.transaction(data=>{
+                data=data||{};
+                const ids=Object.keys(data).filter(id=>{
+                    const r=data[id]||{};return inventoryCodeKey(r.productCode)===codeKey&&inventoryLotKey(r.lotNumber)===lotKey&&inventoryExpiryKey(r.expiryDate)===expKey;
                 });
-                if(!txResult.committed)throw new Error(`Không cộng dồn ${item.productName}: dữ liệu Mã/Tên/Lô/HSD đã thay đổi trên Firebase. Hãy tải lại kho và kiểm tra.`);
-                const latest=txResult.snapshot?.val?.();if(latest){Object.assign(exist,latest);}
-                if(tx && didAdd){exist.appliedTransactions=exist.appliedTransactions||{};exist.appliedTransactions[tx]=new Date().toISOString();}
-            } else {
-                const payload={...item};
-                if(tx)payload.appliedTransactions={[tx]:new Date().toISOString()};
-                const newRef=refs.items.push();
-                await newRef.set(payload);
-                stockData.push({id:newRef.key,...payload});
+                if(ids.length>1){action='duplicate';return;}
+                if(ids.length===1){
+                    const id=ids[0],cur=data[id]||{};
+                    if(inventoryNameKey(cur.productName)!==inventoryNameKey(master.name)||String(cur.packSpec||'').trim()!==String(master.packSpec||'').trim()){action='conflict';return;}
+                    cur.appliedTransactions=cur.appliedTransactions||{};
+                    if(txId&&cur.appliedTransactions[txId]){action='already';return data;}
+                    cur.quantity=(parseInt(cur.quantity)||0)+qty;
+                    cur.productCode=master.code;cur.productName=master.name;cur.productStrength=master.strength||cur.productStrength||'';cur.packSpec=master.packSpec;cur.unit=master.unit||cur.unit||'';
+                    const incomingImport=item.importDate||new Date().toISOString().slice(0,10),incomingCreated=item.createdAt||new Date().toISOString();
+                    if(!cur.importDate||incomingImport<cur.importDate)cur.importDate=incomingImport;
+                    if(!cur.createdAt||incomingCreated<cur.createdAt)cur.createdAt=incomingCreated;
+                    cur.lastImportAt=incomingCreated;cur.sourceType=item.sourceType||cur.sourceType||'';cur.sourceNote=item.sourceNote||cur.sourceNote||'';
+                    if(txId)cur.appliedTransactions[txId]=new Date().toISOString();data[id]=cur;action='increment';return data;
+                }
+                const payload={...item,productCode:master.code,productName:master.name,productStrength:master.strength||item.productStrength||'',packSpec:master.packSpec,unit:master.unit||item.unit||'',quantity:qty};
+                if(txId)payload.appliedTransactions={[txId]:new Date().toISOString()};
+                data[newKey]=payload;action='create';return data;
+            });
+            if(!txResult.committed){
+                if(action==='duplicate')throw new Error(`CHẶN NHẬP KHO: Firebase đang có nhiều hơn 1 dòng cùng Mã SP ${code} + Lô ${item.lotNumber} + HSD ${item.expiryDate}. Hãy chạy Kiểm tra hệ thống và làm sạch dữ liệu.`);
+                if(action==='conflict')throw new Error(`XUNG ĐỘT MASTER: ${code} + Lô ${item.lotNumber} + HSD ${item.expiryDate} có Tên/Quy cách khác Master.`);
+                throw new Error('Firebase không chấp nhận giao dịch nhập kho. Hãy tải lại dữ liệu và thử lại.');
             }
+            const snap=txResult.snapshot?.val?.()||{};stockData=Object.keys(snap).map(id=>({id,...snap[id]}));
         }
 
         // --- MANUAL FALLBACK INPUT ---
@@ -5302,6 +5402,7 @@ if(!getSharedAI())(async()=>{
         function addFallbackToPreview(){
             const m=fallbackSelectedMaster;
             if(!m)return showToast('Hãy chọn đúng sản phẩm từ danh sách Master, không gõ tên tự do.','error');
+            if(!m.code||masterDuplicateCodes.includes(cleanCode(m.code)))return showToast(`Master “${m.name}” thiếu Mã SP duy nhất. Chưa được nhập kho.`,'error');
             if(cleanStr(document.getElementById('fallback-product').value)!==cleanStr(m.name))return showToast('Tên đang nhập đã thay đổi. Hãy chọn lại sản phẩm từ Master.','error');
             if(!m.packSpec)return showToast(`Master của “${m.name}” chưa có Quy cách. Hãy cập nhật Master trước khi nhập kho.`,'error');
             const lot=document.getElementById('fallback-lot').value.trim(),exp=document.getElementById('fallback-exp').value,qty=parseInt(document.getElementById('fallback-qty').value);
@@ -5434,51 +5535,50 @@ if(!getSharedAI())(async()=>{
             
             list.forEach(e => {
                 const item = document.createElement('div'); item.className = 'export-item';
-                item.innerHTML = `<div class="export-info"><strong>${e.productName}</strong> <span style="color:var(--secondary); font-weight:bold;">[${e.productCode || '--'}]</span> <span style="color:#666">(${e.unit || '-'})</span><br><small>${e.productStrength ? 'Hàm lượng: '+e.productStrength+' | ' : ''}${e.packSpec ? 'Quy cách: '+e.packSpec+' | ' : ''}Lô: ${e.lotNumber} | Hạn: ${e.expiryDate} | SL: <b style="color:var(--danger)">${e.quantity}</b></small><br><small style="color:#888">Ngày: ${e.exportDate} -> ${e.destination}</small></div><div class="export-actions"><button class="btn btn-warning" onclick="openEditExport('${e.id}')">Sửa</button><button class="btn btn-danger" onclick="deleteExport('${e.id}')">Xóa</button></div>`;
+                item.innerHTML = `<div class="export-info"><strong>${e.productName}</strong> <span style="color:var(--secondary); font-weight:bold;">[${e.productCode || '--'}]</span> <span style="color:#666">(${e.unit || '-'})</span><br><small>${e.productStrength ? 'Hàm lượng: '+e.productStrength+' | ' : ''}${e.packSpec ? 'Quy cách: '+e.packSpec+' | ' : ''}Lô: ${e.lotNumber} | Hạn: ${e.expiryDate} | SL: <b style="color:var(--danger)">${e.quantity}</b>${e.boxQuantity!==undefined&&Number(e.boxQuantity)!==Number(e.quantity)?` · Hộp/ĐV kho: <b>${e.boxQuantity}</b>`:''}</small><br><small style="color:#888">Ngày: ${e.exportDate} -> ${e.destination}</small></div><div class="export-actions"><button class="btn btn-warning" onclick="openEditExport('${e.id}')">Sửa</button><button class="btn btn-danger" onclick="deleteExport('${e.id}')">Xóa</button></div>`;
                 div.appendChild(item);
             });
         }
 
         window.deleteExport = async (id) => {
-            if(!confirm('Xóa phiếu xuất và hoàn kho?')) return;
-            const ex = exportData.find(x => x.id === id);
-            const stk = stockData.find(s => s.id === ex.relatedId);
-            if(stk) await refs.items.child(stk.id).update({ quantity: parseInt(stk.quantity) + parseInt(ex.quantity) });
-            await refs.exports.child(id).remove();
-            showToast('Đã xóa phiếu xuất', 'success');
+            if(!confirm('Xóa phiếu xuất và hoàn kho? Hệ thống sẽ hoàn theo ĐVT KHO (boxQuantity nếu có).')) return;
+            const ex=exportData.find(x=>x.id===id);if(!ex)return showToast('Không tìm thấy phiếu xuất.','error');
+            const stk=stockData.find(s=>s.id===ex.relatedId);if(!stk)return showToast('Không tìm thấy lô tồn gốc để hoàn kho. Không xóa phiếu để tránh lệch số liệu.','error');
+            const restoreQty=Number(ex.boxQuantity!==undefined&&ex.boxQuantity!==null?ex.boxQuantity:ex.quantity)||0;if(restoreQty<=0)return showToast('Phiếu xuất không có số lượng hoàn kho hợp lệ.','error');
+            const updates={};updates[`pharmaceuticals/${stk.id}/quantity`]=firebase.database.ServerValue.increment(restoreQty);updates[`exports/${id}`]=null;
+            await db.ref().update(updates);
+            showToast(`Đã xóa phiếu xuất và hoàn ${restoreQty} ${stk.unit||'đv kho'} bằng cập nhật Firebase nguyên tử.`, 'success');
         }
         
         window.openEditExport = (id) => {
             const ex = exportData.find(x => x.id === id);
             document.getElementById('edit-ex-id').value = id;
             document.getElementById('edit-ex-related').value = ex.relatedId;
-            document.getElementById('edit-ex-old-qty').value = ex.quantity;
+            const stockQty=Number(ex.boxQuantity!==undefined&&ex.boxQuantity!==null?ex.boxQuantity:ex.quantity)||0;
+            document.getElementById('edit-ex-old-qty').value = stockQty;
             document.getElementById('edit-ex-name').value = ex.productName;
-            document.getElementById('edit-ex-qty').value = ex.quantity;
+            document.getElementById('edit-ex-qty').value = stockQty;
             document.getElementById('edit-ex-dest').value = ex.destination;
             document.getElementById('edit-ex-date').value = ex.exportDate;
             document.getElementById('edit-export-modal').style.display = 'flex';
         }
         
         window.saveExportEdit = async () => {
-            const id = document.getElementById('edit-ex-id').value;
-            const relatedId = document.getElementById('edit-ex-related').value;
-            const oldQty = parseInt(document.getElementById('edit-ex-old-qty').value);
-            const newQty = parseInt(document.getElementById('edit-ex-qty').value);
-            const newDest = document.getElementById('edit-ex-dest').value;
-            const newDate = document.getElementById('edit-ex-date').value;
-            const ex = exportData.find(x => x.id === id);
-            if(newQty < 0) return showToast('Số lượng không hợp lệ', 'error');
-            const stk = stockData.find(s => s.id === relatedId);
-            if(!stk) return alert('Lô hàng gốc đã hết hoặc bị xóa!');
-            const stockAfterRevert = parseInt(stk.quantity) + oldQty;
-            if(newQty > stockAfterRevert) return alert(`Không đủ tồn kho! Tối đa: ${stockAfterRevert}`);
-            const ok = await openSafetyVerification({ title:'KIỂM TRA TRƯỚC KHI SỬA PHIẾU XUẤT', subtitle:'Thay đổi số lượng phiếu xuất sẽ làm thay đổi tồn kho. Hãy đối chiếu chứng từ trước khi cập nhật.', actionType:'SỬA PHIẾU XUẤT', destination:newDest, date:newDate, items:[{...(ex||{}), quantity:newQty}] });
-            if(!ok) return;
-            await refs.items.child(relatedId).update({ quantity: stockAfterRevert - newQty });
-            await refs.exports.child(id).update({ quantity: newQty, destination: newDest, exportDate: newDate });
-            document.getElementById('edit-export-modal').style.display = 'none';
-            showToast('Đã cập nhật', 'success');
+            const id=document.getElementById('edit-ex-id').value,relatedId=document.getElementById('edit-ex-related').value;
+            const oldQty=Number(document.getElementById('edit-ex-old-qty').value)||0,newQty=Number(document.getElementById('edit-ex-qty').value);
+            const newDest=document.getElementById('edit-ex-dest').value,newDate=document.getElementById('edit-ex-date').value,ex=exportData.find(x=>x.id===id);
+            if(!ex||!Number.isFinite(newQty)||newQty<0)return showToast('Số lượng không hợp lệ', 'error');
+            const ratio=(Number(ex.boxQuantity)>0)?Number(ex.quantity||0)/Number(ex.boxQuantity):1,newHistoryQty=newQty*ratio;
+            const ok=await openSafetyVerification({title:'KIỂM TRA TRƯỚC KHI SỬA PHIẾU XUẤT',subtitle:'Số lượng nhập ở đây là ĐVT KHO. Hệ thống cập nhật tồn + lịch sử xuất trong cùng một transaction.',actionType:'SỬA PHIẾU XUẤT',destination:newDest,date:newDate,items:[{...(ex||{}),quantity:newQty}]});if(!ok)return;
+            let reason='';
+            const tx=await db.ref().transaction(root=>{
+                if(!root?.pharmaceuticals?.[relatedId]||!root?.exports?.[id]){reason='Không còn lô tồn hoặc phiếu xuất trên Firebase';return;}
+                const cur=Number(root.pharmaceuticals[relatedId].quantity)||0,max=cur+oldQty;if(newQty>max){reason=`Không đủ tồn. Tối đa ${max}`;return;}
+                root.pharmaceuticals[relatedId].quantity=max-newQty;
+                root.exports[id].boxQuantity=newQty;root.exports[id].quantity=newHistoryQty;root.exports[id].destination=newDest;root.exports[id].exportDate=newDate;root.exports[id].lastEditedAt=new Date().toISOString();return root;
+            });
+            if(!tx.committed)return showToast('Không cập nhật phiếu xuất: '+(reason||'dữ liệu đã thay đổi'),'error');
+            document.getElementById('edit-export-modal').style.display='none';showToast('Đã cập nhật tồn kho + phiếu xuất nguyên tử', 'success');
         }
 
         // --- SIGNATURE EXPORT with Date Filter ---
@@ -5653,24 +5753,20 @@ if(!getSharedAI())(async()=>{
             processBulkExportInput(data);
         }
         function processBulkExportInput(inputData) {
-            bulkExportPreviewData = []; 
+            bulkExportPreviewData = [];
             inputData.forEach((req) => {
-                let reqQty = parseInt(req.qty); if (!reqQty || reqQty <= 0) return;
-                let matches = []; const searchCode = cleanStr(req.code); const searchName = cleanStr(req.name);
-                if (searchCode) matches = stockData.filter(s => cleanStr(s.productCode) === searchCode && parseInt(s.quantity) > 0);
-                if (matches.length === 0 && searchName) matches = stockData.filter(s => cleanStr(s.productName) === searchName && parseInt(s.quantity) > 0);
-                matches.sort(fefoFifoCompare);
-                const totalStock = matches.reduce((sum, item) => sum + parseInt(item.quantity), 0);
-                if (reqQty > totalStock) {
-                    bulkExportPreviewData.push({ isError: true, productCode: req.code || '?', productName: req.name || 'Sản phẩm chưa xác định', reqQty: reqQty, totalStock: totalStock, msg: `Thiếu hàng! (Cần: ${reqQty}, Có: ${totalStock})` });
-                } else {
-                    for (let batch of matches) {
-                        if (reqQty <= 0) break;
-                        let available = parseInt(batch.quantity); let take = Math.min(available, reqQty);
-                        bulkExportPreviewData.push({ isError: false, relatedId: batch.id, productCode: batch.productCode, productName: batch.productName, productStrength: batch.productStrength||'', packSpec: batch.packSpec||'', unit: batch.unit, lotNumber: batch.lotNumber, expiryDate: batch.expiryDate, exportQty: take, originalStock: available });
-                        reqQty -= take;
-                    }
-                }
+                const reqQty=parseInt(req.qty); if(!reqQty||reqQty<=0)return;
+                const rawCode=String(req.code||'').trim(),codeKey=cleanCode(rawCode);
+                if(!rawCode){bulkExportPreviewData.push({isError:true,productCode:'?',productName:req.name||'Chưa xác định',reqQty,totalStock:0,msg:'Thiếu Mã SP. Xuất kho bắt buộc đối chiếu Master bằng Mã SP.'});return;}
+                const mh=masterData.filter(m=>m.code&&cleanCode(m.code)===codeKey);
+                if(mh.length!==1||masterDuplicateCodes.includes(codeKey)){bulkExportPreviewData.push({isError:true,productCode:rawCode,productName:req.name||'Chưa xác định',reqQty,totalStock:0,msg:mh.length?'Mã SP không duy nhất trong Master.':'Mã SP không tồn tại trong Master.'});return;}
+                const master=mh[0];
+                if(req.name&&cleanStr(req.name)!==cleanStr(master.name)){bulkExportPreviewData.push({isError:true,productCode:master.code,productName:req.name,reqQty,totalStock:0,msg:`Mã SP khớp Master nhưng Tên đơn “${req.name}” khác “${master.name}”.`});return;}
+                let matches=stockData.filter(x=>cleanCode(x.productCode)===codeKey&&parseInt(x.quantity)>0).sort(fefoFifoCompare);
+                const totalStock=matches.reduce((sum,item)=>sum+(parseInt(item.quantity)||0),0);
+                if(reqQty>totalStock){bulkExportPreviewData.push({isError:true,productCode:master.code,productName:master.name,reqQty,totalStock,msg:`Thiếu hàng! (Cần: ${reqQty}, Có: ${totalStock})`});return;}
+                let left=reqQty;
+                for(const batch of matches){if(left<=0)break;const available=parseInt(batch.quantity)||0,take=Math.min(available,left);if(take<=0)continue;bulkExportPreviewData.push({isError:false,relatedId:batch.id,productCode:master.code,productName:master.name,productStrength:master.strength||batch.productStrength||'',packSpec:master.packSpec||batch.packSpec||'',unit:master.unit||batch.unit||'',lotNumber:batch.lotNumber,expiryDate:batch.expiryDate,exportQty:take,originalStock:available});left-=take;}
             });
             renderBulkExportPreview(); document.getElementById('exp-preview-box').style.display = 'flex';
         }
@@ -5691,8 +5787,8 @@ if(!getSharedAI())(async()=>{
         window.executeBulkExport = async () => {
             if (bulkExportPreviewData.some(d => d.isError)) return alert('Vui lòng loại bỏ các dòng lỗi (màu đỏ) trước khi xuất kho!');
             if (bulkExportPreviewData.length === 0) return;
-            const unsafeRows = bulkExportPreviewData.filter(d => !d.productName || !d.lotNumber || !d.expiryDate || !d.exportQty || d.exportQty <= 0);
-            if(unsafeRows.length > 0) return alert(`Có ${unsafeRows.length} dòng thiếu Tên SP / Số lô / Hạn dùng / Số lượng. Không cho phép trừ kho!`);
+            const unsafeRows = bulkExportPreviewData.filter(d => !d.productCode || !d.productName || !d.lotNumber || !d.expiryDate || !d.exportQty || d.exportQty <= 0);
+            if(unsafeRows.length > 0) return alert(`Có ${unsafeRows.length} dòng thiếu Mã SP / Tên SP / Số lô / Hạn dùng / Số lượng. Không cho phép trừ kho!`);
             const dest = document.getElementById('bulk-exp-dest').value || 'Khách lẻ/Không xác định';
             const date = document.getElementById('bulk-exp-date').value;
             const ok = await openSafetyVerification({
@@ -5706,14 +5802,13 @@ if(!getSharedAI())(async()=>{
             if(!ok) return;
             // GDP: lập lại FEFO/FIFO trên dữ liệu Firebase NGAY lúc xác nhận, tránh dùng preview cũ khi tồn đã thay đổi.
             const demandMap={};
-            for(const x of bulkExportPreviewData){const k=(x.productCode||'').trim()?`C:${cleanStr(x.productCode)}`:`N:${cleanStr(x.productName)}`;if(!demandMap[k])demandMap[k]={productCode:x.productCode||'',productName:x.productName||'',qty:0};demandMap[k].qty+=parseInt(x.exportQty)||0;}
+            for(const x of bulkExportPreviewData){if(!String(x.productCode||'').trim())return showToast('Có dòng thiếu Mã SP; không cho phép trừ kho.','error');const k=`C:${cleanCode(x.productCode)}`;if(!demandMap[k])demandMap[k]={productCode:x.productCode,productName:x.productName,qty:0};demandMap[k].qty+=parseInt(x.exportQty)||0;}
             let committed=[];
             const tx=await refs.items.transaction(data=>{
                 if(!data)return;const rows=Object.keys(data).map(id=>({id,...data[id]})),plan=[];
                 for(const d of Object.values(demandMap)){
-                    let matches=[];if((d.productCode||'').trim())matches=rows.filter(x=>cleanStr(x.productCode)===cleanStr(d.productCode)&&parseInt(x.quantity)>0);
-                    if(!matches.length)matches=rows.filter(x=>cleanStr(x.productName)===cleanStr(d.productName)&&parseInt(x.quantity)>0);
-                    matches.sort(fefoFifoCompare);let left=d.qty;
+                    const codeKey=cleanCode(d.productCode||'');if(!codeKey)return;
+                    let matches=rows.filter(x=>cleanCode(x.productCode)===codeKey&&parseInt(x.quantity)>0).sort(fefoFifoCompare);let left=d.qty;
                     for(const lot of matches){if(left<=0)break;const take=Math.min(parseInt(lot.quantity)||0,left);if(take<=0)continue;plan.push({relatedId:lot.id,productName:lot.productName||'',productCode:lot.productCode||'',productStrength:lot.productStrength||'',packSpec:lot.packSpec||'',unit:lot.unit||'',lotNumber:lot.lotNumber||'',expiryDate:lot.expiryDate||'',quantity:take});left-=take;}
                     if(left>0)return;
                 }
@@ -5721,7 +5816,7 @@ if(!getSharedAI())(async()=>{
                 for(const x of plan)data[x.relatedId].quantity=(parseInt(data[x.relatedId].quantity)||0)-x.quantity;committed=plan;return data;
             });
             if(!tx.committed)return showToast('Tồn kho đã thay đổi hoặc không còn đáp ứng FEFO/FIFO. Hệ thống KHÔNG trừ kho; hãy soi lại.','error');
-            let count=0;for(const item of committed){await refs.exports.push({productName:item.productName,productCode:item.productCode||'',productStrength:item.productStrength||'',packSpec:item.packSpec||'',unit:item.unit||'',lotNumber:item.lotNumber,expiryDate:item.expiryDate,quantity:item.quantity,destination:dest,exportDate:date,relatedId:item.relatedId,fefoFifo:'FEFO_HSD_TRUOC__FIFO_NHAP_TRUOC',sourceType:'BULK_EXPORT_GDP'});count++;}
+            let count=0;for(const item of committed){await refs.exports.push({productName:item.productName,productCode:item.productCode||'',productStrength:item.productStrength||'',packSpec:item.packSpec||'',unit:item.unit||'',lotNumber:item.lotNumber,expiryDate:item.expiryDate,quantity:item.quantity,boxQuantity:item.quantity,destination:dest,exportDate:date,relatedId:item.relatedId,fefoFifo:'FEFO_HSD_TRUOC__FIFO_NHAP_TRUOC',sourceType:'BULK_EXPORT_GDP'});count++;}
             showToast(`Đã xuất thành công ${count} dòng/lô theo FEFO/FIFO!`, 'success');
             document.getElementById('exp-preview-box').style.display = 'none';
             document.getElementById('exp-paste-area').value = '';
@@ -5866,17 +5961,19 @@ if(!getSharedAI())(async()=>{
         // UTILS
         function parseDate(v) { if(!v)return ''; if(typeof v==='number') return new Date((v-25569)*86400000).toISOString().split('T')[0]; if(v.includes('/')){const p=v.split('/'); if(p.length===3) return `${p[2]}-${p[1]}-${p[0]}`;} return v; }
         window.saveManual = async () => {
-            const typedName=document.getElementById('imp-name').value.trim();
-            const master=masterData.find(m=>vnNorm(m.name)===vnNorm(typedName));
-            if(!master)return showToast('Tên sản phẩm chưa khớp chính xác trong Master. Hãy chọn đúng tên từ Dữ Liệu Gốc!', 'error');
+            const typedName=document.getElementById('imp-name').value.trim(),typedCode=document.getElementById('imp-code').value.trim();
+            if(!typedCode)return showToast('Thiếu Mã SP Master. Hãy chọn lại sản phẩm từ Dữ Liệu Gốc!', 'error');
+            const masterHits=masterData.filter(m=>m.code&&cleanCode(m.code)===cleanCode(typedCode));
+            if(masterHits.length!==1||masterDuplicateCodes.includes(cleanCode(typedCode)))return showToast(`Mã SP ${typedCode} không tồn tại duy nhất trong Master. Không cho phép nhập kho.`, 'error');
+            const master=masterHits[0];
+            if(vnNorm(master.name)!==vnNorm(typedName))return showToast(`Mã SP ${master.code} thuộc “${master.name}”, không khớp tên đang nhập “${typedName}”.`, 'error');
             if(!String(master.packSpec||'').trim())return showToast(`Master của “${master.name}” chưa có Quy cách. Hãy bổ sung Quy cách trước khi nhập kho!`, 'error');
             const item={
                 productName: master.name,
-                productCode: master.code || document.getElementById('imp-code').value || '',
-                // Hàm lượng/NĐ và ĐVT là tham khảo: ưu tiên giá trị người dùng bổ sung, nếu trống mới lấy Master.
-                productStrength: document.getElementById('imp-strength').value.trim() || master.strength || '',
+                productCode: master.code,
+                productStrength: master.strength || '',
                 packSpec: master.packSpec,
-                unit: document.getElementById('imp-unit').value.trim() || master.unit || '',
+                unit: master.unit || '',
                 lotNumber: document.getElementById('imp-lot').value.trim(),
                 expiryDate: document.getElementById('imp-exp').value,
                 quantity: parseInt(document.getElementById('imp-qty').value),
@@ -5901,12 +5998,24 @@ if(!getSharedAI())(async()=>{
         window.requestDeleteStock=async(id)=>{ const d=stockData.find(x=>x.id===id); if(!d) return; const ok=await openSafetyVerification({ title:'CẢNH BÁO XÓA DÒNG TỒN KHO', subtitle:'Dòng này sẽ bị xóa khỏi dữ liệu tồn kho. Chỉ xác nhận khi đã đối chiếu và thật sự cần xóa.', actionType:'XÓA TỒN KHO', items:[d] }); if(!ok) return; await refs.items.child(id).remove(); showToast('Đã xóa dòng tồn kho','success'); };
         window.editStock=(id)=>{ const d=stockData.find(x=>x.id===id); document.getElementById('edit-id').value=id; document.getElementById('edit-name').value=d.productName; document.getElementById('edit-code').value=d.productCode; document.getElementById('edit-unit').value=d.unit; document.getElementById('edit-strength').value=d.productStrength||''; document.getElementById('edit-pack').value=d.packSpec||''; document.getElementById('edit-lot').value=d.lotNumber; document.getElementById('edit-exp').value=d.expiryDate; document.getElementById('edit-qty').value=d.quantity; document.getElementById('edit-modal').style.display='flex'; }
         window.saveEdit=async()=>{
-            const id=document.getElementById('edit-id').value;
-            const item={ productName:document.getElementById('edit-name').value.trim(), productCode:document.getElementById('edit-code').value.trim(), unit:document.getElementById('edit-unit').value.trim(), productStrength:document.getElementById('edit-strength').value.trim(), packSpec:document.getElementById('edit-pack').value.trim(), lotNumber:document.getElementById('edit-lot').value.trim(), expiryDate:document.getElementById('edit-exp').value, quantity:parseInt(document.getElementById('edit-qty').value) };
-            if(!item.productName || !item.lotNumber || !item.expiryDate || !item.quantity || item.quantity < 0) return showToast('Thiếu thông tin kiểm soát bắt buộc!', 'error');
-            const ok=await openSafetyVerification({ title:'KIỂM TRA TRƯỚC KHI SỬA TỒN KHO', subtitle:'Sửa dữ liệu tồn kho là thao tác nhạy cảm. Hãy đối chiếu lại trước khi ghi đè.', actionType:'SỬA TỒN KHO', items:[item] });
+            const id=document.getElementById('edit-id').value,code=document.getElementById('edit-code').value.trim();
+            if(!code)return showToast('Mã SP Master là bắt buộc.','error');
+            const mh=masterData.filter(m=>m.code&&cleanCode(m.code)===cleanCode(code));
+            if(mh.length!==1||masterDuplicateCodes.includes(cleanCode(code)))return showToast(`Mã SP ${code} không tồn tại duy nhất trong Master. Không cho phép sửa tồn.`, 'error');
+            const master=mh[0];
+            const item={ productName:master.name, productCode:master.code, unit:master.unit||'', productStrength:master.strength||'', packSpec:master.packSpec||'', lotNumber:document.getElementById('edit-lot').value.trim(), expiryDate:document.getElementById('edit-exp').value, quantity:parseInt(document.getElementById('edit-qty').value) };
+            if(!item.productName || !item.packSpec || !item.lotNumber || !item.expiryDate || Number.isNaN(item.quantity) || item.quantity < 0) return showToast('Thiếu Mã/Tên/Quy cách/Lô/HSD hoặc số lượng không hợp lệ!', 'error');
+            const ok=await openSafetyVerification({ title:'KIỂM TRA TRƯỚC KHI SỬA TỒN KHO', subtitle:'Mã/Tên/Quy cách/ĐVT/Hàm lượng sẽ lấy lại từ Master. Hệ thống chặn tạo trùng Mã SP + Lô + HSD.', actionType:'SỬA TỒN KHO', items:[item] });
             if(!ok) return;
-            await refs.items.child(id).update(item); document.getElementById('edit-modal').style.display='none'; showToast('Đã lưu sau khi kiểm tra','success');
+            let reason='';
+            const tx=await refs.items.transaction(data=>{
+                if(!data||!data[id]){reason='Dòng tồn không còn tồn tại';return;}
+                const dup=Object.keys(data).find(k=>k!==id&&cleanCode(data[k]?.productCode)===cleanCode(item.productCode)&&inventoryLotKey(data[k]?.lotNumber)===inventoryLotKey(item.lotNumber)&&inventoryExpiryKey(data[k]?.expiryDate)===inventoryExpiryKey(item.expiryDate));
+                if(dup){reason='Đã có dòng khác cùng Mã SP + Lô + HSD';return;}
+                data[id]={...data[id],...item,lastEditedAt:new Date().toISOString()};return data;
+            });
+            if(!tx.committed)return showToast('Không lưu sửa tồn: '+(reason||'dữ liệu đã thay đổi trên Firebase'),'error');
+            const snap=tx.snapshot?.val?.()||{};stockData=Object.keys(snap).map(k=>({id:k,...snap[k]}));renderStockTable();document.getElementById('edit-modal').style.display='none'; showToast('Đã lưu sau khi kiểm tra Master + khóa lô','success');
         }
         window.downloadMasterTemplate = () => {
             const wb = XLSX.utils.book_new();
@@ -6022,6 +6131,7 @@ if(!getSharedAI())(async()=>{
             const existingNames=new Set(masterData.filter(m=>m.name).map(m=>cleanStr(m.name)));
             rows.forEach((r,i)=>{
                 const rowNo=i+1, code=cleanCode(r.code), name=cleanStr(r.name);
+                if(!r.code) errors.push(`Hàng ${rowNo}: thiếu Mã SP.`);
                 if(!r.name) errors.push(`Hàng ${rowNo}: thiếu Tên SP.`);
                 if(!r.packSpec) errors.push(`Hàng ${rowNo}: thiếu Quy Cách.`);
                 if(code && existingCodes.has(code)) errors.push(`Hàng ${rowNo}: Mã SP “${r.code}” đã có trong Master.`);
@@ -6040,7 +6150,7 @@ if(!getSharedAI())(async()=>{
             if(!firebaseConnected){setManualMasterStatus('⛔ Firebase đang mất kết nối. Master là dữ liệu chuẩn nên chưa lưu Offline; hãy kết nối lại rồi bấm Lưu.','error');return;}
             const ok=confirm(`Xác nhận thêm ${rows.length} sản phẩm vào MASTER chính thức?
 
-Tên SP và Quy cách sẽ được dùng làm dữ liệu chuẩn cho Nhập/Xuất kho.`); if(!ok)return;
+Mã SP, Tên SP và Quy cách sẽ được dùng làm dữ liệu chuẩn bắt buộc cho Nhập/Xuất kho.`); if(!ok)return;
             setManualMasterStatus('⏳ Đang lưu và đồng bộ Master...','info');
             try{
                 const node=refs.master.child(MANUAL_MASTER_NODE);
@@ -7216,14 +7326,15 @@ YÊU CẦU BẮT BUỘC:
         function checkMasterRequiredFields(m){
             if(!m)return ['Chưa khớp Master'];
             const missing=[];
+            if(!String(m.code||'').trim())missing.push('Mã SP');
             if(!String(m.name||'').trim())missing.push('Tên SP');
             if(!String(m.packSpec||'').trim())missing.push('Quy cách');
+            if(m.code&&masterDuplicateCodes.includes(cleanCode(m.code)))missing.push('Mã SP bị trùng');
             return missing;
         }
         function checkMasterReferenceFields(m){
             if(!m)return [];
             const missing=[];
-            if(!String(m.code||'').trim())missing.push('Mã SP');
             if(!String(m.unit||'').trim())missing.push('Đơn vị');
             if(!String(m.strength||'').trim())missing.push('Hàm lượng/NĐ');
             return missing;
@@ -7273,7 +7384,7 @@ YÊU CẦU BẮT BUỘC:
             r.issues=issues;
             r.referenceWarnings=referenceWarnings;
             r.unitWarn=unitWarn;
-            r.newProductWarning=!m?'CHƯA KHỚP MASTER – chưa được nhập KHO. Chỉ cần xác nhận đúng TÊN sản phẩm trong Master; Mã/ĐVT/Hàm lượng không phải điều kiện khóa.':'';
+            r.newProductWarning=!m?'CHƯA KHỚP MASTER – chưa được nhập KHO. Phải xác nhận đúng Mã SP + Tên + Quy cách trong Master.':'';
             // warning là cảnh báo tham khảo nhưng VẪN ĐỦ ĐIỀU KIỆN load nếu không có lỗi bắt buộc.
             r.status=issues.length?'blocked':!m?'new':referenceWarnings.length?'warning':'ok';
             return r;
@@ -7283,8 +7394,8 @@ YÊU CẦU BẮT BUỘC:
             const compat=masterNameCompatibility(r.sourceName,r.match.name);
             if(!compat.accepted)return false;
             const p=rowWarehouseProduct(r);
-            // Điều kiện bắt buộc: tên đã khớp Master + quy cách + lô + HSD + số lượng.
-            return !!(String(p.name||'').trim() && String(p.packSpec||'').trim() && String(r.lotNumber||'').trim() && String(r.expiryDate||'').trim() && Number(r.quantity)>0);
+            // V57: Mã SP Master duy nhất là khóa bắt buộc, sau đó mới xét Tên/Quy cách/Lô/HSD/Số lượng.
+            return !!(String(p.code||'').trim() && !masterDuplicateCodes.includes(cleanCode(p.code)) && String(p.name||'').trim() && String(p.packSpec||'').trim() && String(r.lotNumber||'').trim() && String(r.expiryDate||'').trim() && Number(r.quantity)>0);
         }
         async function aiResolveRow(r){
             if(r.match||!r.candidates?.length||r.matchScore<.60)return;
@@ -7342,11 +7453,12 @@ YÊU CẦU BẮT BUỘC:
         function candidateOptions(r){
             const opts=['<option value="">-- CHỌN MASTER ĐÚNG / GẦN ĐÚNG TÊN --</option>'];
             for(const c of (r.candidates||[])){
+                if(!c.m?.code||masterDuplicateCodes.includes(cleanCode(c.m.code)))continue;
                 const compat=masterNameCompatibility(r.sourceName,c.m.name);
                 const selected=(r.match&&((r.match.code&&c.m.code&&cleanCode(r.match.code)===cleanCode(c.m.code))||r.match.name===c.m.name))||(r.pendingMasterCode&&c.m.code&&cleanCode(r.pendingMasterCode)===cleanCode(c.m.code))?'selected':'';
                 const suggested=r.aiSuggestedCode&&c.m.code&&cleanCode(r.aiSuggestedCode)===cleanCode(c.m.code)?' ⭐ Huyền gợi ý':'';
                 const tag=compat.accepted?(compat.level==='exact'?' ✅ đúng tên':compat.level==='safe'?' ✅ gần đúng an toàn':' ⚠ gần đúng'):' ⛔ khác tên · chỉ dùng khi xác nhận ĐỒNG BỘ';
-                opts.push(`<option ${selected} value="${escAI(c.m.code||'NAME:'+c.m.name)}">${escAI(c.m.code||'--')} · ${escAI(c.m.name)} · ${Math.round(compat.score*100)}%${tag}${suggested}</option>`);
+                opts.push(`<option ${selected} value="${escAI(c.m.code)}">${escAI(c.m.code)} · ${escAI(c.m.name)} · ${Math.round(compat.score*100)}%${tag}${suggested}</option>`);
             }
             return opts.join('');
         }
@@ -7387,12 +7499,12 @@ YÊU CẦU BẮT BUỘC:
                 const idx=Number(sel.dataset.aiSelect),r=aiState.rows[idx],val=sel.value;
                 if(!val){r.match=null;r.manual=false; if(aiState.rawItems[idx]){aiState.rawItems[idx].confirmedMasterCode='';aiState.rawItems[idx].masterExplicitlyConfirmed=false;}}
                 else{
-                    const hit=masterData.find(m=>m.code&&cleanCode(m.code)===cleanCode(val))||masterData.find(m=>'NAME:'+m.name===val);
+                    const hit=masterData.find(m=>m.code&&cleanCode(m.code)===cleanCode(val)&&!masterDuplicateCodes.includes(cleanCode(m.code)));
                     const compat=hit?masterNameCompatibility(r.sourceName,hit.name):{accepted:false,score:0};
                     if(!hit){r.match=null;r.pendingMasterCode='';r.manual=false;}
                     else if(!compat.accepted){
                         // Không cho xác nhận trực tiếp tên khác. Chỉ lưu như một lựa chọn CHỜ ĐỒNG BỘ có chủ đích.
-                        r.match=null; r.pendingMasterCode=hit.code||('NAME:'+hit.name); r.manual=false; r.matchMethod='pending-sync';
+                        r.match=null; r.pendingMasterCode=hit.code; r.manual=false; r.matchMethod='pending-sync';
                         if(aiState.rawItems[idx]){aiState.rawItems[idx].pendingMasterCode=r.pendingMasterCode;aiState.rawItems[idx].confirmedMasterCode='';aiState.rawItems[idx].masterExplicitlyConfirmed=false;}
                         aiNotice(`⚠️ Tên PDF “${r.sourceName}” chưa đủ khớp “${hit.name}”. Nếu đây là lỗi đọc PDF, kiểm tra đúng sản phẩm rồi bấm ĐỒNG BỘ DÒNG NÀY THEO MASTER.`, 'info');
                     }else{
@@ -7445,7 +7557,7 @@ YÊU CẦU BẮT BUỘC:
         async function addRowToMaster(index){
             const r=aiState.rows[index]; if(!r||r.match)return;
             const p=rowWarehouseProduct(r),missing=[];
-            if(!p.name)missing.push('Tên SP'); if(!p.packSpec)missing.push('Quy cách');
+            if(!p.code)missing.push('Mã SP'); if(!p.name)missing.push('Tên SP'); if(!p.packSpec)missing.push('Quy cách');
             if(missing.length)return aiNotice('Chưa thể thêm Master. Thiếu dữ liệu bắt buộc: '+missing.join(', '),'error');
             const duplicateCode=p.code?masterData.find(m=>m.code&&cleanCode(m.code)===cleanCode(p.code)):null;
             if(duplicateCode)return aiNotice(`Mã SP ${p.code} đã tồn tại trong Master cho “${duplicateCode.name}”. Hãy chọn đúng Master thay vì tạo mới.`,'error');
@@ -7466,12 +7578,12 @@ YÊU CẦU BẮT BUỘC:
                 }else{ r.matchMethod='manual-master-created'; r.manual=true; }
                 finalizeRow(r);
                 renderCompare(); renderReceipt(); autoLoadWarehousePreview(false);
-                aiNotice(`Đã thêm ${p.code||'--'} · ${p.name} vào Master. Tên + Quy cách là chuẩn bắt buộc; Mã/ĐVT/Hàm lượng là thông tin tham khảo.`);
+                aiNotice(`Đã thêm ${p.code||'--'} · ${p.name} vào Master. Mã SP + Tên + Quy cách là chuẩn bắt buộc; ĐVT/Hàm lượng là thông tin bổ sung.`);
             }catch(e){aiNotice('Không thêm được Master: '+(e?.message||e),'error');}
         }
         function chosenMasterForSync(r){
             const key=r?.pendingMasterCode||r?.match?.code||'';
-            if(key){const hit=masterData.find(m=>m.code&&cleanCode(m.code)===cleanCode(key))||masterData.find(m=>'NAME:'+m.name===key);if(hit)return hit}
+            if(key){const hit=masterData.find(m=>m.code&&cleanCode(m.code)===cleanCode(key)&&!masterDuplicateCodes.includes(cleanCode(m.code)));if(hit)return hit}
             return r?.match||null;
         }
         function syncRowFromMaster(index,ask=true){
@@ -7793,7 +7905,7 @@ YÊU CẦU BẮT BUỘC:
         window.IDECO_MASTER_REVIEW={run:()=>runMasterReview(),rematch:()=>rematchAll(false)};
 
         // ===== API dùng chung cho XUẤT KHO AI =====
-        const exportAIItemSchema={type:'OBJECT',properties:{stt:{type:'NUMBER'},maSP:{type:'STRING'},tenSP:{type:'STRING'},dvt:{type:'STRING'},soLuong:{type:'NUMBER'}},required:['tenSP','dvt','soLuong']};
+        const exportAIItemSchema={type:'OBJECT',properties:{stt:{type:'NUMBER'},maSP:{type:'STRING'},tenSP:{type:'STRING'},dvt:{type:'STRING'},soLuong:{type:'NUMBER'}},required:['maSP','tenSP','dvt','soLuong']};
         const exportAISchema={type:'OBJECT',properties:{slipInfo:{type:'OBJECT',properties:{maPhieu:{type:'STRING'},donHang:{type:'STRING'},ngay:{type:'STRING'},nguoiNhan:{type:'STRING'},diaChi:{type:'STRING'},nhanVien:{type:'STRING'},ghiChu:{type:'STRING'}}},items:{type:'ARRAY',items:exportAIItemSchema}},required:['slipInfo','items']};
         const EXPORT_AI_PROMPT=`Bạn là AI chuyên đọc PHIẾU XUẤT KHO của công ty dược.
 Hãy đọc TOÀN BỘ mọi trang và trả đúng JSON theo schema.
@@ -7848,26 +7960,20 @@ QUY TẮC CỰC KỲ QUAN TRỌNG:
         function setSaveStatus(msg,type='info'){const e=$('xk-voucher-save-status');if(!e)return;e.textContent=msg;e.style.color=type==='error'?'#b91c1c':type==='ok'?'#166534':'#64748b'}
         function loadLogo(){try{S.logo=localStorage.getItem('ideco_export_logo_v1')||''}catch{};if($('xk-logo-status'))$('xk-logo-status').textContent=S.logo?'✅ Đã lưu logo trên máy.':'Chưa chọn logo.'}
         function saveLogo(file){if(!file)return;const r=new FileReader();r.onload=()=>{S.logo=String(r.result||'');try{localStorage.setItem('ideco_export_logo_v1',S.logo)}catch{};$('xk-logo-status').textContent='✅ Đã lưu logo trên máy.';renderVoucher();};r.readAsDataURL(file)}
-        function exportMasterCandidates(req){const shared=window.IDECO_SHARED_AI;if(shared&&typeof shared.masterCandidates==='function')return shared.masterCandidates(req.tenSP||'',req.maSP||'').map(x=>x.m||x).filter(Boolean);const name=norm(req.tenSP);return (masterData||[]).filter(m=>name&&norm(m.name||m.productName).includes(name)).slice(0,5)}
+        function exportMasterCandidates(req){const valid=m=>m&&String(m.code||m.productCode||'').trim()&&!masterDuplicateCodes.includes(cleanCode(m.code||m.productCode));const shared=window.IDECO_SHARED_AI;if(shared&&typeof shared.masterCandidates==='function')return shared.masterCandidates(req.tenSP||'',req.maSP||'').map(x=>x.m||x).filter(valid);const name=norm(req.tenSP);return (masterData||[]).filter(m=>valid(m)&&name&&norm(m.name||m.productName).includes(name)).slice(0,5)}
         function masterFor(req){
-            const code=norm(req.maSP),name=norm(req.tenSP),shared=window.IDECO_SHARED_AI;
-            let byCode=code?(masterData||[]).find(x=>norm(x.code||x.productCode)===code):null;
-            if(byCode){
-                const cp=shared?.masterNameCompatibility?.(req.tenSP,byCode.name||byCode.productName);
-                if(!name||cp?.accepted||norm(byCode.name||byCode.productName)===name)return byCode;
-                // Mã trùng nhưng tên khác đáng kể: không được tự coi là cùng thuốc. Người dùng phải Đồng bộ Master có chủ đích.
-                return null;
-            }
-            let m=name?(masterData||[]).find(x=>norm(x.name||x.productName)===name):null;
-            if(!m&&name){for(const c of exportMasterCandidates(req)){const cp=shared?.masterNameCompatibility?.(req.tenSP,c.name||c.productName);if(cp?.accepted){m=c;break}}}
-            return m||null
+            const code=norm(req.maSP);
+            if(!code)return null;
+            const hits=(masterData||[]).filter(x=>norm(x.code||x.productCode)===code);
+            if(hits.length!==1||masterDuplicateCodes.includes(cleanCode(req.maSP||'')))return null;
+            const byCode=hits[0],name=norm(req.tenSP),shared=window.IDECO_SHARED_AI;
+            if(name){const cp=shared?.masterNameCompatibility?.(req.tenSP,byCode.name||byCode.productName);if(cp&&!cp.accepted&&norm(byCode.name||byCode.productName)!==name)return null;}
+            return byCode;
         }
         function stockFor(req,master=null){
-            const m=master||masterFor(req); if(!m)return [];
-            const code=norm(m.code||m.productCode),name=norm(m.name||m.productName);let arr=[];
-            if(code)arr=(stockData||[]).filter(x=>norm(x.productCode)===code);
-            if(!arr.length&&name)arr=(stockData||[]).filter(x=>norm(x.productName)===name);
-            return arr
+            const m=master||masterFor(req); if(!m||!String(m.code||m.productCode||'').trim())return [];
+            const code=norm(m.code||m.productCode);
+            return (stockData||[]).filter(x=>norm(x.productCode)===code);
         }
         function smallestConversion(packSpec,unitHint){
             const raw=String(packSpec||unitHint||'').trim(),s=norm(raw);
@@ -7911,10 +8017,10 @@ QUY TẮC CỰC KỲ QUAN TRỌNG:
             const plan=req._lotPlan||{};
             return `<details class="xk-lot-plan"><summary>🎯 Chọn lô thủ công${Object.values(plan).some(x=>n(x)>0)?'<span class="xk-plan-badge">ĐANG ÁP DỤNG</span>':''}</summary><div style="font-size:.68rem;color:#475569;margin:5px 0">Nhập số HỘP theo từng lô. Tổng phải đúng bằng SL phiếu ${fmt(req.soLuong)}. Để trống toàn bộ = FEFO/FIFO tự động.</div>${matches.map((lot,j)=>`<div class="xk-lot-plan-row"><div><b>${j+1}. Lô ${esc(lot.lotNumber||'—')}</b> · HSD ${esc(hsdShort(lot.expiryDate))} · Tồn ${fmt(lot.quantity)}${j===0?' · ⭐ FEFO':''}</div><input type="number" min="0" max="${esc(lot.quantity)}" step="1" data-xk-lot-plan-row="${index}" data-lot-id="${esc(lot.id)}" value="${n(plan[lot.id])||''}" placeholder="SL hộp"></div>`).join('')}<div class="xk-lot-plan-actions"><button type="button" class="btn btn-primary" data-xk-apply-plan="${index}" style="padding:5px 8px">Áp dụng lô đã chọn</button><button type="button" class="btn" data-xk-clear-plan="${index}" style="padding:5px 8px;background:#64748b">Trở về FEFO/FIFO</button></div></details>`
         }
-        function renderCompare(){const tb=$('xk-compare-body');if(!tb)return;tb.innerHTML=S.compare.map((r,i)=>{const req=S.requests[i]||r,cands=exportMasterCandidates(req).slice(0,5),opts=['<option value="">-- Chọn Master để đồng bộ --</option>',...cands.map(m=>`<option value="${esc(m.code||'NAME:'+m.name)}" ${(req._masterChoice&&(norm(req._masterChoice)===norm(m.code)||req._masterChoice==='NAME:'+m.name))?'selected':''}>${esc(m.code||'--')} · ${esc(m.name||'')}</option>`)].join('');return `<tr class="${r.status==='ok'?'xk-row-ok':r.status==='zero'?'xk-row-zero':r.status==='short'?'xk-row-short':'xk-row-unmatched'}"><td>${i+1}</td><td><input data-xk-edit="code" data-row="${i}" value="${esc(req.maSP||'')}" style="min-width:110px"></td><td><input data-xk-edit="name" data-row="${i}" value="${esc(req.tenSP||'')}" style="min-width:220px;font-weight:800"></td><td><input data-xk-edit="unit" data-row="${i}" value="${esc(req.dvt||'')}" style="min-width:120px"></td><td><input type="number" min="0" data-xk-edit="qty" data-row="${i}" value="${esc(req.soLuong||0)}" style="width:90px;text-align:right;font-weight:800"></td><td style="text-align:center;font-weight:800">${fmt(r.total)}</td><td>${esc(r.packSpec||'')}</td><td><b>${esc(r.conversion?.unit||'—')}</b></td><td style="text-align:right;font-weight:800">${r.conversion?.factor?fmt((r.boxes??r.soLuong)*r.conversion.factor):'—'}</td><td><b>${esc(r.msg||'')}</b>${lotPlanHTML(req,i)}<div style="margin-top:6px"><select data-xk-master-choice="${i}" style="max-width:250px">${opts}</select><button type="button" class="btn btn-primary" data-xk-sync="${i}" style="padding:5px 7px;margin-top:4px">🔄 Đồng bộ Master</button></div></td></tr>`}).join('')||'<tr><td colspan="10" style="text-align:center">Chưa có dữ liệu.</td></tr>';
+        function renderCompare(){const tb=$('xk-compare-body');if(!tb)return;tb.innerHTML=S.compare.map((r,i)=>{const req=S.requests[i]||r,cands=exportMasterCandidates(req).slice(0,5),opts=['<option value="">-- Chọn Master để đồng bộ --</option>',...cands.map(m=>`<option value="${esc(m.code)}" ${(req._masterChoice&&norm(req._masterChoice)===norm(m.code))?'selected':''}>${esc(m.code)} · ${esc(m.name||'')}</option>`)].join('');return `<tr class="${r.status==='ok'?'xk-row-ok':r.status==='zero'?'xk-row-zero':r.status==='short'?'xk-row-short':'xk-row-unmatched'}"><td>${i+1}</td><td><input data-xk-edit="code" data-row="${i}" value="${esc(req.maSP||'')}" style="min-width:110px"></td><td><input data-xk-edit="name" data-row="${i}" value="${esc(req.tenSP||'')}" style="min-width:220px;font-weight:800"></td><td><input data-xk-edit="unit" data-row="${i}" value="${esc(req.dvt||'')}" style="min-width:120px"></td><td><input type="number" min="0" data-xk-edit="qty" data-row="${i}" value="${esc(req.soLuong||0)}" style="width:90px;text-align:right;font-weight:800"></td><td style="text-align:center;font-weight:800">${fmt(r.total)}</td><td>${esc(r.packSpec||'')}</td><td><b>${esc(r.conversion?.unit||'—')}</b></td><td style="text-align:right;font-weight:800">${r.conversion?.factor?fmt((r.boxes??r.soLuong)*r.conversion.factor):'—'}</td><td><b>${esc(r.msg||'')}</b>${lotPlanHTML(req,i)}<div style="margin-top:6px"><select data-xk-master-choice="${i}" style="max-width:250px">${opts}</select><button type="button" class="btn btn-primary" data-xk-sync="${i}" style="padding:5px 7px;margin-top:4px">🔄 Đồng bộ Master</button></div></td></tr>`}).join('')||'<tr><td colspan="10" style="text-align:center">Chưa có dữ liệu.</td></tr>';
             tb.querySelectorAll('[data-xk-edit]').forEach(inp=>inp.onchange=()=>{const i=Number(inp.dataset.row),q=S.requests[i];if(!q)return;const k=inp.dataset.xkEdit;if(k==='code')q.maSP=inp.value.trim();if(k==='name')q.tenSP=inp.value.trim();if(k==='unit')q.dvt=inp.value.trim();if(k==='qty')q.soLuong=n(inp.value);q._masterChoice='';q._lotPlan=null;evaluate()});
             tb.querySelectorAll('[data-xk-master-choice]').forEach(sel=>sel.onchange=()=>{const q=S.requests[Number(sel.dataset.xkMasterChoice)];if(q)q._masterChoice=sel.value});
-            tb.querySelectorAll('[data-xk-sync]').forEach(btn=>btn.onclick=()=>{const i=Number(btn.dataset.xkSync),q=S.requests[i];if(!q)return;const val=q._masterChoice;if(!val)return showToast('Hãy chọn Master đúng cho dòng này.','error');const m=(masterData||[]).find(x=>x.code&&norm(x.code)===norm(val))||(masterData||[]).find(x=>'NAME:'+x.name===val);if(!m)return showToast('Không tìm thấy Master đã chọn.','error');if(!confirm(`Đồng bộ dòng phiếu “${q.tenSP}” theo MASTER “${m.name}”?\nMã/Tên/ĐVT sẽ lấy từ Master; số lượng trên phiếu giữ nguyên.`))return;q._originalName=q._originalName||q.tenSP;q.maSP=m.code||q.maSP;q.tenSP=m.name||q.tenSP;q.dvt=m.unit||q.dvt;q._masterChoice='';q._lotPlan=null;evaluate();showToast('Đã đồng bộ dòng phiếu xuất theo Master.','success')});
+            tb.querySelectorAll('[data-xk-sync]').forEach(btn=>btn.onclick=()=>{const i=Number(btn.dataset.xkSync),q=S.requests[i];if(!q)return;const val=q._masterChoice;if(!val)return showToast('Hãy chọn Master đúng cho dòng này.','error');const m=(masterData||[]).find(x=>x.code&&norm(x.code)===norm(val));if(!m||masterDuplicateCodes.includes(cleanCode(m.code)))return showToast('Không tìm thấy Mã SP Master duy nhất đã chọn.','error');if(!confirm(`Đồng bộ dòng phiếu “${q.tenSP}” theo MASTER “${m.name}”?\nMã/Tên/ĐVT sẽ lấy từ Master; số lượng trên phiếu giữ nguyên.`))return;q._originalName=q._originalName||q.tenSP;q.maSP=m.code||q.maSP;q.tenSP=m.name||q.tenSP;q.dvt=m.unit||q.dvt;q._masterChoice='';q._lotPlan=null;evaluate();showToast('Đã đồng bộ dòng phiếu xuất theo Master.','success')});
             tb.querySelectorAll('[data-xk-apply-plan]').forEach(btn=>btn.onclick=()=>{const i=Number(btn.dataset.xkApplyPlan),q=S.requests[i];if(!q)return;const inputs=[...tb.querySelectorAll(`[data-xk-lot-plan-row="${i}"]`)];const plan={};let sum=0,bad=false;inputs.forEach(inp=>{const v=n(inp.value),mx=n(inp.max);if(v<0||v>mx)bad=true;if(v>0){plan[inp.dataset.lotId]=v;sum+=v}});if(bad)return showToast('Có lô nhập số lượng vượt tồn hiện có.','error');if(!sum){q._lotPlan=null;evaluate();return showToast('Đã trở về phân lô FEFO/FIFO tự động.','success')}if(Math.abs(sum-n(q.soLuong))>.000001)return showToast(`Tổng số hộp chọn theo lô = ${fmt(sum)}, phải bằng SL phiếu = ${fmt(q.soLuong)}.`,'error');q._lotPlan=plan;evaluate();showToast('Đã khóa phân lô thủ công theo số lượng bạn chọn.','success')});
             tb.querySelectorAll('[data-xk-clear-plan]').forEach(btn=>btn.onclick=()=>{const q=S.requests[Number(btn.dataset.xkClearPlan)];if(q){q._lotPlan=null;evaluate();showToast('Đã dùng lại FEFO/FIFO tự động.','success')}})
         }
@@ -8021,10 +8127,8 @@ QUY TẮC CỰC KỲ QUAN TRỌNG:
                     const rows=Object.keys(data).map(id=>({id,...data[id]})),fresh=[];
                     for(const req of S.requests){
                         const master=masterFor(req); if(!master)return;
-                        const code=norm(master.code||master.productCode),name=norm(master.name||master.productName);let matches=[];
-                        if(code)matches=rows.filter(x=>norm(x.productCode)===code);
-                        if(!matches.length&&name)matches=rows.filter(x=>norm(x.productName)===name);
-                        matches=matches.filter(x=>n(x.quantity)>0).sort(fefoFifoCompare);
+                        const code=norm(master.code||master.productCode);if(!code)return;
+                        let matches=rows.filter(x=>norm(x.productCode)===code&&n(x.quantity)>0).sort(fefoFifoCompare);
                         const pack=(master?.packSpec||master?.['Quy Cách']||matches[0]?.packSpec||req.dvt||''),conv=smallestConversion(pack,req.dvt);if(!conv.factor)return;
                         let left=n(req.soLuong);
                         const plan=req._lotPlan&&typeof req._lotPlan==='object'?req._lotPlan:null;
@@ -8322,7 +8426,7 @@ function invoiceMasterRecord(row){if(!row)return {code:'',name:'',unit:'',streng
   strength:String(row.strength??masterColumn(row,['Hàm Lượng / Nồng Độ','Hàm Lượng','Hàm lượng','Nồng Độ','Nồng độ','Strength','Concentration'])??'').trim(),
   packSpec:String(row.packSpec??masterColumn(row,['Quy Cách','Quy cách','Quy Cách Đóng Gói','Quy cách đóng gói','Pack','Packaging'])??'').trim()
 }}
-function flattenMasterFiles(raw){const map=new Map();Object.entries(raw||{}).forEach(([fileId,f])=>{const data=f?.data;if(!data)return;(Array.isArray(data)?data:Object.values(data)).forEach(row=>{const m=invoiceMasterRecord(row);if(!m.name)return;const isSample=cleanCodeLocal(m.code)==='THVIDU01'&&normKey(m.name).includes('ten san pham mau');if(isSample)return;const sig=[cleanCodeLocal(m.code),normKey(m.name),strengthCanonical(m.strength),normKey(m.packSpec),unitCanonical(m.unit)].join('|');const id=m.code?`C:${sig}`:`N:${sig}`;if(!map.has(id))map.set(id,{...m,searchKey:normKey(m.name),sourceFile:f?.fileName||fileId})})});return [...map.values()]}
+function flattenMasterFiles(raw){const out=[];Object.entries(raw||{}).forEach(([fileId,f])=>{const data=f?.data;if(!data)return;(Array.isArray(data)?data:Object.values(data)).forEach((row,ri)=>{const m=invoiceMasterRecord(row);if(!m.name&&!m.code)return;const isSample=cleanCodeLocal(m.code)==='THVIDU01'&&normKey(m.name).includes('ten san pham mau');if(isSample)return;out.push({...m,searchKey:normKey(m.name),sourceFile:f?.fileName||fileId,sourceRow:ri})})});return out}
 function masterCompatibility(sourceName,masterName){const shared=window.IDECO_SHARED_AI;if(shared&&typeof shared.masterNameCompatibility==='function'){try{return shared.masterNameCompatibility(sourceName,masterName)}catch{}}const a=normKey(sourceName),b=normKey(masterName);if(a&&b&&a===b)return {accepted:true,level:'exact',score:1,reason:'Tên trùng chuẩn hóa'};const at=a.split(' ').filter(x=>x.length>2),bt=b.split(' ').filter(x=>x.length>2),same=at.filter(x=>bt.includes(x)).length,score=Math.max(at.length,bt.length)?same/Math.max(at.length,bt.length):0;return {accepted:score>=.72,level:score>=.9?'safe':score>=.72?'near':'bad',score,reason:'So tên cục bộ'}}
 function unitCanonical(v){const s=normKey(v);if(!s)return '';const rules=[['hop',/\b(hop|box)\b/],['vien',/\b(vien|tablet|capsule)\b/],['tuyp',/\b(tuyp|tube)\b/],['chai',/\b(chai|bottle)\b/],['lo',/\b(lo|vial|jar)\b/],['ong',/\b(ong|ampoule|ampule)\b/],['goi',/\b(goi|sachet)\b/],['vi',/\b(vi|blister)\b/]];for(const [k,re] of rules)if(re.test(s))return k;return s}
 function strengthCanonical(v){return normKey(v).replace(/\s+/g,'').replace(/miligam|milligram/g,'mg').replace(/microgam|microgram/g,'mcg')}
@@ -8565,6 +8669,42 @@ async function exportCleanElementPDF(sourceEl, fileName, orientation='p'){
 }
 </script>
 
+
+<script id="ideco-shared-ai-rpc-parent-bridge">
+(function(){
+  'use strict';
+  const NS='IDECO_SHARED_AI_RPC_V1';
+  function allowedSource(src){
+    try{
+      const ids=['forecast-order-iframe','price-agent-iframe'];
+      return ids.some(id=>{const f=document.getElementById(id);return !!(f&&f.contentWindow===src)});
+    }catch(e){return false}
+  }
+  function publicState(ai){
+    let route='main',main=false,backup=false;
+    try{route=typeof ai?.getRoute==='function'&&ai.getRoute()==='backup'?'backup':'main'}catch(e){}
+    try{const st=typeof ai?.getState==='function'?ai.getState():null,s=st&&st.settings?st.settings:{};main=!!((s.keys||[]).some(Boolean));backup=!!String(s.kieKey||'').trim()}catch(e){}
+    return {route,configuredMain:main,configuredBackup:backup};
+  }
+  window.addEventListener('message',async function(ev){
+    const d=ev&&ev.data;
+    if(!d||d.__idecoAiRpc!==NS||d.type!=='request'||!d.id)return;
+    if(!allowedSource(ev.source))return;
+    const reply=(ok,result,error)=>{try{ev.source.postMessage({__idecoAiRpc:NS,type:'response',id:d.id,ok,result:result??null,error:error||''},'*')}catch(e){}};
+    try{
+      const ai=window.IDECO_SHARED_AI;
+      if(d.action==='hello'){if(!ai)throw new Error('Module AI chung chưa khởi tạo.');return reply(true,publicState(ai),'')}
+      if(d.action==='openSettings'){if(typeof window.openIDECOSettingsPanel==='function'){window.openIDECOSettingsPanel();return reply(true,{opened:true},'')}throw new Error('Không mở được Cài đặt AI chung.')}
+      if(!ai)throw new Error('Module AI chung chưa sẵn sàng. Hãy kiểm tra TAB Nhập hàng / Cài đặt AI.');
+      if(d.action==='getRoute')return reply(true,publicState(ai),'');
+      if(d.action==='setRoute'){const mode=d.args&&d.args.mode==='backup'?'backup':'main';if(typeof ai.setRoute!=='function')throw new Error('AI chung không hỗ trợ đổi tuyến.');const ok=ai.setRoute(mode);if(ok===false)throw new Error('Không chuyển được tuyến AI.');return reply(true,publicState(ai),'')}
+      if(d.action==='textRequest'){if(typeof ai.textRequest!=='function')throw new Error('AI chung thiếu textRequest.');const r=await ai.textRequest(String(d.args?.prompt||''),d.args?.opts||{});return reply(true,Object.assign({},r,publicState(ai)),'')}
+      if(d.action==='fileRequest'){if(typeof ai.fileRequest!=='function')throw new Error('AI chung thiếu fileRequest.');const file=d.args?.file;if(!file)throw new Error('Không nhận được file từ TAB con.');const r=await ai.fileRequest(file,String(d.args?.prompt||''),d.args?.opts||{});return reply(true,Object.assign({},r,publicState(ai)),'')}
+      throw new Error('Yêu cầu AI bridge không hợp lệ: '+String(d.action||''));
+    }catch(e){reply(false,null,String(e&&e.message||e))}
+  });
+})();
+</script>
 
 <script id="forecast-tab-loader">
 (function(){

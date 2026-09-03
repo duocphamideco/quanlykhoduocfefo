@@ -3658,8 +3658,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App />);
             <div class="price-agent-toolbar">
               <div><b>🛡️ AI AGENT SOI ĐƠN &amp; GIÁ</b><small>KIỂM TRA GIÁ CNT CHUẨN · PDF/ảnh → Master → Giá/CK → Tồn kho → Sẵn sàng đầu ra</small></div>
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-                <span class="price-agent-pill">🧪 FIREBASE TEST CHUNG · thunghiem-eeb1f</span>
+                <span class="price-agent-pill">💾 GIÁ CHUẨN · kiemtradon</span>
+                <span class="price-agent-pill">🧪 KHO V57 · thunghiem-eeb1f</span>
                 <span class="price-agent-pill" style="background:#dcfce7;color:#166534;border-color:#86efac">🤖 AI CHÍNH / AI PHỤ · dùng chung TAB Nhập hàng</span>
+                <button type="button" class="btn btn-primary" onclick="window.openPriceMasterData&&window.openPriceMasterData()">💾 Quản lý Dữ liệu Chuẩn</button>
                 <button type="button" class="btn btn-primary" onclick="window.openIDECOSettingsPanel&&window.openIDECOSettingsPanel()">⚙️ Cài đặt AI</button>
                 <button type="button" class="btn btn-primary" onclick="window.reloadPriceAgentTab&&window.reloadPriceAgentTab()">↻ Khởi động lại tab</button>
               </div>
@@ -3706,11 +3708,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 <header class="hero"><h1>HỆ THỐNG KIỂM TRA ĐƠN CHUỖI NHÀ THUỐC</h1></header>
 <nav class="tabs">
 <button class="tab active" data-main="extract">1. Trích Xuất Đơn Hàng (AI)</button>
-<button class="tab" data-main="verify">2. Kiểm Tra & Phân Tích (IDECO)</button>
+<button class="tab" data-main="verify">2. SOI GIÁ & QUẢN LÝ DỮ LIỆU CHUẨN</button>
 <button class="tab" data-main="settings">⚙️ Cài Đặt</button>
 <button id="agentRouteMain" type="button" class="tab priority-t">AI CHÍNH</button><button id="agentRouteBackup" type="button" class="tab priority-t">AI PHỤ</button>
 </nav>
-<div class="agent-hub" id="agentHub"><div class="agent-grow"><b>🛡️ AI AGENT KIỂM SOÁT ĐƠN & GIÁ</b><div class="small" style="color:#cbd5e1;margin-top:3px">Cổng kiểm soát: PDF 2 lượt → Master chính thức → Giá/CK chuẩn → Tồn kho → Sẵn sàng đầu ra. Không tự bỏ qua dòng sai.</div></div><span class="agent-pill">🧪 FIREBASE TEST · thunghiem-eeb1f</span><span class="agent-pill" id="agentRouteStatus">AI CHÍNH</span><button id="openSharedAISettings" type="button" class="agent-route-btn">⚙️ Cài đặt AI chung</button></div>
+<div class="agent-hub" id="agentHub"><div class="agent-grow"><b>🛡️ AI AGENT KIỂM SOÁT ĐƠN & GIÁ</b><div class="small" style="color:#cbd5e1;margin-top:3px">Cổng kiểm soát: PDF 2 lượt → Master chính thức → Giá/CK chuẩn → Tồn kho → Sẵn sàng đầu ra. Không tự bỏ qua dòng sai.</div></div><span class="agent-pill">💾 GIÁ CHUẨN · kiemtradon</span><span class="agent-pill">🧪 KHO V57 · thunghiem-eeb1f</span><span class="agent-pill" id="agentRouteStatus">AI CHÍNH</span><button id="openSharedAISettings" type="button" class="agent-route-btn">⚙️ Cài đặt AI chung</button></div>
 
 <section id="panel-extract" class="panel active">
 <div class="grid2">
@@ -3745,15 +3747,16 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 </section>
 
 <section id="panel-verify" class="panel">
-<div class="card">
+<div class="card" id="masterDataManager">
 <h2 class="section-title">Quản lý Dữ liệu Chuẩn</h2>
+<div class="status info"><b>Bảng dữ liệu chuẩn của V57:</b> chọn bảng đã lưu để sửa, hoặc nhập tên bảng mới rồi nạp Excel. Sau khi chỉnh dữ liệu, bấm <b>💾 Lưu thay đổi</b>.</div>
 <div class="row">
 <div class="field grow"><label>Chọn bảng dữ liệu gốc</label><select id="datasetSelect"><option value="">-- Chọn bảng dữ liệu --</option></select></div>
 <div class="field grow"><label>Tên bảng mới</label><input id="newDatasetName" placeholder="VD: LONG_CHAU_2026" /></div>
 <label class="btn blue" style="margin-top:14px">📂 Nạp Excel dữ liệu chuẩn<input id="masterFile" class="hidden" type="file" accept=".xlsx,.xls,.csv"></label>
 </div>
 <div id="masterMapping" class="hidden"></div>
-<div class="row" style="margin:10px 0"><button id="addMasterRow" class="btn">➕ Thêm hàng</button><button id="saveMaster" class="btn green">💾 Lưu thay đổi</button><button id="exportMaster" class="btn blue">📄 Xuất Excel</button><button id="deleteDataset" class="btn red">🗑️ Xóa bảng này</button><span id="masterStatus" class="muted"></span></div>
+<div class="row" style="margin:10px 0"><button id="addMasterRow" class="btn">➕ Thêm hàng</button><button id="saveMaster" class="btn green">💾 Lưu thay đổi</button><button id="exportMaster" class="btn blue">📄 Xuất Excel</button><button id="deleteDataset" class="btn red">🗑️ Xóa bảng này</button><span id="masterStatus" class="muted">Sẵn sàng quản lý dữ liệu chuẩn V57.</span></div>
 <div id="masterTable" class="table-wrap"><div class="muted" style="padding:20px">Vui lòng chọn bảng dữ liệu.</div></div>
 </div>
 
@@ -3897,10 +3900,12 @@ window.__IDECO_RPC_CALL_PARENT=function(action,args={},timeoutMs=120000){return 
 window.__IDECO_RPC_SHARED_AI_PROXY={__rpcProxy:true,textRequest:(prompt,opts)=>window.__IDECO_RPC_CALL_PARENT('textRequest',{prompt,opts:opts||{}},150000),fileRequest:(file,prompt,opts)=>window.__IDECO_RPC_CALL_PARENT('fileRequest',{file,prompt,opts:opts||{}},240000),getRoute:()=>__idecoRpcRoute,setRoute:(mode)=>{__idecoRpcRoute=mode==='backup'?'backup':'main';window.__IDECO_RPC_CALL_PARENT('setRoute',{mode:__idecoRpcRoute},15000).catch(()=>{});return true},getState:()=>({settings:{keys:__idecoRpcState.configuredMain?['shared-via-rpc']:[],kieKey:__idecoRpcState.configuredBackup?'shared-via-rpc':''},bridgeReady:__idecoRpcState.ready})};
 try{window.__IDECO_RPC_CALL_PARENT('hello',{},12000).then(r=>{if(r&&r.route)__idecoRpcRoute=r.route==='backup'?'backup':'main';if(r)__idecoRpcState={ready:true,configuredMain:!!r.configuredMain,configuredBackup:!!r.configuredBackup}}).catch(()=>{__idecoRpcState.ready=false})}catch(e){}
 
+// V57 giữ Firebase kho TEST; riêng bảng giá chuẩn dùng lại đúng Firebase của bảng gốc.
+const PRICE_DATA_FIREBASE_CONFIG={apiKey:'AIzaSyDtxpm3ZGde1Zl0BtTalGAsY9XFGQyncjQ',authDomain:'kiemtradon.firebaseapp.com',databaseURL:'https://kiemtradon-default-rtdb.firebaseio.com',projectId:'kiemtradon',storageBucket:'kiemtradon.firebasestorage.app',messagingSenderId:'113183972853',appId:'1:113183972853:web:5ecbd594ef8a5154d214bc',measurementId:'G-N59VCM3QJF'};
 const TEST_FIREBASE_CONFIG={apiKey:'AIzaSyArwL_z1HJgoF1VSI2cUy7dDum_kmWuuCc',authDomain:'thunghiem-eeb1f.firebaseapp.com',databaseURL:'https://thunghiem-eeb1f-default-rtdb.firebaseio.com',projectId:'thunghiem-eeb1f',storageBucket:'thunghiem-eeb1f.firebasestorage.app',messagingSenderId:'136411195211',appId:'1:136411195211:web:553beff72c3988eb39eace',measurementId:'G-QRGS6JETKV'};
-const DEFAULT_MAIN={...TEST_FIREBASE_CONFIG};
+const DEFAULT_MAIN={...PRICE_DATA_FIREBASE_CONFIG};
 const DEFAULT_INV={...TEST_FIREBASE_CONFIG};
-let mainConfig={...TEST_FIREBASE_CONFIG};
+let mainConfig={...PRICE_DATA_FIREBASE_CONFIG};
 let invConfig={...TEST_FIREBASE_CONFIG};
 let mainApp=null,mainDb=null,invApp=null,invDb=null,unsubDatasets=null,unsubInventory=null,unsubGeminiSettings=null;
 let officialMasterData=[],exportHistoryData=[],unsubOfficialMaster=null,unsubExports=null,agentLastAudit=null;
@@ -4096,9 +4101,9 @@ async function ensureGeminiSettings(){
  return {key:geminiRuntime.apiKey,model:geminiRuntime.model||'gemini-3.6-flash'};
 }
 function connectFirebase(){
- mainConfig={...TEST_FIREBASE_CONFIG}; invConfig={...TEST_FIREBASE_CONFIG};
- try{if(mainApp)deleteApp(mainApp).catch(()=>{});mainApp=initializeApp(mainConfig,'main_'+uid());mainDb=getDatabase(mainApp);toast($('#mainFbStatus'),'✅ Firebase TEST chung đã kết nối.','ok');subscribeDatasets();subscribeOfficialMaster();subscribeExports()}catch(e){toast($('#mainFbStatus'),'Lỗi Firebase TEST: '+e.message,'err')}
- try{if(invApp)deleteApp(invApp).catch(()=>{});invApp=initializeApp(invConfig,'inv_'+uid());invDb=getDatabase(invApp);toast($('#invFbStatus'),'✅ Tồn kho TEST đã kết nối.','ok');subscribeInventory()}catch(e){toast($('#invFbStatus'),'Lỗi Firebase kho TEST: '+e.message,'err')}
+ mainConfig={...PRICE_DATA_FIREBASE_CONFIG}; invConfig={...TEST_FIREBASE_CONFIG};
+ try{if(mainApp)deleteApp(mainApp).catch(()=>{});mainApp=initializeApp(mainConfig,'price_'+uid());mainDb=getDatabase(mainApp);toast($('#mainFbStatus'),'✅ Bảng giá chuẩn kiemtradon đã kết nối.','ok');subscribeDatasets()}catch(e){toast($('#mainFbStatus'),'Lỗi Firebase dữ liệu giá chuẩn: '+e.message,'err')}
+ try{if(invApp)deleteApp(invApp).catch(()=>{});invApp=initializeApp(invConfig,'v57_'+uid());invDb=getDatabase(invApp);toast($('#invFbStatus'),'✅ Kho V57 thunghiem-eeb1f đã kết nối.','ok');subscribeInventory();subscribeOfficialMaster();subscribeExports()}catch(e){toast($('#invFbStatus'),'Lỗi Firebase kho V57: '+e.message,'err')}
  updateSharedAIUI();
 }
 
@@ -4125,6 +4130,8 @@ $$('.tab[data-main]').forEach(b=>b.onclick=()=>{
  openMainPanel(b);
 });
 function switchMain(name){$(`.tab[data-main="${name}"]`).click()}
+function openMasterDataManager(){switchMain('verify');setTimeout(()=>{const box=$('#masterDataManager');if(box){box.scrollIntoView({behavior:'smooth',block:'start'});box.style.boxShadow='0 0 0 4px #38bdf855,0 8px 24px #0f172a0a';setTimeout(()=>box.style.boxShadow='',1800)}},80)}
+window.addEventListener('message',e=>{if(e?.data?.type==='IDECO_OPEN_MASTER_DATA')openMasterDataManager()});
 
 const PROMPTS={
 longchau:`Bạn là chuyên gia nhập liệu và kiểm tra đơn hàng dược phẩm. Hãy đọc TOÀN BỘ PDF/ảnh của Nhà Thuốc Long Châu, không bỏ sót trang hoặc dòng. Trích xuất chính xác 5 cột: ["STT","Mã sản phẩm","Tên sản phẩm","Giá xuất (HD) VAT","Sản lượng"]. "Sản lượng" lấy từ SL đặt/số lượng tương ứng. Mã và tên phải tách biệt. Giữ số 0 đầu mã sản phẩm. Giá và số lượng trả về dạng chuỗi, dấu phẩy phân cách hàng nghìn. Nếu ô mờ/không chắc, giữ chuỗi nhìn thấy và ghi cảnh báo trong audit, KHÔNG tự đoán.`,
@@ -4584,8 +4591,12 @@ $('#masterFile').onchange=e=>{let f=e.target.files?.[0];if(!f)return;readExcel(f
 function readExcel(file,cb){let r=new FileReader();r.onload=e=>{try{let wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'}),ws=wb.Sheets[wb.SheetNames[0]],arr=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:''});if(!arr.length)throw new Error('File trống');let h=arr[0].map(x=>String(x).trim()),rows=arr.slice(1).filter(r=>r.some(v=>String(v).trim())).map(row=>Object.fromEntries(h.map((x,i)=>[x,row[i]??''])));cb(h,rows)}catch(err){alert(err.message)}};r.readAsArrayBuffer(file)}
 function guessHeader(key){let patterns={ma_sp:['mã sp','ma sp','mã sản phẩm','product code'],ma_erp:['mã erp','ma erp','erp'],ten_sp:['tên sp','tên sản phẩm','tên hàng','product name'],gia_ban:['giá bán','gia ban'],chiet_khau:['chiết khấu','chiet khau','ck'],gia_xuat_hd:['giá xuất','gia xuat','vat'],quy_cach:['quy cách','quy cach','qc']};return masterHeaders.find(h=>patterns[key].some(p=>h.toLowerCase().includes(p)))||''}
 function renderMasterMapping(){Object.keys(masterMapping).forEach(k=>masterMapping[k]=guessHeader(k));$('#masterMapping').classList.remove('hidden');$('#masterMapping').innerHTML=`<div class="card" style="background:#f8fafc"><h3>Ánh xạ cột Dữ liệu Chuẩn</h3>${Object.keys(masterMapping).map(k=>`<div class="mapping"><label>${k.toUpperCase()} ${['ma_sp','ma_erp','ten_sp','gia_ban','gia_xuat_hd','quy_cach'].includes(k)?'(*)':''}</label><select class="master-map" data-k="${k}"><option value="">-- Chọn --</option>${masterHeaders.map(h=>`<option ${masterMapping[k]===h?'selected':''}>${esc(h)}</option>`).join('')}</select></div>`).join('')}<button id="confirmMasterMap" class="btn green">Xác nhận & Lưu</button> <button id="cancelMasterMap" class="btn outline">Hủy</button></div>`;$$('.master-map').forEach(s=>s.onchange=()=>masterMapping[s.dataset.k]=s.value);$('#cancelMasterMap').onclick=()=>$('#masterMapping').classList.add('hidden');$('#confirmMasterMap').onclick=saveMappedMaster}
-async function saveMappedMaster(){let req=['ma_sp','ma_erp','ten_sp','gia_ban','gia_xuat_hd','quy_cach'];if(req.some(k=>!masterMapping[k]))return alert('Vui lòng chọn đủ các trường bắt buộc (*).');let name=$('#newDatasetName').value.trim()||selectedDataset;if(!name)return alert('Nhập tên bảng mới hoặc chọn bảng hiện có.');masterData=tempMaster.map((row,i)=>{let gb=row[masterMapping.gia_ban],gx=row[masterMapping.gia_xuat_hd],ck=masterMapping.chiet_khau?row[masterMapping.chiet_khau]:'';return {stt:i+1,ma_sp:String(row[masterMapping.ma_sp]||'').trim(),ma_erp:String(row[masterMapping.ma_erp]||'').trim(),ten_sp:String(row[masterMapping.ten_sp]||'').trim(),gia_ban:parseNumber(gb),gia_ban_display:String(gb??''),chiet_khau:getCK(row,masterMapping.chiet_khau),ck_display:String(ck??''),gia_xuat_hd:parseNumber(gx),gia_xuat_hd_display:String(gx??''),quy_cach:parseQty(row[masterMapping.quy_cach])||1}});selectedDataset=name;await set(ref(mainDb,`du_lieu_goc/${name}`),masterData);$('#masterMapping').classList.add('hidden');$('#newDatasetName').value='';renderMaster();toast($('#masterStatus'),`Đã lưu ${masterData.length} dòng vào ${name}.`,'ok');setTimeout(()=>{$('#datasetSelect').value=name;$('#selectedDatasetLabel').textContent=name},300)}
-$('#saveMaster').onclick=async()=>{if(!selectedDataset)return alert('Chọn bảng dữ liệu trước.');try{await set(ref(mainDb,`du_lieu_goc/${selectedDataset}`),masterData);toast($('#masterStatus'),'Đã lưu thay đổi.','ok')}catch(e){toast($('#masterStatus'),'Lỗi lưu: '+e.message,'err')}};
+function validMasterDatasetName(name){return !!name&&!/[.#$\[\]\/]/.test(name)}
+async function writeAndVerifyMaster(name,rows){if(!mainDb)throw new Error('Firebase dữ liệu giá chuẩn chưa kết nối.');if(!validMasterDatasetName(name))throw new Error('Tên bảng không được chứa . # $ [ ] /');await set(ref(mainDb,`du_lieu_goc/${name}`),rows);const check=await get(ref(mainDb,`du_lieu_goc/${name}`));if(!check.exists()&&rows.length)throw new Error('Firebase chưa xác nhận dữ liệu vừa lưu.');const saved=check.val(),count=saved?(Array.isArray(saved)?saved.filter(Boolean).length:Object.keys(saved).length):0;if(count!==rows.length)throw new Error(`Firebase xác nhận ${count}/${rows.length} dòng.`)}
+async function saveMappedMaster(){const req=['ma_sp','ma_erp','ten_sp','gia_ban','gia_xuat_hd','quy_cach'];if(req.some(k=>!masterMapping[k]))return alert('Vui lòng chọn đủ các trường bắt buộc (*).');const name=$('#newDatasetName').value.trim()||selectedDataset;if(!name)return alert('Nhập tên bảng mới hoặc chọn bảng hiện có.');if(!Array.isArray(tempMaster)||!tempMaster.length)return alert('File Excel chưa có dữ liệu để lưu.');const nextMaster=tempMaster.map((row,i)=>{let gb=row[masterMapping.gia_ban],gx=row[masterMapping.gia_xuat_hd],ck=masterMapping.chiet_khau?row[masterMapping.chiet_khau]:'';return {stt:i+1,ma_sp:String(row[masterMapping.ma_sp]||'').trim(),ma_erp:String(row[masterMapping.ma_erp]||'').trim(),ten_sp:String(row[masterMapping.ten_sp]||'').trim(),gia_ban:parseNumber(gb),gia_ban_display:String(gb??''),chiet_khau:getCK(row,masterMapping.chiet_khau),ck_display:String(ck??''),gia_xuat_hd:parseNumber(gx),gia_xuat_hd_display:String(gx??''),quy_cach:parseQty(row[masterMapping.quy_cach])||1}});toast($('#masterStatus'),'Đang lưu và kiểm tra dữ liệu chuẩn V57...','info');try{await writeAndVerifyMaster(name,nextMaster);masterData=nextMaster;selectedDataset=name;$('#masterMapping').classList.add('hidden');$('#newDatasetName').value='';renderMaster();$('#datasetSelect').value=name;$('#selectedDatasetLabel').textContent=name;toast($('#masterStatus'),`✅ Đã lưu và xác nhận ${masterData.length} dòng vào ${name}.`,'ok')}catch(e){toast($('#masterStatus'),'❌ Lỗi lưu dữ liệu chuẩn: '+e.message,'err')}}
+$('#saveMaster').onclick=async()=>{if(!selectedDataset)return alert('Chọn bảng dữ liệu trước.');if(!masterData.length&&!confirm('Bảng hiện không có dòng nào. Bạn có chắc muốn lưu bảng rỗng?'))return;const rows=masterData.map((r,i)=>({...r,stt:i+1}));toast($('#masterStatus'),'Đang lưu và kiểm tra thay đổi...','info');try{await writeAndVerifyMaster(selectedDataset,rows);masterData=rows;toast($('#masterStatus'),`✅ Đã lưu và xác nhận ${rows.length} dòng.`, 'ok')}catch(e){toast($('#masterStatus'),'❌ Lỗi lưu: '+e.message,'err')}};
+$('#masterDataManager').addEventListener('input',e=>{if(e.target.matches('.master-cell'))$('#masterStatus').textContent='⚠️ Có thay đổi chưa lưu.'});
+$('#masterDataManager').addEventListener('click',e=>{if(e.target.matches('#addMasterRow,.master-del'))setTimeout(()=>$('#masterStatus').textContent='⚠️ Có thay đổi chưa lưu.',0)});
 $('#exportMaster').onclick=()=>exportXlsx(masterData,`${selectedDataset||'MasterData'}.xlsx`,'MasterData');
 $('#deleteDataset').onclick=async()=>{if(!selectedDataset)return;let p=prompt(`Nhập mật khẩu để xóa vĩnh viễn bảng "${selectedDataset}":`);if(p===null)return;if(p!=='minhtriet1973')return alert('Mật khẩu không chính xác!');if(!confirm('Xác nhận xóa vĩnh viễn?'))return;await remove(ref(mainDb,`du_lieu_goc/${selectedDataset}`));selectedDataset='';masterData=[];renderMaster();$('#selectedDatasetLabel').textContent='...'};
 
@@ -4603,8 +4614,8 @@ $$('[data-result-tab]').forEach(b=>b.onclick=()=>{$$('[data-result-tab]').forEac
 // ===== AI AGENT CONTROL: Master chính thức + Giá chuẩn + Tồn + Lịch sử xuất =====
 function deepCollectMasterRows(v,out=[]){if(Array.isArray(v)){v.forEach(x=>deepCollectMasterRows(x,out));return out}if(!v||typeof v!=='object')return out;const name=String(v.name||v.productName||v['Tên SP']||v['Tên Sản Phẩm']||'').trim(),code=String(v.code||v.productCode||v['Mã SP']||'').trim();if(name&&(v.packSpec!==undefined||v.unit!==undefined||v.strength!==undefined||code))out.push({code,name,unit:String(v.unit||'').trim(),strength:String(v.strength||'').trim(),packSpec:String(v.packSpec||'').trim()});Object.values(v).forEach(x=>{if(x&&typeof x==='object')deepCollectMasterRows(x,out)});return out}
 function dedupeOfficialMaster(rows){const m=new Map();rows.forEach(x=>{const k=[String(x.code||'').trim().toLowerCase(),normAgent(x.name),normAgent(x.packSpec),normAgent(x.unit),normAgent(x.strength)].join('|');if(!m.has(k))m.set(k,x)});return [...m.values()]}
-function subscribeOfficialMaster(){if(!mainDb)return;if(unsubOfficialMaster)unsubOfficialMaster();unsubOfficialMaster=onValue(ref(mainDb,'excelFiles'),s=>{officialMasterData=dedupeOfficialMaster(deepCollectMasterRows(s.val()||{}));renderAgentGate()},e=>console.warn('Master TEST',e))}
-function subscribeExports(){if(!mainDb)return;if(unsubExports)unsubExports();unsubExports=onValue(ref(mainDb,'exports'),s=>{const d=s.val()||{};exportHistoryData=Object.values(d).filter(Boolean);renderAgentGate()},e=>console.warn('Exports TEST',e))}
+function subscribeOfficialMaster(){if(!invDb)return;if(unsubOfficialMaster)unsubOfficialMaster();unsubOfficialMaster=onValue(ref(invDb,'excelFiles'),s=>{officialMasterData=dedupeOfficialMaster(deepCollectMasterRows(s.val()||{}));renderAgentGate()},e=>console.warn('Master V57',e))}
+function subscribeExports(){if(!invDb)return;if(unsubExports)unsubExports();unsubExports=onValue(ref(invDb,'exports'),s=>{const d=s.val()||{};exportHistoryData=Object.values(d).filter(Boolean);renderAgentGate()},e=>console.warn('Lịch sử xuất V57',e))}
 function normAgent(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').toLowerCase().replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim()}
 function findOfficialMaster(code,name){const c=String(code||'').trim().toLowerCase();if(!c)return null;const hits=officialMasterData.filter(m=>String(m.code||'').trim().toLowerCase()===c);return hits.length===1?hits[0]:null}
 function inventoryFor(code,name){const c=String(code||'').trim().toLowerCase();if(!c)return 0;const hit=inventoryGrouped.filter(x=>String(x.productCode||'').trim().toLowerCase()===c);return hit.reduce((s,x)=>s+(Number(x.totalQty)||0),0)}
@@ -8772,6 +8783,12 @@ async function exportCleanElementPDF(sourceEl, fileName, orientation='p'){
     if(frame)frame.srcdoc='';
     priceAgentLoaded=false;
     setTimeout(()=>loadPriceAgent(true),80);
+  };
+  window.openPriceMasterData=()=>{
+    loadPriceAgent(false);
+    const frame=document.getElementById('price-agent-iframe');let tries=0;
+    const reveal=()=>{tries++;try{frame?.contentWindow?.postMessage({type:'IDECO_OPEN_MASTER_DATA'},'*');const doc=frame?.contentDocument,box=doc?.getElementById('masterDataManager');if(doc&&box){doc.querySelectorAll('.tab[data-main]').forEach(x=>x.classList.toggle('active',x.dataset.main==='verify'));doc.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id==='panel-verify'));box.scrollIntoView({behavior:'smooth',block:'start'});box.style.boxShadow='0 0 0 4px #38bdf855,0 8px 24px #0f172a0a';setTimeout(()=>box.style.boxShadow='',1800);return}}catch(e){}if(tries<20)setTimeout(reveal,120)};
+    setTimeout(reveal,100);
   };
 })();
 </script>

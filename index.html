@@ -493,6 +493,7 @@
             <div style="min-width:0">
                 <h1>QUẢN LÝ KHO DƯỢC GDP - IDECO <span style="font-size:.72rem;opacity:.9">V58</span></h1>
                 <div style="margin-top:5px;display:inline-flex;align-items:center;gap:6px;background:#fef3c7;color:#92400e;border:1px solid #f59e0b;border-radius:999px;padding:4px 9px;font-size:.75rem;font-weight:800;letter-spacing:.2px">🧪 FIREBASE TEST · thunghiem-eeb1f</div>
+                
             </div>
             <div class="header-actions">
                 <div class="ai-route-switch" title="Chuyển nhanh AI cho toàn bộ hệ sinh thái">
@@ -517,6 +518,7 @@
             <div class="nav-tab" onclick="switchTab('tab5', this)" id="btn-tab5">5. KIỂM TRA HÓA ĐƠN THUỐC</div>
             <div class="nav-tab" onclick="switchTab('tab6', this)" id="btn-tab6">6. ĐẶT HÀNG/NGÀY &amp; DỰ BÁO</div>
             <div class="nav-tab" onclick="switchTab('tab7', this)" id="btn-tab7">7. AI AGENT SOI ĐƠN &amp; GIÁ</div>
+            <div class="nav-tab" onclick="switchTab('tab8', this)" id="btn-tab8">8. SOẠN THƯ KHÁCH HÀNG - NCC</div>
         </div>
 
         <div id="tab1" class="tab-content">
@@ -4684,6 +4686,1423 @@ if(!getSharedAI())(async()=>{
 </script>
         </div>
 
+        <div id="tab8" class="tab-content">
+          <div class="letter-app-shell" id="letter-app-full-shell">
+            <div class="letter-app-toolbar">
+              <div><b>✉️ SOẠN THƯ KHÁCH HÀNG - NHÀ CUNG CẤP</b><small>IDECO · Soạn thảo · Phân tích AI · Lưu thư · Dữ liệu khách hàng / sản phẩm</small></div>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <span class="letter-app-pill">🤖 AI SOẠN THẢO &amp; PHÂN TÍCH</span>
+                <span class="letter-app-pill" style="background:#dcfce7;color:#166534;border-color:#86efac">🔥 FIREBASE DÙNG CHUNG</span>
+                <button type="button" class="btn btn-primary" onclick="window.reloadLetterAppTab&amp;&amp;window.reloadLetterAppTab()">↻ Khởi động lại tab</button>
+              </div>
+            </div>
+            <iframe id="letter-app-iframe" class="letter-app-frame" title="IDECO Soạn thư khách hàng và nhà cung cấp" loading="lazy"></iframe>
+          </div>
+          <script type="text/plain" id="letter-app-src"><!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#dc2626" />
+  <title>IDECO - Soạn thảo & Phân tích thư</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"><\/script>
+  <style>
+    body{font-family:'Inter',sans-serif;background:#f1f5f9}
+    .letter-content table{border-collapse:collapse!important;width:100%!important;margin:16px 0!important}
+    .letter-content th,.letter-content td{border:1px solid #1e293b!important;padding:8px 10px!important;text-align:left!important;vertical-align:top!important}
+    .letter-content th{background:#f1f5f9!important;font-weight:700!important}
+    .letter-content p{margin:0 0 10px}
+    @media print{button{display:none!important}}
+  </style>
+  <script type="importmap">
+  {
+    "imports": {
+      "react": "https://esm.sh/react@18.3.1",
+      "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
+      "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+      "@google/genai": "https://esm.sh/@google/genai@1.42.0",
+      "firebase/app": "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js",
+      "firebase/database": "https://www.gstatic.com/firebasejs/12.2.1/firebase-database.js",
+      "html2pdf.js": "https://esm.sh/html2pdf.js@0.14.0",
+      "xlsx": "https://esm.sh/xlsx@0.18.5"
+    }
+  }
+  <\/script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module">
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import ReactDOM from 'react-dom/client';
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from 'react/jsx-runtime';
+import { GoogleGenAI } from '@google/genai';
+import { initializeApp } from 'firebase/app';
+import { getDatabase, ref, get, push, set, remove } from 'firebase/database';
+import html2pdf from 'html2pdf.js';
+import * as XLSX from 'xlsx';
+/* ===== types.js ===== */
+var NotificationType;
+(function (NotificationType) {
+    NotificationType["OUT_OF_STOCK"] = "OUT_OF_STOCK";
+    NotificationType["DISCONTINUED"] = "DISCONTINUED";
+    NotificationType["PRICE_ADJUSTMENT"] = "PRICE_ADJUSTMENT";
+    NotificationType["ORDER_LETTER"] = "ORDER_LETTER";
+    NotificationType["SAVED_LETTERS"] = "SAVED_LETTERS";
+})(NotificationType || (NotificationType = {}));
+
+/* ===== constants.js ===== */
+const IDECO_LOGO_SVG_RAW = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" width="100%" height="100%">
+  <g fill="#E33224">
+    <path d="M 320 0 L 520 550 L 650 300 L 600 200 L 620 200 Z" />
+    <path d="M 600 60 L 730 500 L 900 280 Z" />
+    <path d="M 0 600 Q 500 680 950 410 L 950 700 L 500 700 Q 200 700 0 600 Z" />
+    <text x="20" y="950" font-family="Arial, Helvetica, sans-serif" font-size="280" font-weight="900" letter-spacing="-5">iDECO</text>
+  </g>
+</svg>`;
+const IDECO_LOGO_SVG = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAwIDEwMDAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPgogIDxnIGZpbGw9IiNFMzMyMjQiPgogICAgPHBhdGggZD0iTSAzMjAgMCBMIDUyMCA1NTAgTCA2NTAgMzAwIEwgNjAwIDIwMCBMIDYyMCAyMDAgWiIgLz4KICAgIDxwYXRoIGQ9Ik0gNjAwIDYwIEwgNzMwIDUwMCBMIDkwMCAyODAgWiIgLz4KICAgIDxwYXRoIGQ9Ik0gMCA2MDAgUSA1MDAgNjgwIDk1MCA0MTAgTCA5NTAgNzAwIEwgNTAwIDcwMCBRIDIwMCA3MDAgMCA2MDAgWiIgLz4KICAgIDx0ZXh0IHg9IjIwIiB5PSI5NTAiIGZvbnQtZmFtaWx5PSJBcmlhbCwgSGVsdmV0aWNhLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjI4MCIgZm9udC13ZWlnaHQ9IjkwMCIgbGV0dGVyLXNwYWNpbmc9Ii01Ij5pREVDTzwvdGV4dD4KICA8L2c+Cjwvc3ZnPg==`;
+
+/* ===== services/firebaseService.js ===== */
+const firebaseConfig = {
+    apiKey: "AIzaSyCPb-_cScG3ZK_9Y7_Cbpe-_cQ7GqpXNV8",
+    authDomain: "qldulieukh.firebaseapp.com",
+    databaseURL: "https://qldulieukh-default-rtdb.firebaseio.com",
+    projectId: "qldulieukh",
+    storageBucket: "qldulieukh.firebasestorage.app",
+    messagingSenderId: "875989375682",
+    appId: "1:875989375682:web:436e932afc2899b5c5b95b"
+};
+let db;
+try {
+    db = getDatabase(initializeApp(firebaseConfig));
+}
+catch (error) {
+    console.error("Lỗi khởi tạo Firebase:", error);
+}
+const fetchCustomerDataFromFirebase = async () => {
+    if (!db)
+        throw new Error("Firebase chưa được khởi tạo!");
+    const snapshot = await get(ref(db, '/'));
+    if (!snapshot.exists())
+        return null;
+    const data = snapshot.val();
+    if (!data || typeof data !== 'object')
+        return data;
+    // Không đưa thư đã lưu/cài đặt/danh mục gợi ý vào khối dữ liệu giao dịch để AI dò khách bị ảnh hưởng.
+    const { settings, saved_letters, ...businessData } = data;
+    return businessData;
+};
+const saveLetterToFirebase = async (title, content, type, affectedCustomers, analysis) => {
+    if (!db)
+        throw new Error("Firebase chưa được khởi tạo!");
+    const newLetterRef = push(ref(db, 'saved_letters'));
+    await set(newLetterRef, {
+        title,
+        content,
+        type,
+        affectedCustomers: affectedCustomers || null,
+        analysis: analysis || null,
+        createdAt: new Date().toISOString()
+    });
+    return newLetterRef.key || '';
+};
+const fetchSavedLettersFromFirebase = async () => {
+    if (!db)
+        throw new Error("Firebase chưa được khởi tạo!");
+    const snapshot = await get(ref(db, 'saved_letters'));
+    if (!snapshot.exists())
+        return [];
+    const data = snapshot.val();
+    return Object.keys(data).map(key => ({ id: key, ...data[key] }))
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+};
+const deleteSavedLetterFromFirebase = async (id) => {
+    if (!db)
+        throw new Error("Firebase chưa được khởi tạo!");
+    await remove(ref(db, `saved_letters/${id}`));
+};
+const saveAiSettingsToFirebase = async (settings) => {
+    if (!db)
+        throw new Error("Firebase chưa được khởi tạo!");
+    await set(ref(db, 'settings/letter_ai_v3'), settings);
+};
+const fetchAiSettingsFromFirebase = async () => {
+    if (!db)
+        return null;
+    try {
+        const snapshot = await get(ref(db, 'settings/letter_ai_v3'));
+        return snapshot.exists() ? snapshot.val() : null;
+    }
+    catch (e) {
+        console.error("Lỗi lấy AI settings từ Firebase", e);
+        return null;
+    }
+};
+const REFERENCE_ROOT = 'settings/letter_reference_data_v1';
+const fetchReferenceDatasetsFromFirebase = async () => {
+    if (!db)
+        return { customers: null, products: null };
+    try {
+        const snapshot = await get(ref(db, REFERENCE_ROOT));
+        if (!snapshot.exists())
+            return { customers: null, products: null };
+        const value = snapshot.val() || {};
+        return { customers: value.customers || null, products: value.products || null };
+    }
+    catch (e) {
+        console.error('Lỗi tải dữ liệu danh mục:', e);
+        return { customers: null, products: null };
+    }
+};
+const saveReferenceDatasetToFirebase = async (kind, dataset) => {
+    if (!db)
+        throw new Error('Firebase chưa được khởi tạo!');
+    await set(ref(db, `${REFERENCE_ROOT}/${kind}`), dataset);
+};
+const deleteReferenceDatasetFromFirebase = async (kind) => {
+    if (!db)
+        throw new Error('Firebase chưa được khởi tạo!');
+    await remove(ref(db, `${REFERENCE_ROOT}/${kind}`));
+};
+const deleteAiSettingsFromFirebase = async () => {
+    if (!db)
+        throw new Error("Firebase chưa được khởi tạo!");
+    await remove(ref(db, 'settings/letter_ai_v3'));
+};
+
+/* ===== services/geminiService.js ===== */
+const GOOGLE_PRIMARY_KEY = "AQ.Ab8RN6IW7QMcKTUtHdr-dAIAggn3Ea8U2_54rbIt3daY5YXtcA";
+const DEFAULT_KIE_KEY = "6a11cd4b360b77e7cd515b8296a00e6a";
+const MODEL = "gemini-3.8-flash";
+const KIE_ENDPOINT = "https://api.kie.ai/gemini/v1/models/gemini-3-8-flash:streamGenerateContent";
+const SETTINGS_KEY = "ideco_letter_ai_settings_v3";
+const DEFAULT_AI_SETTINGS = {
+    providerMode: "auto",
+    googleBackupKey1: "",
+    googleBackupKey2: "",
+    kieApiKey: DEFAULT_KIE_KEY,
+    draftThinking: "medium",
+    analysisThinking: "high",
+};
+const getPrimaryKeyMasked = () => {
+    if (!GOOGLE_PRIMARY_KEY)
+        return "Chưa cấu hình";
+    return `${GOOGLE_PRIMARY_KEY.slice(0, 7)}••••••••${GOOGLE_PRIMARY_KEY.slice(-5)}`;
+};
+const loadAiSettings = () => {
+    try {
+        const raw = localStorage.getItem(SETTINGS_KEY);
+        if (!raw)
+            return { ...DEFAULT_AI_SETTINGS };
+        const parsed = JSON.parse(raw);
+        return { ...DEFAULT_AI_SETTINGS, ...parsed, kieApiKey: parsed.kieApiKey || DEFAULT_KIE_KEY };
+    }
+    catch {
+        return { ...DEFAULT_AI_SETTINGS };
+    }
+};
+const saveAiSettingsLocal = (settings) => {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+};
+const styleInstruction = (style) => {
+    switch (style) {
+        case "friendly":
+            return "Thân thiện, gần gũi, ấm áp, tự nhiên như một người phụ trách khách hàng lâu năm; vẫn chuẩn mực và tôn trọng.";
+        case "concise":
+            return "Ngắn gọn, rõ ý, đi thẳng vào thông tin chính; cắt bỏ câu sáo rỗng nhưng vẫn lịch sự và đủ thông tin hành động.";
+        default:
+            return "Chuyên nghiệp, trang trọng, chuẩn mực kinh doanh ngành dược; câu chữ rõ ràng, cầu thị, tin cậy và không khoa trương.";
+    }
+};
+const standardFooter = (creatorName) => `Mọi thắc mắc liên quan đến nội dung thư, Quý khách hàng vui lòng liên hệ nhân viên kinh doanh phụ trách hay điện thoại 028 385400436 để được hỗ trợ. Xem báo giá thuốc: https://deco-thuoc.netlify.app hay http://ideco-thuoc2.netlify.app
+
+Đại diện công ty IDECO kính thư
+${creatorName}
+Địa điểm kd: 003 Carlion 5 - 262/3 Lũy Bán Bích - P. Tân Phú - Tp. HCM - Hotline 028 385400436`;
+const cleanText = (text) => text
+    .replace(/^```(?:html|json|text)?\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim();
+const classifyError = (err) => {
+    const msg = String(err?.message || err || "").toLowerCase();
+    const status = Number(err?.status || err?.code || 0);
+    return {
+        retryable: status === 429 || status === 503 || status === 500 || status === 403 || status === 401 ||
+            /quota|resource_exhausted|rate limit|too many|high demand|overload|exhaust|api key|permission|unauth/.test(msg),
+        message: String(err?.message || err || "Lỗi không xác định"),
+    };
+};
+const toGoogleContents = (contents) => contents;
+async function callGoogle(apiKey, keySlot, systemInstruction, contents, thinkingLevel, responseMimeType) {
+    const ai = new GoogleGenAI({ apiKey });
+    const response = await ai.models.generateContent({
+        model: MODEL,
+        contents: toGoogleContents(contents),
+        config: {
+            systemInstruction,
+            temperature: 0.45,
+            thinkingConfig: { thinkingLevel },
+            ...(responseMimeType ? { responseMimeType } : {}),
+        },
+    });
+    const text = cleanText(response.text || "");
+    if (!text)
+        throw new Error("Google Gemini không trả về nội dung.");
+    return { text, route: { provider: "google", model: MODEL, keySlot } };
+}
+function extractKieText(raw) {
+    const direct = (() => {
+        try {
+            const data = JSON.parse(raw);
+            return (data?.candidates || [])
+                .flatMap((c) => c?.content?.parts || [])
+                .map((p) => p?.text || "")
+                .join("");
+        }
+        catch {
+            return "";
+        }
+    })();
+    if (direct)
+        return direct;
+    let out = "";
+    for (const line of raw.split(/\r?\n/)) {
+        const trimmed = line.trim();
+        if (!trimmed.startsWith("data:"))
+            continue;
+        const payload = trimmed.slice(5).trim();
+        if (!payload || payload === "[DONE]")
+            continue;
+        try {
+            const data = JSON.parse(payload);
+            const chunk = (data?.candidates || [])
+                .flatMap((c) => c?.content?.parts || [])
+                .map((p) => p?.text || "")
+                .join("");
+            out += chunk;
+        }
+        catch {
+            // Bỏ qua heartbeat/chunk không phải JSON.
+        }
+    }
+    return out;
+}
+async function callKie(apiKey, systemInstruction, contents, thinkingLevel, responseMimeType) {
+    if (!apiKey.trim())
+        throw new Error("Chưa có API Key Kie.ai.");
+    const body = {
+        stream: true,
+        systemInstruction: { parts: [{ text: systemInstruction }] },
+        contents,
+        generationConfig: {
+            temperature: 0.45,
+            thinkingConfig: { thinkingLevel, includeThoughts: false },
+            ...(responseMimeType ? { responseMimeType } : {}),
+        },
+    };
+    const res = await fetch(KIE_ENDPOINT, {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${apiKey.trim()}`,
+            "Content-Type": "application/json",
+            Accept: "text/event-stream, application/json",
+        },
+        body: JSON.stringify(body),
+    });
+    const raw = await res.text();
+    if (!res.ok) {
+        throw Object.assign(new Error(`Kie.ai HTTP ${res.status}: ${raw.slice(0, 500)}`), { status: res.status });
+    }
+    const text = cleanText(extractKieText(raw));
+    if (!text)
+        throw new Error("Kie.ai không trả về nội dung.");
+    return { text, route: { provider: "kie", model: MODEL, keySlot: "kie" } };
+}
+async function routedGenerate(args) {
+    const settings = { ...DEFAULT_AI_SETTINGS, ...(args.settings || loadAiSettings()) };
+    const googleKeys = [];
+    if (GOOGLE_PRIMARY_KEY.trim())
+        googleKeys.push({ key: GOOGLE_PRIMARY_KEY.trim(), slot: "primary" });
+    if (settings.googleBackupKey1.trim())
+        googleKeys.push({ key: settings.googleBackupKey1.trim(), slot: "backup-1" });
+    if (settings.googleBackupKey2.trim())
+        googleKeys.push({ key: settings.googleBackupKey2.trim(), slot: "backup-2" });
+    const errors = [];
+    if (settings.providerMode !== "kie") {
+        for (const item of googleKeys) {
+            try {
+                return await callGoogle(item.key, item.slot, args.systemInstruction, args.contents, args.thinkingLevel, args.responseMimeType);
+            }
+            catch (err) {
+                const info = classifyError(err);
+                errors.push(`Google ${item.slot}: ${info.message}`);
+                if (!info.retryable && settings.providerMode === "google")
+                    break;
+            }
+        }
+    }
+    if (settings.providerMode !== "google") {
+        try {
+            return await callKie(settings.kieApiKey || DEFAULT_KIE_KEY, args.systemInstruction, args.contents, args.thinkingLevel, args.responseMimeType);
+        }
+        catch (err) {
+            errors.push(`Kie.ai: ${err?.message || err}`);
+        }
+    }
+    throw new Error(`Không thể gọi AI. ${errors.join(" | ")}`);
+}
+function buildDraftPrompts(config) {
+    const recipient = config.isAllCustomers ? "Quý khách hàng" : config.customerName;
+    const style = styleInstruction(config.style);
+    const productInfo = [
+        config.productName ? `Sản phẩm: ${config.productName}` : "",
+        config.packaging ? `Quy cách: ${config.packaging}` : "",
+        config.concentration ? `Hàm lượng: ${config.concentration}` : "",
+    ].filter(Boolean).join(" | ");
+    if (config.type === NotificationType.ORDER_LETTER) {
+        const systemInstruction = `Bạn là chuyên viên thu mua cấp cao của IDECO, giỏi đọc đơn hàng từ ảnh/PDF và soạn thư cho nhà cung cấp.
+Mục tiêu: chính xác dữ liệu trước, sau đó mới tối ưu câu chữ. Không tự bịa số lượng, lô, hạn dùng, giá hoặc thời gian giao.
+Phong cách: ${style}
+Chỉ trả về HTML sạch dùng cho email. Không markdown, không script, không CSS bên ngoài. Chỉ dùng p, br, strong, u, table, thead, tbody, tr, th, td.
+Bảng phải có border-collapse:collapse và từng th/td phải có border:1px solid #000;padding:8px;text-align:left.
+Nếu thông tin trong file không rõ, để trống hoặc ghi "Cần xác nhận", tuyệt đối không đoán.`;
+        const isCaoMai = config.supplierName?.toLowerCase().includes("cao mai");
+        const opening = isCaoMai
+            ? `Mến gửi: Chị Vân - Phòng Kinh doanh Công ty TNHH TM Dược phẩm Cao Mai<br>C/C Kính gửi: Ban Giám đốc Công ty<br><br>${config.creatorName} xin phép gửi đơn đặt hàng dưới đây:`
+            : `Kính gửi ${config.supplierName},<br><br>IDECO gửi đơn đặt hàng mới và nhờ Anh/Chị hỗ trợ kiểm tra, xác nhận thông tin.`;
+        const closing = isCaoMai
+            ? `Nếu có thay đổi về tình trạng thuốc hoặc thông tin đơn, Chị Vân giúp cập nhật cho ${config.creatorName} sớm nhé. Cảm ơn Chị hỗ trợ nhiều.<br><br><strong>BỘ PHẬN THU MUA IDECO</strong><br>${config.creatorName}<br>Email: datmuahangideco@gmail.com`
+            : `Anh/Chị vui lòng kiểm tra giá mua IDECO, số lượng và khả năng đáp ứng; điền các ô còn trống rồi phản hồi email để IDECO xác nhận đặt hàng.<br><br><strong>BỘ PHẬN THU MUA IDECO</strong><br>${config.creatorName}<br>Email: datmuahangideco@gmail.com`;
+        const userPrompt = `Đọc TẤT CẢ file đính kèm và soạn thư đặt hàng gửi: ${config.supplierName}.
+Lời mở đầu: ${opening}
+
+Tạo 1 bảng gồm đúng 7 cột:
+1. Tên sản phẩm
+2. Quy cách
+3. Số lượng
+4. Lô / Hạn dùng
+5. Thời gian đổi trả / hủy cho phép
+6. Thời gian dự kiến giao đến kho IDECO
+7. Ghi chú khác
+
+Quy tắc xử lý:
+- Gộp các dòng trùng Tên sản phẩm + Quy cách từ nhiều file và cộng dồn số lượng.
+- Tên sản phẩm: ưu tiên tên thương mại in hoa trước dấu ngoặc hoặc dấu gạch ngang; không đưa hoạt chất dài vào cột tên nếu tài liệu thể hiện rõ tên thương mại.
+- Quy cách: lấy đúng quy cách đóng gói từ file.
+- Lô/HSD và thời gian đổi trả: chỉ điền nếu file có dữ liệu rõ ràng, không có thì để trống.
+- Hai cột "Thời gian dự kiến giao đến kho IDECO" và "Ghi chú khác" luôn để trống để nhà cung cấp điền.
+- Kiểm tra lại phép cộng số lượng trước khi trả lời.
+
+Lời kết: ${closing}`;
+        return { systemInstruction, userPrompt, html: true };
+    }
+    const systemInstruction = `Bạn là chuyên gia soạn thảo thư khách hàng của công ty phân phối dược phẩm IDECO.
+Viết tiếng Việt tự nhiên, chính xác, dễ đọc, có tinh thần hợp tác và giữ quan hệ lâu dài. Không dùng câu sáo rỗng kiểu "Lời đầu tiên", không thổi phồng, không hứa điều chưa có dữ liệu.
+Phong cách: ${style}
+Ưu tiên cấu trúc: tiêu đề/ngữ cảnh ngắn → thông tin thay đổi → ảnh hưởng & lời xin lỗi/ghi nhận → hướng xử lý → thời điểm/đầu mối liên hệ.
+Không dùng markdown, không dùng dấu ** hoặc _. Chỉ trả về nội dung thư thuần văn bản.
+Không tự bịa ngày, giá, mức chiết khấu, lý do hay cam kết ngoài dữ liệu đầu vào.
+Cuối thư bắt buộc giữ nguyên khối sau:
+${standardFooter(config.creatorName)}`;
+    let userPrompt = "";
+    if (config.type === NotificationType.OUT_OF_STOCK) {
+        const reasonMap = {
+            material: "Nhà máy đang chờ lô nguyên liệu mới đáp ứng tiêu chuẩn để tiếp tục sản xuất.",
+            batch: "Lô phân phối hiện tại đã hết và đang chờ lịch sản xuất lô kế tiếp.",
+            demand: "Nhu cầu thị trường tăng nhanh hơn dự kiến, gây thiếu hàng cục bộ tạm thời.",
+            packaging: "Hãng đang nâng cấp/thay đổi bao bì và hoàn thiện mẫu mã mới.",
+            shipping: "Có chậm trễ khách quan trong vận chuyển quốc tế và/hoặc thông quan.",
+        };
+        userPrompt = `Soạn thư thông báo tạm hết hàng gửi ${recipient}.
+${productInfo}
+Lý do được phép nêu: ${reasonMap[config.reason || "material"] || reasonMap.material}
+Yêu cầu: cảm ơn sự đồng hành; xin lỗi về gián đoạn; giải thích ngắn gọn, dễ cảm thông; cho thấy IDECO đang bám sát nguồn hàng; hứa thông báo ngay khi có lịch hàng mới nhưng không tự bịa ngày về hàng.`;
+    }
+    else if (config.type === NotificationType.DISCONTINUED) {
+        const reasonMap = {
+            no_agreement: "Chưa đạt được thỏa thuận phù hợp để đảm bảo điều kiện phân phối ổn định, lâu dài.",
+            policy_mismatch: "Chính sách định vị và kế hoạch phát triển thị trường giữa hãng và IDECO hiện chưa thống nhất.",
+            stop_trading: "Điều kiện giao dịch thực tế hiện không còn phù hợp để duy trì phân phối ổn định.",
+        };
+        userPrompt = `Soạn thư thông báo dừng phân phối gửi ${recipient}.
+${productInfo}
+Lý do được phép nêu: ${reasonMap[config.reason || "no_agreement"] || reasonMap.no_agreement}
+Yêu cầu: tri ân khách hàng; thông tin quyết định một cách khéo léo; không đổ lỗi; mời khách trao đổi với nhân viên phụ trách về sản phẩm thay thế phù hợp nếu có; nhấn mạnh mong muốn tiếp tục hợp tác.`;
+    }
+    else if (config.type === NotificationType.PRICE_ADJUSTMENT) {
+        userPrompt = `Soạn thư thông báo điều chỉnh giá gửi ${recipient}.
+${productInfo}
+Giá trước đây: ${config.oldPrice || "Chưa cung cấp"} VNĐ/hộp${config.oldDiscount ? ` | CK cũ: ${config.oldDiscount}%` : ""}
+Giá mới: ${config.newPrice || "Chưa cung cấp"} VNĐ/hộp${config.newDiscount ? ` | CK mới: ${config.newDiscount}%` : ""}
+Ngày áp dụng: ${config.effectiveDate || "Chưa cung cấp"}
+Yêu cầu: nêu rõ mốc áp dụng; giải thích khách quan về biến động chi phí/đầu vào ở mức vừa đủ; thể hiện IDECO đã cố gắng giảm tác động; đề nghị đối tác cập nhật hệ thống/đơn hàng; không thêm số liệu ngoài dữ liệu trên.`;
+    }
+    return { systemInstruction, userPrompt, html: false };
+}
+const generateLetter = async (config, settings) => {
+    const { systemInstruction, userPrompt } = buildDraftPrompts(config);
+    const parts = [{ text: userPrompt }];
+    if (config.type === NotificationType.ORDER_LETTER && config.orderFiles?.length) {
+        for (const file of config.orderFiles) {
+            parts.push({ inlineData: { data: file.data, mimeType: file.mimeType } });
+        }
+    }
+    const result = await routedGenerate({
+        systemInstruction,
+        contents: [{ role: "user", parts }],
+        settings,
+        thinkingLevel: settings?.draftThinking || loadAiSettings().draftThinking,
+    });
+    return { ...result, text: cleanText(result.text) };
+};
+function safeJsonParse(text) {
+    const cleaned = cleanText(text);
+    try {
+        return JSON.parse(cleaned);
+    }
+    catch { /* continue */ }
+    const start = cleaned.indexOf("{");
+    const end = cleaned.lastIndexOf("}");
+    if (start >= 0 && end > start) {
+        try {
+            return JSON.parse(cleaned.slice(start, end + 1));
+        }
+        catch { /* ignore */ }
+    }
+    return null;
+}
+const analyzeLetter = async (letterHtmlOrText, context, settings) => {
+    const plain = letterHtmlOrText.replace(/<br\s*\/?>/gi, "\n").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    const systemInstruction = `Bạn là trưởng bộ phận CRM và kiểm soát chất lượng thư khách hàng của IDECO. Phân tích nghiêm túc nhưng thực tế, ưu tiên độ chính xác, sự rõ ràng, quan hệ khách hàng và rủi ro cam kết. Chỉ trả về JSON hợp lệ, không markdown.`;
+    const prompt = `Phân tích bức thư sau theo bối cảnh ngành dược/phân phối. Chấm 0-100 và chỉ ra điểm mạnh, vấn đề, rủi ro, đề xuất sửa.
+Bối cảnh loại thư: ${context.type || "không xác định"}; khách hàng: ${context.customerName || (context.isAllCustomers ? "Quý khách hàng" : "không rõ")}; sản phẩm: ${context.productName || "không rõ"}; phong cách mong muốn: ${context.style || "professional"}.
+
+TRẢ VỀ ĐÚNG JSON:
+{
+  "score": 0,
+  "summary": "...",
+  "strengths": ["..."],
+  "issues": ["..."],
+  "risks": ["..."],
+  "suggestions": ["..."],
+  "recommendedSubject": "...",
+  "recommendedTone": "...",
+  "nextAction": "..."
+}
+
+THƯ CẦN PHÂN TÍCH:
+${plain.slice(0, 45000)}`;
+    const result = await routedGenerate({
+        systemInstruction,
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        settings,
+        thinkingLevel: settings?.analysisThinking || loadAiSettings().analysisThinking,
+        responseMimeType: "application/json",
+    });
+    const obj = safeJsonParse(result.text) || {};
+    const analysis = {
+        score: Math.max(0, Math.min(100, Number(obj.score) || 0)),
+        summary: String(obj.summary || "AI chưa tạo được tóm tắt."),
+        strengths: Array.isArray(obj.strengths) ? obj.strengths.map(String) : [],
+        issues: Array.isArray(obj.issues) ? obj.issues.map(String) : [],
+        risks: Array.isArray(obj.risks) ? obj.risks.map(String) : [],
+        suggestions: Array.isArray(obj.suggestions) ? obj.suggestions.map(String) : [],
+        recommendedSubject: String(obj.recommendedSubject || ""),
+        recommendedTone: String(obj.recommendedTone || ""),
+        nextAction: String(obj.nextAction || ""),
+    };
+    return { analysis, route: result.route };
+};
+const improveLetter = async (letterHtmlOrText, style, settings, analysis, isHtml = false) => {
+    const systemInstruction = `Bạn là biên tập viên thư khách hàng cấp cao của IDECO. Hãy viết lại để rõ hơn, tự nhiên hơn, thuyết phục hơn nhưng không làm thay đổi dữ kiện. Không bịa số, ngày, giá, lý do hoặc cam kết. Phong cách: ${styleInstruction(style)}. ${isHtml ? "Giữ định dạng HTML bảng nếu có, chỉ dùng thẻ an toàn p, br, strong, u, table, thead, tbody, tr, th, td; không markdown." : "Chỉ trả văn bản thuần, không markdown."}`;
+    const prompt = `Viết lại bức thư dưới đây thành phiên bản tốt hơn. Giữ nguyên toàn bộ dữ kiện và thông tin liên hệ.
+${analysis ? `Các vấn đề AI đã phát hiện: ${[...analysis.issues, ...analysis.risks, ...analysis.suggestions].join(" | ")}` : ""}
+
+NỘI DUNG:
+${letterHtmlOrText.slice(0, 60000)}`;
+    return routedGenerate({
+        systemInstruction,
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        settings,
+        thinkingLevel: settings?.draftThinking || loadAiSettings().draftThinking,
+    });
+};
+const findAffectedCustomers = async (productName, databaseJson, settings) => {
+    const systemInstruction = "Bạn là trợ lý dữ liệu CRM. Chỉ trả JSON hợp lệ, không giải thích.";
+    const prompt = `Từ JSON dữ liệu bên dưới, tìm tất cả khách hàng từng đặt hoặc có liên quan đến sản phẩm giống/gần giống "${productName}". Nhận diện linh hoạt trường tên khách (name, ten, tenKhachHang...) và điện thoại (phone, sdt, soDienThoai...). Chỉ trả mảng JSON [{"name":"...","phone":"..."}]. Không tìm thấy thì [].\n\n${JSON.stringify(databaseJson).slice(0, 140000)}`;
+    try {
+        const result = await routedGenerate({
+            systemInstruction,
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            settings,
+            thinkingLevel: "low",
+            responseMimeType: "application/json",
+        });
+        const obj = safeJsonParse(result.text);
+        if (Array.isArray(obj)) {
+            const seen = new Set();
+            return obj
+                .map((x) => ({ name: String(x?.name || "").trim(), phone: String(x?.phone || "").trim() }))
+                .filter((x) => x.name)
+                .filter((x) => {
+                const key = `${x.name.toLowerCase()}|${x.phone}`;
+                if (seen.has(key))
+                    return false;
+                seen.add(key);
+                return true;
+            });
+        }
+    }
+    catch (e) {
+        console.error("findAffectedCustomers error", e);
+    }
+    return [];
+};
+
+/* ===== App.js ===== */
+const ADMIN_PASSWORD = 'minhtriet1973';
+const typeLabel = {
+    [NotificationType.OUT_OF_STOCK]: 'Hết hàng',
+    [NotificationType.DISCONTINUED]: 'Ngừng phân phối',
+    [NotificationType.PRICE_ADJUSTMENT]: 'Điều chỉnh giá',
+    [NotificationType.ORDER_LETTER]: 'Đặt hàng',
+};
+const routeLabel = (route) => {
+    if (!route)
+        return '';
+    if (route.keySlot === 'primary')
+        return 'API chính';
+    if (route.keySlot === 'backup-1')
+        return 'API dự phòng 1';
+    if (route.keySlot === 'backup-2')
+        return 'API dự phòng 2';
+    return 'API trả phí';
+};
+const normalizeSearch = (value) => String(value ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd').replace(/Đ/g, 'D')
+    .toLowerCase()
+    .replace(/[^a-z0-9%+./-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+const asCleanText = (value, max = 300) => String(value ?? '').replace(/\s+/g, ' ').trim().slice(0, max);
+const CUSTOMER_NAME_ALIASES = ['khach hang', 'ten khach hang', 'ten kh', 'ten nha thuoc', 'nha thuoc', 'ten cong ty', 'cong ty', 'customer', 'customer name', 'ten don vi', 'don vi'];
+const CUSTOMER_PHONE_ALIASES = ['dien thoai', 'so dien thoai', 'sdt', 'phone', 'mobile', 'tel', 'telephone'];
+const CUSTOMER_CODE_ALIASES = ['ma', 'ma khach hang', 'ma kh', 'customer code', 'code', 'ma don vi'];
+const CUSTOMER_CONTACT_ALIASES = ['nguoi lien he', 'lien he', 'contact', 'contact person'];
+const CUSTOMER_EMAIL_ALIASES = ['email', 'e-mail', 'mail'];
+const CUSTOMER_REGION_ALIASES = ['khu vuc', 'tinh thanh', 'tinh/thanh', 'region', 'area'];
+const CUSTOMER_ADDRESS_ALIASES = ['dia chi', 'address'];
+const CUSTOMER_OWNER_ALIASES = ['nguoi phu trach don hang', 'nguoi phu trach', 'phu trach don hang', 'sales owner', 'owner'];
+const PRODUCT_NAME_ALIASES = ['ten sp', 'ten san pham', 'san pham', 'ten thuoc', 'thuoc', 'ten hang', 'hang hoa', 'product', 'product name'];
+const PRODUCT_CONC_ALIASES = ['ham luong-nong do', 'ham luong nong do', 'nong do-ham luong', 'nong do ham luong', 'nong do/ham luong', 'nong do', 'ham luong', 'strength', 'concentration', 'hamluong'];
+const PRODUCT_PACK_ALIASES = ['quy cach', 'quy cach dong goi', 'dong goi', 'packaging', 'pack size', 'pack'];
+const PRODUCT_CODE_ALIASES = ['ma sp', 'ma san pham', 'ma thuoc', 'sku', 'product code', 'code', 'ma hang'];
+const PRODUCT_INGREDIENT_ALIASES = ['hoat chat', 'active ingredient', 'ingredient', 'thanh phan'];
+const headerScore = (header, aliases) => {
+    const h = normalizeSearch(header);
+    let best = 0;
+    aliases.forEach(a => {
+        const n = normalizeSearch(a);
+        if (h === n)
+            best = Math.max(best, 100);
+        else if (h.includes(n) || n.includes(h))
+            best = Math.max(best, 70);
+        else {
+            const tokens = n.split(' ').filter(Boolean);
+            if (tokens.length && tokens.every(t => h.includes(t)))
+                best = Math.max(best, 50);
+        }
+    });
+    return best;
+};
+const findBestColumn = (headers, aliases) => {
+    let bestIdx = -1, bestScore = 0;
+    headers.forEach((h, i) => { const score = headerScore(String(h ?? ''), aliases); if (score > bestScore) {
+        bestScore = score;
+        bestIdx = i;
+    } });
+    return bestScore >= 50 ? bestIdx : -1;
+};
+const findExactColumn = (headers, exactNames) => {
+    const normalized = headers.map(h => normalizeSearch(String(h ?? '')));
+    for (const exact of exactNames) {
+        const idx = normalized.indexOf(normalizeSearch(exact));
+        if (idx >= 0)
+            return idx;
+    }
+    return -1;
+};
+const detectHeaderRow = (matrix, kind) => {
+    const aliases = kind === 'customers' ? CUSTOMER_NAME_ALIASES : PRODUCT_NAME_ALIASES;
+    let bestRow = -1, bestScore = 0;
+    matrix.slice(0, 30).forEach((row, idx) => {
+        const score = Math.max(0, ...row.map(v => headerScore(String(v ?? ''), aliases)));
+        if (score > bestScore) {
+            bestScore = score;
+            bestRow = idx;
+        }
+    });
+    return bestScore >= 50 ? bestRow : -1;
+};
+const parseMasterExcel = async (file, kind) => {
+    const buffer = await file.arrayBuffer();
+    const wb = XLSX.read(buffer, { type: 'array', cellDates: false });
+    const collected = [];
+    for (const sheetName of wb.SheetNames) {
+        const ws = wb.Sheets[sheetName];
+        const matrix = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', raw: false });
+        if (!matrix?.length)
+            continue;
+        const headerRow = detectHeaderRow(matrix, kind);
+        const headers = headerRow >= 0 ? matrix[headerRow] : [];
+        const start = headerRow >= 0 ? headerRow + 1 : 0;
+        if (kind === 'customers') {
+            // File chuẩn IDECO:
+            // STT | Mã | Khách hàng | Người liên hệ | Điện thoại | Email | Khu vực | Địa chỉ | Người phụ trách đơn hàng
+            let nameIdx = findExactColumn(headers, ['Khách hàng']);
+            if (nameIdx < 0)
+                nameIdx = findBestColumn(headers, CUSTOMER_NAME_ALIASES);
+            let codeIdx = findExactColumn(headers, ['Mã']);
+            if (codeIdx < 0)
+                codeIdx = findBestColumn(headers, CUSTOMER_CODE_ALIASES);
+            let contactIdx = findExactColumn(headers, ['Người liên hệ']);
+            if (contactIdx < 0)
+                contactIdx = findBestColumn(headers, CUSTOMER_CONTACT_ALIASES);
+            let phoneIdx = findExactColumn(headers, ['Điện thoại']);
+            if (phoneIdx < 0)
+                phoneIdx = findBestColumn(headers, CUSTOMER_PHONE_ALIASES);
+            let emailIdx = findExactColumn(headers, ['Email']);
+            if (emailIdx < 0)
+                emailIdx = findBestColumn(headers, CUSTOMER_EMAIL_ALIASES);
+            let regionIdx = findExactColumn(headers, ['Khu vực']);
+            if (regionIdx < 0)
+                regionIdx = findBestColumn(headers, CUSTOMER_REGION_ALIASES);
+            let addressIdx = findExactColumn(headers, ['Địa chỉ']);
+            if (addressIdx < 0)
+                addressIdx = findBestColumn(headers, CUSTOMER_ADDRESS_ALIASES);
+            let ownerIdx = findExactColumn(headers, ['Người phụ trách đơn hàng']);
+            if (ownerIdx < 0)
+                ownerIdx = findBestColumn(headers, CUSTOMER_OWNER_ALIASES);
+            if (nameIdx < 0)
+                nameIdx = 0;
+            for (let r = start; r < matrix.length; r++) {
+                const row = matrix[r] || [];
+                const name = asCleanText(row[nameIdx]);
+                if (!name || normalizeSearch(name).includes('ten khach hang') || normalizeSearch(name) === 'khach hang')
+                    continue;
+                collected.push({
+                    name,
+                    code: codeIdx >= 0 ? asCleanText(row[codeIdx], 100) : '',
+                    contact: contactIdx >= 0 ? asCleanText(row[contactIdx], 160) : '',
+                    phone: phoneIdx >= 0 ? asCleanText(row[phoneIdx], 100) : '',
+                    email: emailIdx >= 0 ? asCleanText(row[emailIdx], 160) : '',
+                    region: regionIdx >= 0 ? asCleanText(row[regionIdx], 160) : '',
+                    address: addressIdx >= 0 ? asCleanText(row[addressIdx], 300) : '',
+                    orderOwner: ownerIdx >= 0 ? asCleanText(row[ownerIdx], 220) : '',
+                });
+            }
+        }
+        else {
+            // File thuốc chuẩn IDECO:
+            // Mã SP | Tên SP | Hoạt chất | Hàm lượng-nồng độ | Quy cách
+            let nameIdx = findExactColumn(headers, ['Tên SP']);
+            if (nameIdx < 0)
+                nameIdx = findBestColumn(headers, PRODUCT_NAME_ALIASES);
+            let codeIdx = findExactColumn(headers, ['Mã SP']);
+            if (codeIdx < 0)
+                codeIdx = findBestColumn(headers, PRODUCT_CODE_ALIASES);
+            let ingredientIdx = findExactColumn(headers, ['Hoạt chất']);
+            if (ingredientIdx < 0)
+                ingredientIdx = findBestColumn(headers, PRODUCT_INGREDIENT_ALIASES);
+            let concentrationIdx = findExactColumn(headers, ['Hàm lượng-nồng độ']);
+            if (concentrationIdx < 0)
+                concentrationIdx = findBestColumn(headers, PRODUCT_CONC_ALIASES);
+            let packagingIdx = findExactColumn(headers, ['Quy cách']);
+            if (packagingIdx < 0)
+                packagingIdx = findBestColumn(headers, PRODUCT_PACK_ALIASES);
+            if (nameIdx < 0)
+                nameIdx = 0;
+            for (let r = start; r < matrix.length; r++) {
+                const row = matrix[r] || [];
+                const name = asCleanText(row[nameIdx]);
+                if (!name || normalizeSearch(name).includes('ten san pham') || normalizeSearch(name) === 'ten thuoc' || normalizeSearch(name) === 'ten sp')
+                    continue;
+                collected.push({
+                    name,
+                    code: codeIdx >= 0 ? asCleanText(row[codeIdx], 100) : '',
+                    activeIngredient: ingredientIdx >= 0 ? asCleanText(row[ingredientIdx], 300) : '',
+                    concentration: concentrationIdx >= 0 ? asCleanText(row[concentrationIdx], 180) : '',
+                    packaging: packagingIdx >= 0 ? asCleanText(row[packagingIdx], 240) : '',
+                });
+            }
+        }
+    }
+    const seen = new Set();
+    return collected.filter(row => {
+        const key = kind === 'customers'
+            ? normalizeSearch(`${row.name}|${row.code || ''}|${row.phone || ''}|${row.address || ''}`)
+            : normalizeSearch(`${row.name}|${row.code || ''}|${row.activeIngredient || ''}|${row.concentration || ''}|${row.packaging || ''}`);
+        if (!key || seen.has(key))
+            return false;
+        seen.add(key);
+        return true;
+    }).slice(0, 50000);
+};
+const datasetRows = (dataset) => {
+    if (!dataset?.rows)
+        return [];
+    return Array.isArray(dataset.rows) ? dataset.rows : Object.values(dataset.rows);
+};
+const escapeHtml = (value) => value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+const textToHtml = (value) => escapeHtml(value).replace(/\r?\n/g, '<br>');
+const htmlToPlain = (value) => {
+    if (typeof document === 'undefined')
+        return value.replace(/<[^>]+>/g, ' ');
+    const div = document.createElement('div');
+    div.innerHTML = value;
+    return (div.innerText || div.textContent || '').trim();
+};
+const sanitizeHtml = (html) => {
+    if (typeof document === 'undefined')
+        return html;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(`<div id="root">${html}</div>`, 'text/html');
+    const root = doc.getElementById('root');
+    if (!root)
+        return '';
+    const blocked = root.querySelectorAll('script,iframe,object,embed,link,meta,style,form,input,button,textarea,select');
+    blocked.forEach(x => x.remove());
+    root.querySelectorAll('*').forEach(el => {
+        [...el.attributes].forEach(attr => {
+            const name = attr.name.toLowerCase();
+            const value = attr.value.toLowerCase();
+            if (name.startsWith('on') || value.includes('javascript:'))
+                el.removeAttribute(attr.name);
+            if (!['style', 'colspan', 'rowspan'].includes(name))
+                el.removeAttribute(attr.name);
+        });
+    });
+    return root.innerHTML;
+};
+const App = () => {
+    const [activeTab, setActiveTab] = useState(NotificationType.OUT_OF_STOCK);
+    const [style, setStyle] = useState('professional');
+    const [isAllCustomers, setIsAllCustomers] = useState(false);
+    const [customerName, setCustomerName] = useState('');
+    const [productName, setProductName] = useState('');
+    const [reason, setReason] = useState('material');
+    const [creatorName, setCreatorName] = useState('');
+    const [packaging, setPackaging] = useState('');
+    const [concentration, setConcentration] = useState('');
+    const [priceInputMode, setPriceInputMode] = useState('direct');
+    const [oldPriceDirect, setOldPriceDirect] = useState('');
+    const [newPriceDirect, setNewPriceDirect] = useState('');
+    const [listedPrice, setListedPrice] = useState('');
+    const [oldDiscount, setOldDiscount] = useState('');
+    const [newDiscount, setNewDiscount] = useState('');
+    const [effectiveDate, setEffectiveDate] = useState('');
+    const [supplierName, setSupplierName] = useState('');
+    const [orderFiles, setOrderFiles] = useState([]);
+    const [generatedLetter, setGeneratedLetter] = useState('');
+    const [manualLetter, setManualLetter] = useState('');
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [isImproving, setIsImproving] = useState(false);
+    const [analysis, setAnalysis] = useState(null);
+    const [lastRoute, setLastRoute] = useState(null);
+    const [copyStatus, setCopyStatus] = useState(false);
+    const [isExporting, setIsExporting] = useState(false);
+    const [affectedCustomers, setAffectedCustomers] = useState(null);
+    const [isSearchingCustomers, setIsSearchingCustomers] = useState(false);
+    const [showAffectedTab, setShowAffectedTab] = useState(false);
+    const [letterTitle, setLetterTitle] = useState('');
+    const [savedLetters, setSavedLetters] = useState([]);
+    const [selectedSavedLetter, setSelectedSavedLetter] = useState(null);
+    const [isSavingLetter, setIsSavingLetter] = useState(false);
+    const [isLoadingSavedLetters, setIsLoadingSavedLetters] = useState(false);
+    const [showSettings, setShowSettings] = useState(false);
+    const [settingsAuthorized, setSettingsAuthorized] = useState(false);
+    const [passwordInput, setPasswordInput] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [showSecrets, setShowSecrets] = useState(false);
+    const [aiSettings, setAiSettings] = useState(() => loadAiSettings());
+    const [customerMaster, setCustomerMaster] = useState([]);
+    const [productMaster, setProductMaster] = useState([]);
+    const [customerDatasetInfo, setCustomerDatasetInfo] = useState(null);
+    const [productDatasetInfo, setProductDatasetInfo] = useState(null);
+    const [pendingCustomerRows, setPendingCustomerRows] = useState(null);
+    const [pendingProductRows, setPendingProductRows] = useState(null);
+    const [pendingCustomerFile, setPendingCustomerFile] = useState('');
+    const [pendingProductFile, setPendingProductFile] = useState('');
+    const [customerSuggestOpen, setCustomerSuggestOpen] = useState(false);
+    const [productSuggestOpen, setProductSuggestOpen] = useState(false);
+    const [masterBusy, setMasterBusy] = useState('');
+    const letterRef = useRef(null);
+    const fileInputRef = useRef(null);
+    const customerMasterFileRef = useRef(null);
+    const productMasterFileRef = useRef(null);
+    const formatVND = (n) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
+    const calculatedPrices = useMemo(() => {
+        if (priceInputMode !== 'discount' || !listedPrice)
+            return null;
+        const lp = Number(listedPrice);
+        if (!Number.isFinite(lp))
+            return null;
+        const oldVal = lp * (1 - (Number(oldDiscount) || 0) / 100);
+        const newVal = lp * (1 - (Number(newDiscount) || 0) / 100);
+        return { oldFormatted: formatVND(oldVal), newFormatted: formatVND(newVal) };
+    }, [priceInputMode, listedPrice, oldDiscount, newDiscount]);
+    const customerSuggestions = useMemo(() => {
+        const q = normalizeSearch(customerName);
+        if (!q)
+            return customerMaster.slice(0, 40);
+        const tokens = q.split(' ').filter(Boolean);
+        return customerMaster.filter(row => {
+            const hay = normalizeSearch(`${row.name} ${row.code || ''} ${row.contact || ''} ${row.phone || ''} ${row.email || ''} ${row.region || ''} ${row.address || ''} ${row.orderOwner || ''}`);
+            return tokens.every(t => hay.includes(t));
+        }).slice(0, 40);
+    }, [customerMaster, customerName]);
+    const productSuggestions = useMemo(() => {
+        const q = normalizeSearch(productName);
+        if (q.length < 2)
+            return [];
+        const tokens = q.split(' ').filter(Boolean);
+        return productMaster.filter(row => {
+            const hay = normalizeSearch(`${row.name} ${row.code || ''} ${row.activeIngredient || ''} ${row.concentration || ''} ${row.packaging || ''}`);
+            return tokens.every(t => hay.includes(t));
+        }).slice(0, 40);
+    }, [productMaster, productName]);
+    const currentContext = () => ({
+        type: activeTab,
+        customerName,
+        isAllCustomers,
+        productName,
+        style,
+        creatorName,
+    });
+    useEffect(() => {
+        (async () => {
+            try {
+                const remote = await fetchAiSettingsFromFirebase();
+                if (remote) {
+                    const merged = { ...DEFAULT_AI_SETTINGS, ...loadAiSettings(), ...remote };
+                    setAiSettings(merged);
+                    saveAiSettingsLocal(merged);
+                }
+            }
+            catch (e) {
+                console.warn('Không đồng bộ được AI settings:', e);
+            }
+        })();
+    }, []);
+    useEffect(() => {
+        (async () => {
+            try {
+                const remote = await fetchReferenceDatasetsFromFirebase();
+                const customerInfo = remote.customers;
+                const productInfo = remote.products;
+                setCustomerDatasetInfo(customerInfo);
+                setProductDatasetInfo(productInfo);
+                setCustomerMaster(datasetRows(customerInfo));
+                setProductMaster(datasetRows(productInfo));
+            }
+            catch (e) {
+                console.warn('Không tải được dữ liệu danh mục:', e);
+            }
+        })();
+    }, []);
+    const chooseCustomer = (row) => {
+        setCustomerName(row.name);
+        setCustomerSuggestOpen(false);
+    };
+    const chooseProduct = (row) => {
+        setProductName(row.name);
+        setConcentration(row.concentration || '');
+        setPackaging(row.packaging || '');
+        setProductSuggestOpen(false);
+    };
+    const handleMasterFile = async (kind, file) => {
+        if (!file)
+            return;
+        setMasterBusy(kind);
+        try {
+            const rows = await parseMasterExcel(file, kind);
+            if (!rows.length)
+                throw new Error(kind === 'customers' ? 'Không tìm thấy tên khách hàng trong file.' : 'Không tìm thấy tên sản phẩm trong file.');
+            if (kind === 'customers') {
+                setPendingCustomerRows(rows);
+                setPendingCustomerFile(file.name);
+            }
+            else {
+                setPendingProductRows(rows);
+                setPendingProductFile(file.name);
+            }
+        }
+        catch (e) {
+            console.error(e);
+            alert(e?.message || 'Không đọc được file Excel.');
+        }
+        finally {
+            setMasterBusy('');
+            if (customerMasterFileRef.current)
+                customerMasterFileRef.current.value = '';
+            if (productMasterFileRef.current)
+                productMasterFileRef.current.value = '';
+        }
+    };
+    const saveMasterDataset = async (kind) => {
+        const rows = kind === 'customers' ? pendingCustomerRows : pendingProductRows;
+        const sourceFile = kind === 'customers' ? pendingCustomerFile : pendingProductFile;
+        if (!rows?.length)
+            return alert('Vui lòng chọn file Excel trước.');
+        setMasterBusy(kind);
+        try {
+            const dataset = { sourceFile, updatedAt: new Date().toISOString(), count: rows.length, rows };
+            await saveReferenceDatasetToFirebase(kind, dataset);
+            if (kind === 'customers') {
+                setCustomerMaster(rows);
+                setCustomerDatasetInfo(dataset);
+                setPendingCustomerRows(null);
+                setPendingCustomerFile('');
+            }
+            else {
+                setProductMaster(rows);
+                setProductDatasetInfo(dataset);
+                setPendingProductRows(null);
+                setPendingProductFile('');
+            }
+            alert(`Đã lưu ${rows.length.toLocaleString('vi-VN')} dòng dữ liệu lên Firebase Realtime Database.`);
+        }
+        catch (e) {
+            console.error(e);
+            alert('Chưa lưu được dữ liệu lên Firebase. Vui lòng kiểm tra kết nối/quyền ghi.');
+        }
+        finally {
+            setMasterBusy('');
+        }
+    };
+    const deleteMasterDataset = async (kind) => {
+        const label = kind === 'customers' ? 'danh mục khách hàng' : 'danh mục sản phẩm';
+        if (!confirm(`Xóa toàn bộ ${label} đang lưu trên Firebase?`))
+            return;
+        setMasterBusy(kind);
+        try {
+            await deleteReferenceDatasetFromFirebase(kind);
+            if (kind === 'customers') {
+                setCustomerMaster([]);
+                setCustomerDatasetInfo(null);
+                setPendingCustomerRows(null);
+                setPendingCustomerFile('');
+            }
+            else {
+                setProductMaster([]);
+                setProductDatasetInfo(null);
+                setPendingProductRows(null);
+                setPendingProductFile('');
+            }
+            alert(`Đã xóa ${label}.`);
+        }
+        catch (e) {
+            console.error(e);
+            alert(`Không xóa được ${label}.`);
+        }
+        finally {
+            setMasterBusy('');
+        }
+    };
+    useEffect(() => {
+        const onPaste = (e) => {
+            if (activeTab !== NotificationType.ORDER_LETTER)
+                return;
+            const items = e.clipboardData?.items;
+            if (!items)
+                return;
+            for (let i = 0; i < items.length; i++) {
+                if (!items[i].type.startsWith('image/'))
+                    continue;
+                const f = items[i].getAsFile();
+                if (f)
+                    addFile(f, `Pasted_${Date.now()}.jpg`);
+            }
+        };
+        window.addEventListener('paste', onPaste);
+        return () => window.removeEventListener('paste', onPaste);
+    }, [activeTab]);
+    const compressImage = (file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = reject;
+        reader.onload = () => {
+            const src = String(reader.result || '');
+            const img = new Image();
+            img.onload = () => {
+                const max = 1400;
+                const ratio = Math.min(1, max / Math.max(img.width, img.height));
+                const canvas = document.createElement('canvas');
+                canvas.width = Math.max(1, Math.round(img.width * ratio));
+                canvas.height = Math.max(1, Math.round(img.height * ratio));
+                const ctx = canvas.getContext('2d');
+                if (!ctx)
+                    return reject(new Error('Không tạo được canvas'));
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                const out = canvas.toDataURL('image/jpeg', 0.84);
+                const m = out.match(/^data:(.+);base64,(.+)$/);
+                resolve({ mimeType: m?.[1] || 'image/jpeg', data: m?.[2] || '', previewUrl: out });
+            };
+            img.onerror = () => {
+                const m = src.match(/^data:(.+);base64,(.+)$/);
+                resolve({ mimeType: m?.[1] || 'image/png', data: m?.[2] || '', previewUrl: src });
+            };
+            img.src = src;
+        };
+        reader.readAsDataURL(file);
+    });
+    const addFile = async (file, name) => {
+        if (file.type?.startsWith('image/')) {
+            const x = await compressImage(file);
+            setOrderFiles(prev => [...prev, { ...x, name: name || file.name || `image_${Date.now()}.jpg` }]);
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => {
+            const src = String(reader.result || '');
+            const m = src.match(/^data:(.+);base64,(.+)$/);
+            if (m)
+                setOrderFiles(prev => [...prev, { mimeType: m[1], data: m[2], name: name || file.name || 'document.pdf', previewUrl: src }]);
+        };
+        reader.readAsDataURL(file);
+    };
+    const handleFileUpload = (e) => {
+        [...(e.target.files || [])].forEach(file => addFile(file));
+        if (fileInputRef.current)
+            fileInputRef.current.value = '';
+    };
+    const switchTab = (tab) => {
+        setActiveTab(tab);
+        setGeneratedLetter('');
+        setAnalysis(null);
+        setLastRoute(null);
+        setAffectedCustomers(null);
+        setShowAffectedTab(false);
+        setSelectedSavedLetter(null);
+        if (tab === NotificationType.SAVED_LETTERS)
+            loadSavedLetters();
+    };
+    const buildConfig = () => {
+        let finalOldPrice = '';
+        let finalNewPrice = '';
+        let finalDate = effectiveDate;
+        if (activeTab === NotificationType.PRICE_ADJUSTMENT) {
+            const p = effectiveDate.split('-');
+            if (p.length === 3)
+                finalDate = `${p[2]}/${p[1]}/${p[0]}`;
+            if (priceInputMode === 'direct') {
+                finalOldPrice = formatVND(Number(oldPriceDirect));
+                finalNewPrice = formatVND(Number(newPriceDirect));
+            }
+            else if (calculatedPrices) {
+                finalOldPrice = calculatedPrices.oldFormatted;
+                finalNewPrice = calculatedPrices.newFormatted;
+            }
+        }
+        return {
+            type: activeTab,
+            customerName,
+            isAllCustomers,
+            productName,
+            reason,
+            creatorName,
+            style,
+            packaging,
+            concentration,
+            oldPrice: finalOldPrice,
+            newPrice: finalNewPrice,
+            oldDiscount: priceInputMode === 'discount' ? oldDiscount : undefined,
+            newDiscount: priceInputMode === 'discount' ? newDiscount : undefined,
+            effectiveDate: finalDate,
+            supplierName,
+            orderFiles: orderFiles.map(({ data, mimeType, name }) => ({ data, mimeType, name })),
+        };
+    };
+    const validate = () => {
+        if (activeTab === NotificationType.ORDER_LETTER) {
+            if (!supplierName.trim())
+                return 'Vui lòng nhập tên nhà cung cấp.';
+            if (!orderFiles.length)
+                return 'Vui lòng tải lên hoặc dán ảnh/PDF đơn hàng.';
+        }
+        else {
+            if (!isAllCustomers && !customerName.trim())
+                return 'Vui lòng nhập tên khách hàng hoặc chọn Gửi tất cả.';
+            if (!productName.trim())
+                return 'Vui lòng nhập tên sản phẩm/thuốc.';
+        }
+        if (!creatorName.trim())
+            return 'Vui lòng nhập tên người đại diện ký thư.';
+        if (activeTab === NotificationType.PRICE_ADJUSTMENT) {
+            if (!effectiveDate)
+                return 'Vui lòng chọn ngày áp dụng.';
+            if (priceInputMode === 'direct' && (!oldPriceDirect || !newPriceDirect))
+                return 'Vui lòng nhập giá cũ và giá mới.';
+            if (priceInputMode === 'discount' && !calculatedPrices)
+                return 'Vui lòng nhập giá niêm yết và chiết khấu.';
+        }
+        return '';
+    };
+    const handleGenerate = async () => {
+        const msg = validate();
+        if (msg)
+            return alert(msg);
+        setIsGenerating(true);
+        setGeneratedLetter('');
+        setAnalysis(null);
+        setLastRoute(null);
+        setAffectedCustomers(null);
+        try {
+            const config = buildConfig();
+            const result = await generateLetter(config, aiSettings);
+            const html = activeTab === NotificationType.ORDER_LETTER ? sanitizeHtml(result.text) : textToHtml(result.text);
+            setGeneratedLetter(html);
+            setLastRoute(result.route);
+            if ([NotificationType.OUT_OF_STOCK, NotificationType.DISCONTINUED].includes(activeTab) && productName.trim()) {
+                setIsSearchingCustomers(true);
+                try {
+                    const dbData = await fetchCustomerDataFromFirebase();
+                    const affected = dbData ? await findAffectedCustomers(productName, dbData, aiSettings) : [];
+                    setAffectedCustomers(affected);
+                }
+                catch (e) {
+                    console.error(e);
+                    setAffectedCustomers([]);
+                }
+                finally {
+                    setIsSearchingCustomers(false);
+                }
+            }
+        }
+        catch (e) {
+            console.error(e);
+            alert('Dịch vụ xử lý đang bận hoặc API hiện tại chưa sẵn sàng. Hệ thống đã thử các API dự phòng. Vui lòng thử lại.');
+        }
+        finally {
+            setIsGenerating(false);
+        }
+    };
+    const handleAnalyze = async (sourceHtml = generatedLetter) => {
+        if (!sourceHtml.trim())
+            return alert('Chưa có nội dung thư để phân tích.');
+        setIsAnalyzing(true);
+        try {
+            const result = await analyzeLetter(sourceHtml, currentContext(), aiSettings);
+            setAnalysis(result.analysis);
+            setLastRoute(result.route);
+        }
+        catch (e) {
+            console.error(e);
+            alert('Chưa phân tích được thư. Vui lòng thử lại.');
+        }
+        finally {
+            setIsAnalyzing(false);
+        }
+    };
+    const handleAnalyzeManual = async () => {
+        if (!manualLetter.trim())
+            return alert('Vui lòng dán nội dung thư cần phân tích.');
+        const html = textToHtml(manualLetter.trim());
+        setGeneratedLetter(html);
+        setAffectedCustomers(null);
+        setShowAffectedTab(false);
+        await handleAnalyze(html);
+    };
+    const handleImprove = async () => {
+        if (!generatedLetter.trim())
+            return;
+        setIsImproving(true);
+        try {
+            const result = await improveLetter(generatedLetter, style, aiSettings, analysis, activeTab === NotificationType.ORDER_LETTER);
+            setGeneratedLetter(activeTab === NotificationType.ORDER_LETTER ? sanitizeHtml(result.text) : textToHtml(result.text));
+            setLastRoute(result.route);
+            setAnalysis(null);
+        }
+        catch (e) {
+            console.error(e);
+            alert('Chưa tối ưu được thư. Vui lòng thử lại.');
+        }
+        finally {
+            setIsImproving(false);
+        }
+    };
+    const handleCopy = async () => {
+        if (!letterRef.current)
+            return;
+        try {
+            const html = letterRef.current.innerHTML;
+            const text = letterRef.current.innerText;
+            if (activeTab === NotificationType.ORDER_LETTER && 'ClipboardItem' in window) {
+                await navigator.clipboard.write([new ClipboardItem({
+                        'text/html': new Blob([html], { type: 'text/html' }),
+                        'text/plain': new Blob([text], { type: 'text/plain' }),
+                    })]);
+            }
+            else {
+                await navigator.clipboard.writeText(text);
+            }
+            setCopyStatus(true);
+            setTimeout(() => setCopyStatus(false), 1800);
+        }
+        catch {
+            await navigator.clipboard.writeText(letterRef.current.innerText);
+        }
+    };
+    const handleExportPDF = () => {
+        if (!generatedLetter)
+            return;
+        setIsExporting(true);
+        const htmlContent = `
+      <style>
+        table{border-collapse:collapse;width:100%;margin:16px 0} th,td{border:1px solid #1e293b;padding:8px;text-align:left;font-size:11px} th{background:#f1f5f9;font-weight:700}
+      </style>
+      <div style="padding:40px;font-family:Arial,sans-serif;font-size:14px;line-height:1.6;color:#222;background:#fff">
+        <div style="display:flex;gap:16px;align-items:flex-start;border-bottom:1px solid #ddd;padding-bottom:15px;margin-bottom:24px">
+          <div style="width:75px">${IDECO_LOGO_SVG_RAW}</div>
+          <div><b>CÔNG TY TNHH TM - DV KẾT GIAO PHÁT TRIỂN QUỐC TẾ (IDECO)</b><br><span style="font-size:12px">MST: 0310280621</span></div>
+        </div>
+        ${sanitizeHtml(generatedLetter)}
+      </div>`;
+        const opt = {
+            margin: 10,
+            filename: `Thu_IDECO_${Date.now()}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, logging: false },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: activeTab === NotificationType.ORDER_LETTER ? 'landscape' : 'portrait' },
+        };
+        html2pdf().set(opt).from(htmlContent).save().finally(() => setIsExporting(false));
+    };
+    const handleExportExcel = () => {
+        const table = letterRef.current?.querySelector('table');
+        if (!table)
+            return alert('Không tìm thấy bảng dữ liệu để xuất Excel.');
+        const wb = XLSX.utils.table_to_book(table, { sheet: 'Don Hang' });
+        XLSX.writeFile(wb, `Don_Hang_IDECO_${Date.now()}.xlsx`);
+    };
+    const exportCustomers = (customers, title) => {
+        if (!customers?.length)
+            return;
+        const rows = customers.map((c, i) => ({ STT: i + 1, 'Tên khách hàng': c.name, 'Ghi chú': '', 'Số điện thoại': c.phone || '' }));
+        const ws = XLSX.utils.json_to_sheet(rows);
+        ws['!cols'] = [{ wch: 7 }, { wch: 42 }, { wch: 24 }, { wch: 18 }];
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Khach_Hang');
+        XLSX.writeFile(wb, `${title}_${Date.now()}.xlsx`);
+    };
+    const loadSavedLetters = async () => {
+        setIsLoadingSavedLetters(true);
+        try {
+            setSavedLetters(await fetchSavedLettersFromFirebase());
+        }
+        catch (e) {
+            console.error(e);
+        }
+        finally {
+            setIsLoadingSavedLetters(false);
+        }
+    };
+    const handleSaveLetter = async () => {
+        if (!generatedLetter)
+            return;
+        if (!letterTitle.trim())
+            return alert('Vui lòng đặt tên cho thư.');
+        setIsSavingLetter(true);
+        try {
+            await saveLetterToFirebase(letterTitle.trim(), generatedLetter, activeTab, affectedCustomers || undefined, analysis || undefined);
+            setLetterTitle('');
+            await loadSavedLetters();
+            alert('Đã lưu thư thành công.');
+        }
+        catch {
+            alert('Lỗi khi lưu thư.');
+        }
+        finally {
+            setIsSavingLetter(false);
+        }
+    };
+    const deleteSaved = async (id) => {
+        if (!confirm('Bạn có chắc chắn muốn xóa thư này?'))
+            return;
+        await deleteSavedLetterFromFirebase(id);
+        setSelectedSavedLetter(null);
+        await loadSavedLetters();
+    };
+    const saveSettings = async () => {
+        const normalized = {
+            ...aiSettings,
+            googleBackupKey1: aiSettings.googleBackupKey1.trim(),
+            googleBackupKey2: aiSettings.googleBackupKey2.trim(),
+            kieApiKey: aiSettings.kieApiKey.trim(),
+        };
+        try {
+            saveAiSettingsLocal(normalized);
+            await saveAiSettingsToFirebase(normalized);
+            setAiSettings(normalized);
+            setShowSettings(false);
+            alert('Đã lưu cấu hình AI trên máy và Firebase.');
+        }
+        catch (e) {
+            saveAiSettingsLocal(normalized);
+            setAiSettings(normalized);
+            alert(`Đã lưu trên máy, nhưng chưa đồng bộ Firebase: ${e?.message || e}`);
+        }
+    };
+    const clearSettings = async () => {
+        if (!confirm('Xóa 2 API key dự phòng và khôi phục cấu hình xử lý mặc định? API chính và API trả phí tích hợp sẵn vẫn được giữ nguyên.'))
+            return;
+        const reset = { ...DEFAULT_AI_SETTINGS };
+        setAiSettings(reset);
+        saveAiSettingsLocal(reset);
+        try {
+            await deleteAiSettingsFromFirebase();
+        }
+        catch { }
+    };
+    return (_jsxs("div", { className: "min-h-screen bg-slate-100 text-slate-800 px-3 py-6 sm:px-6", children: [_jsxs("header", { className: "max-w-5xl mx-auto mb-5 flex items-center justify-between gap-4", children: [_jsxs("div", { className: "flex items-center gap-3", children: [_jsx("img", { src: IDECO_LOGO_SVG, className: "w-14 h-14 object-contain" }), _jsxs("div", { children: [_jsx("h1", { className: "text-xl sm:text-2xl font-black tracking-tight text-slate-900", children: "IDECO \u00B7 AI SO\u1EA0N TH\u1EA2O & PH\u00C2N T\u00CDCH TH\u01AF" }), _jsx("p", { className: "text-xs text-slate-500 font-semibold", children: "T\u1EF1 lu\u00E2n phi\u00EAn API \u00B7 ki\u1EC3m tra n\u1ED9i dung tr\u01B0\u1EDBc khi g\u1EEDi" })] })] }), _jsx("button", { onClick: () => { setShowSettings(true); setSettingsAuthorized(false); setPasswordInput(''); }, className: "w-11 h-11 rounded-xl bg-white border border-slate-200 shadow-sm hover:bg-slate-50", title: "C\u00E0i \u0111\u1EB7t", children: "\u2699\uFE0F" })] }), _jsxs("main", { className: "max-w-5xl mx-auto bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden", children: [_jsx("div", { className: "flex overflow-x-auto bg-slate-50 border-b border-slate-200", children: [
+                            [NotificationType.OUT_OF_STOCK, '📢 Hết hàng'],
+                            [NotificationType.DISCONTINUED, '🛑 Ngừng phân phối'],
+                            [NotificationType.PRICE_ADJUSTMENT, '💰 Điều chỉnh giá'],
+                            [NotificationType.ORDER_LETTER, '🛒 Đặt hàng'],
+                            [NotificationType.SAVED_LETTERS, '📝 Thư đã lưu'],
+                        ].map(([id, label]) => (_jsx("button", { onClick: () => switchTab(id), className: `px-4 py-4 text-sm font-bold whitespace-nowrap flex-1 ${activeTab === id ? 'bg-white text-red-600 border-b-2 border-red-600' : 'text-slate-500 hover:bg-white/60'}`, children: label }, id))) }), activeTab === NotificationType.SAVED_LETTERS ? (_jsxs("section", { className: "p-6", children: [_jsxs("div", { className: "flex items-center justify-between mb-4", children: [_jsx("h2", { className: "font-black text-lg", children: "DANH S\u00C1CH TH\u01AF \u0110\u00C3 L\u01AFU" }), _jsx("button", { onClick: loadSavedLetters, className: "px-3 py-2 text-xs font-bold rounded-lg border border-slate-200", children: "\u21BB T\u1EA2I L\u1EA0I" })] }), isLoadingSavedLetters ? _jsx("div", { className: "py-12 text-center text-slate-500", children: "\u0110ang t\u1EA3i..." }) : selectedSavedLetter ? (_jsxs("div", { className: "space-y-4", children: [_jsx("button", { onClick: () => setSelectedSavedLetter(null), className: "text-sm font-bold text-blue-600", children: "\u2190 Quay l\u1EA1i" }), _jsx("div", { className: "p-6 border rounded-xl bg-white letter-content", dangerouslySetInnerHTML: { __html: sanitizeHtml(selectedSavedLetter.content) } }), selectedSavedLetter.analysis && (_jsxs("div", { className: "p-4 rounded-xl bg-amber-50 border border-amber-200 text-sm", children: [_jsxs("b", { children: ["\u0110i\u1EC3m ph\u00E2n t\u00EDch \u0111\u00E3 l\u01B0u: ", selectedSavedLetter.analysis.score, "/100"] }), _jsx("br", {}), selectedSavedLetter.analysis.summary] })), selectedSavedLetter.affectedCustomers?.length > 0 && (_jsxs("div", { className: "border rounded-xl overflow-hidden", children: [_jsxs("div", { className: "p-3 bg-slate-50 font-bold text-sm", children: ["Kh\u00E1ch h\u00E0ng b\u1ECB \u1EA3nh h\u01B0\u1EDFng (", selectedSavedLetter.affectedCustomers.length, ")"] }), _jsx("table", { className: "w-full text-sm", children: _jsx("tbody", { children: selectedSavedLetter.affectedCustomers.map((c, i) => _jsxs("tr", { className: "border-t", children: [_jsxs("td", { className: "p-2", children: [i + 1, ". ", c.name] }), _jsx("td", { className: "p-2", children: c.phone || '—' })] }, i)) }) })] })), _jsxs("div", { className: "flex flex-wrap gap-2", children: [_jsx("button", { onClick: () => navigator.clipboard.writeText(htmlToPlain(selectedSavedLetter.content)), className: "px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold", children: "COPY" }), selectedSavedLetter.affectedCustomers?.length > 0 && _jsx("button", { onClick: () => exportCustomers(selectedSavedLetter.affectedCustomers, 'DS_Khach_Hang'), className: "px-4 py-2 bg-green-600 text-white rounded-lg text-xs font-bold", children: "XU\u1EA4T DS KH\u00C1CH" }), _jsx("button", { onClick: () => deleteSaved(selectedSavedLetter.id), className: "px-4 py-2 bg-red-50 text-red-600 border border-red-200 rounded-lg text-xs font-bold", children: "X\u00D3A" })] })] })) : savedLetters.length ? (_jsx("div", { className: "space-y-2", children: savedLetters.map(x => (_jsxs("button", { onClick: () => setSelectedSavedLetter(x), className: "w-full text-left p-4 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50/30", children: [_jsx("div", { className: "font-bold", children: x.title }), _jsxs("div", { className: "text-xs text-slate-500 mt-1", children: [typeLabel[x.type] || x.type, " \u00B7 ", new Date(x.createdAt).toLocaleString('vi-VN')] })] }, x.id))) })) : _jsx("div", { className: "py-12 text-center text-slate-500 border border-dashed rounded-xl", children: "Ch\u01B0a c\u00F3 th\u01B0 n\u00E0o \u0111\u01B0\u1EE3c l\u01B0u." })] })) : (_jsxs(_Fragment, { children: [_jsxs("section", { className: "p-6 grid grid-cols-1 lg:grid-cols-3 gap-6", children: [_jsxs("div", { className: "lg:col-span-2 space-y-5", children: [activeTab !== NotificationType.ORDER_LETTER ? (_jsxs(_Fragment, { children: [_jsxs("div", { className: "p-4 rounded-xl bg-slate-50 border border-slate-200", children: [_jsx("label", { className: "block text-xs font-black uppercase tracking-wider text-slate-600 mb-3", children: "\u0110\u1ED1i t\u01B0\u1EE3ng nh\u1EADn th\u01B0" }), _jsxs("div", { className: "flex gap-5 mb-3", children: [_jsxs("label", { className: "flex items-center gap-2 text-sm", children: [_jsx("input", { type: "radio", checked: !isAllCustomers, onChange: () => setIsAllCustomers(false) }), " Kh\u00E1ch c\u1EE5 th\u1EC3"] }), _jsxs("label", { className: "flex items-center gap-2 text-sm", children: [_jsx("input", { type: "radio", checked: isAllCustomers, onChange: () => setIsAllCustomers(true) }), " G\u1EEDi t\u1EA5t c\u1EA3 kh\u00E1ch h\u00E0ng"] })] }), !isAllCustomers && (_jsxs("div", { className: "relative", children: [_jsx("input", { value: customerName, onFocus: () => setCustomerSuggestOpen(true), onBlur: () => setTimeout(() => setCustomerSuggestOpen(false), 160), onChange: e => { setCustomerName(e.target.value); setCustomerSuggestOpen(true); }, placeholder: customerMaster.length ? 'Chọn hoặc gõ tên khách hàng...' : 'Chưa có danh mục khách hàng — vào Cài đặt để tải Excel', className: "w-full px-4 py-2.5 border rounded-lg outline-none focus:ring-2 focus:ring-red-400" }), customerSuggestOpen && customerMaster.length > 0 && (_jsx("div", { className: "absolute z-30 left-0 right-0 mt-1 max-h-72 overflow-auto bg-white border border-slate-200 rounded-xl shadow-xl", children: customerSuggestions.length ? customerSuggestions.map((row, i) => (_jsxs("button", { type: "button", onMouseDown: e => e.preventDefault(), onClick: () => chooseCustomer(row), className: "w-full text-left px-4 py-2.5 border-b last:border-b-0 hover:bg-red-50", children: [_jsx("div", { className: "font-semibold text-sm", children: row.name }), (row.code || row.contact || row.phone) && _jsx("div", { className: "text-[11px] text-slate-500 mt-0.5", children: [row.code && `Mã: ${row.code}`, row.contact && `Liên hệ: ${row.contact}`, row.phone && `ĐT: ${row.phone}`].filter(Boolean).join(' · ') })] }, `${row.name}-${i}`))) : _jsx("div", { className: "px-4 py-3 text-xs text-slate-500", children: "Kh\u00F4ng t\u00ECm th\u1EA5y t\u00EAn ph\u00F9 h\u1EE3p." }) }))] }))] }), _jsxs("div", { className: "grid sm:grid-cols-3 gap-3", children: [_jsxs("div", { className: "sm:col-span-1 relative", children: [_jsx("label", { className: "text-xs font-bold uppercase", children: "T\u00EAn s\u1EA3n ph\u1EA9m *" }), _jsx("input", { value: productName, onFocus: () => setProductSuggestOpen(true), onBlur: () => setTimeout(() => setProductSuggestOpen(false), 160), onChange: e => { setProductName(e.target.value); setProductSuggestOpen(true); }, className: "mt-1 w-full px-3 py-2.5 border rounded-lg", placeholder: productMaster.length ? 'Gõ vài chữ để tìm...' : 'Chưa có danh mục sản phẩm' }), productSuggestOpen && productMaster.length > 0 && normalizeSearch(productName).length >= 2 && (_jsx("div", { className: "absolute z-30 left-0 right-0 mt-1 max-h-80 overflow-auto bg-white border border-slate-200 rounded-xl shadow-xl min-w-[340px]", children: productSuggestions.length ? productSuggestions.map((row, i) => (_jsxs("button", { type: "button", onMouseDown: e => e.preventDefault(), onClick: () => chooseProduct(row), className: "w-full text-left px-4 py-2.5 border-b last:border-b-0 hover:bg-red-50", children: [_jsx("div", { className: "font-semibold text-sm", children: row.name }), _jsx("div", { className: "text-[11px] text-slate-500 mt-0.5", children: [row.activeIngredient && `Hoạt chất: ${row.activeIngredient}`, row.concentration && `Hàm lượng: ${row.concentration}`, row.packaging && `Quy cách: ${row.packaging}`, row.code && `Mã: ${row.code}`].filter(Boolean).join(' · ') || 'Chọn sản phẩm' })] }, `${row.name}-${i}`))) : _jsx("div", { className: "px-4 py-3 text-xs text-slate-500", children: "Kh\u00F4ng t\u00ECm th\u1EA5y s\u1EA3n ph\u1EA9m ph\u00F9 h\u1EE3p." }) }))] }), _jsxs("div", { children: [_jsx("label", { className: "text-xs font-bold uppercase", children: "Quy c\u00E1ch" }), _jsx("input", { value: packaging, onChange: e => setPackaging(e.target.value), className: "mt-1 w-full px-3 py-2.5 border rounded-lg", placeholder: "T\u1EF1 \u0111i\u1EC1n khi ch\u1ECDn s\u1EA3n ph\u1EA9m" })] }), _jsxs("div", { children: [_jsx("label", { className: "text-xs font-bold uppercase", children: "N\u1ED3ng \u0111\u1ED9 / H\u00E0m l\u01B0\u1EE3ng" }), _jsx("input", { value: concentration, onChange: e => setConcentration(e.target.value), className: "mt-1 w-full px-3 py-2.5 border rounded-lg", placeholder: "T\u1EF1 \u0111i\u1EC1n khi ch\u1ECDn s\u1EA3n ph\u1EA9m" })] })] })] })) : (_jsxs("div", { className: "space-y-4", children: [_jsxs("div", { children: [_jsx("label", { className: "text-xs font-bold uppercase", children: "Nh\u00E0 cung c\u1EA5p *" }), _jsx("input", { value: supplierName, onChange: e => setSupplierName(e.target.value), className: "mt-1 w-full px-4 py-2.5 border rounded-lg", placeholder: "VD: C\u00F4ng ty TNHH TM D\u01B0\u1EE3c ph\u1EA9m Cao Mai" })] }), _jsxs("div", { className: "p-5 border-2 border-dashed rounded-xl bg-slate-50", children: [_jsxs("div", { className: "flex items-center justify-between gap-3 flex-wrap", children: [_jsxs("div", { children: [_jsx("b", { className: "text-sm", children: "T\u1EA3i \u1EA3nh/PDF \u0111\u01A1n \u0111\u1EB7t h\u00E0ng" }), _jsx("p", { className: "text-xs text-slate-500", children: "C\u00F3 th\u1EC3 Ctrl+V \u1EA3nh ch\u1EE5p m\u00E0n h\u00ECnh. AI s\u1EBD g\u1ED9p m\u1EB7t h\u00E0ng tr\u00F9ng v\u00E0 c\u1ED9ng s\u1ED1 l\u01B0\u1EE3ng." })] }), _jsx("button", { onClick: () => fileInputRef.current?.click(), className: "px-4 py-2 bg-slate-800 text-white rounded-lg text-xs font-bold", children: "CH\u1ECCN FILE" }), _jsx("input", { ref: fileInputRef, type: "file", multiple: true, accept: "image/*,.pdf", onChange: handleFileUpload, className: "hidden" })] }), !!orderFiles.length && _jsx("div", { className: "grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4", children: orderFiles.map((f, i) => _jsxs("div", { className: "relative p-2 bg-white border rounded-lg text-xs truncate", children: [_jsx("span", { children: f.name }), _jsx("button", { onClick: () => setOrderFiles(p => p.filter((_, j) => j !== i)), className: "absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-600 text-white", children: "\u00D7" })] }, i)) })] })] })), activeTab === NotificationType.OUT_OF_STOCK && _jsxs("div", { children: [_jsx("label", { className: "text-xs font-bold uppercase", children: "L\u00FD do h\u1EBFt h\u00E0ng" }), _jsxs("select", { value: reason, onChange: e => setReason(e.target.value), className: "mt-1 w-full px-4 py-2.5 border rounded-lg bg-white", children: [_jsx("option", { value: "material", children: "Ch\u1EDD nguy\u00EAn li\u1EC7u m\u1EDBi" }), _jsx("option", { value: "batch", children: "Ch\u1EDD l\u00F4 s\u1EA3n xu\u1EA5t k\u1EBF ti\u1EBFp" }), _jsx("option", { value: "demand", children: "Nhu c\u1EA7u t\u0103ng \u0111\u1ED9t bi\u1EBFn" }), _jsx("option", { value: "packaging", children: "Thay \u0111\u1ED5i bao b\u00EC/m\u1EABu m\u00E3" }), _jsx("option", { value: "shipping", children: "Ch\u1EADm v\u1EADn chuy\u1EC3n/th\u00F4ng quan" })] })] }), activeTab === NotificationType.DISCONTINUED && _jsxs("div", { children: [_jsx("label", { className: "text-xs font-bold uppercase", children: "L\u00FD do ng\u1EEBng ph\u00E2n ph\u1ED1i" }), _jsxs("select", { value: reason, onChange: e => setReason(e.target.value), className: "mt-1 w-full px-4 py-2.5 border rounded-lg bg-white", children: [_jsx("option", { value: "no_agreement", children: "Ch\u01B0a th\u1ECFa thu\u1EADn \u0111i\u1EC1u ki\u1EC7n ph\u00F9 h\u1EE3p" }), _jsx("option", { value: "policy_mismatch", children: "Ch\u00EDnh s\u00E1ch ph\u00E2n ph\u1ED1i ch\u01B0a th\u1ED1ng nh\u1EA5t" }), _jsx("option", { value: "stop_trading", children: "\u0110i\u1EC1u ki\u1EC7n giao d\u1ECBch kh\u00F4ng c\u00F2n ph\u00F9 h\u1EE3p" })] })] }), activeTab === NotificationType.PRICE_ADJUSTMENT && (_jsxs("div", { className: "p-4 rounded-xl bg-blue-50 border border-blue-100 space-y-4", children: [_jsxs("div", { className: "flex gap-2", children: [_jsx("button", { onClick: () => setPriceInputMode('direct'), className: `flex-1 py-2 rounded-lg text-xs font-bold ${priceInputMode === 'direct' ? 'bg-blue-600 text-white' : 'bg-white border'}`, children: "NH\u1EACP GI\u00C1 TR\u1EF0C TI\u1EBEP" }), _jsx("button", { onClick: () => setPriceInputMode('discount'), className: `flex-1 py-2 rounded-lg text-xs font-bold ${priceInputMode === 'discount' ? 'bg-blue-600 text-white' : 'bg-white border'}`, children: "T\u00CDNH THEO CHI\u1EBET KH\u1EA4U" })] }), priceInputMode === 'direct' ? _jsxs("div", { className: "grid grid-cols-2 gap-3", children: [_jsx("input", { type: "number", value: oldPriceDirect, onChange: e => setOldPriceDirect(e.target.value), placeholder: "Gi\u00E1 c\u0169", className: "px-3 py-2.5 border rounded-lg" }), _jsx("input", { type: "number", value: newPriceDirect, onChange: e => setNewPriceDirect(e.target.value), placeholder: "Gi\u00E1 m\u1EDBi", className: "px-3 py-2.5 border rounded-lg" })] }) : _jsxs(_Fragment, { children: [_jsx("input", { type: "number", value: listedPrice, onChange: e => setListedPrice(e.target.value), placeholder: "Gi\u00E1 ni\u00EAm y\u1EBFt", className: "w-full px-3 py-2.5 border rounded-lg" }), _jsxs("div", { className: "grid grid-cols-2 gap-3", children: [_jsx("input", { type: "number", value: oldDiscount, onChange: e => setOldDiscount(e.target.value), placeholder: "CK c\u0169 %", className: "px-3 py-2.5 border rounded-lg" }), _jsx("input", { type: "number", value: newDiscount, onChange: e => setNewDiscount(e.target.value), placeholder: "CK m\u1EDBi %", className: "px-3 py-2.5 border rounded-lg" })] }), calculatedPrices && _jsxs("div", { className: "text-sm font-semibold", children: ["Gi\u00E1 c\u0169: ", calculatedPrices.oldFormatted, " \u0111 \u00B7 Gi\u00E1 m\u1EDBi: ", calculatedPrices.newFormatted, " \u0111"] })] }), _jsx("input", { type: "date", value: effectiveDate, onChange: e => setEffectiveDate(e.target.value), className: "w-full px-3 py-2.5 border rounded-lg" })] })), _jsxs("div", { className: "grid sm:grid-cols-2 gap-3", children: [_jsxs("div", { children: [_jsx("label", { className: "text-xs font-bold uppercase", children: "\u0110\u1EA1i di\u1EC7n IDECO k\u00FD th\u01B0 *" }), _jsx("input", { value: creatorName, onChange: e => setCreatorName(e.target.value), className: "mt-1 w-full px-3 py-2.5 border rounded-lg", placeholder: "H\u1ECD t\u00EAn ng\u01B0\u1EDDi k\u00FD" })] }), _jsxs("div", { children: [_jsx("label", { className: "text-xs font-bold uppercase", children: "Phong c\u00E1ch" }), _jsxs("select", { value: style, onChange: e => setStyle(e.target.value), className: "mt-1 w-full px-3 py-2.5 border rounded-lg bg-white", children: [_jsx("option", { value: "professional", children: "Chuy\u00EAn nghi\u1EC7p, trang tr\u1ECDng" }), _jsx("option", { value: "friendly", children: "Th\u00E2n thi\u1EC7n, g\u1EA7n g\u0169i" }), _jsx("option", { value: "concise", children: "Ng\u1EAFn g\u1ECDn, s\u00FAc t\u00EDch" })] })] })] }), _jsx("button", { onClick: handleGenerate, disabled: isGenerating, className: "w-full py-4 rounded-xl bg-gradient-to-r from-red-600 to-red-700 text-white font-black tracking-wider shadow-lg disabled:bg-slate-400", children: isGenerating ? 'AI ĐANG SOẠN & KIỂM TRA DỮ KIỆN...' : '✨ SOẠN THƯ BẰNG AI' })] }), _jsxs("aside", { className: "space-y-4", children: [_jsxs("div", { className: "p-4 rounded-xl border border-emerald-200 bg-emerald-50", children: [_jsx("div", { className: "text-xs font-black uppercase text-emerald-800", children: "Tr\u1EA1ng th\u00E1i x\u1EED l\u00FD" }), _jsx("div", { className: "text-sm font-bold mt-1", children: aiSettings.providerMode === 'auto' ? 'TỰ ĐỘNG · Luân phiên API' : aiSettings.providerMode === 'google' ? 'Chỉ nhóm API chính' : 'Chỉ API trả phí' }), _jsx("p", { className: "text-xs text-emerald-700 mt-2", children: "Th\u1EE9 t\u1EF1 t\u1EF1 \u0111\u1ED9ng: API ch\u00EDnh \u2192 d\u1EF1 ph\u00F2ng 1 \u2192 d\u1EF1 ph\u00F2ng 2 \u2192 API tr\u1EA3 ph\u00ED." })] }), _jsxs("div", { className: "p-4 rounded-xl border border-amber-200 bg-amber-50", children: [_jsx("div", { className: "font-bold text-sm", children: "\uD83D\uDD0E C\u00F3 th\u01B0 s\u1EB5n c\u1EA7n ph\u00E2n t\u00EDch?" }), _jsx("textarea", { value: manualLetter, onChange: e => setManualLetter(e.target.value), rows: 7, placeholder: "D\u00E1n n\u1ED9i dung th\u01B0 v\u00E0o \u0111\u00E2y...", className: "mt-2 w-full p-3 border rounded-lg text-sm bg-white" }), _jsx("button", { onClick: handleAnalyzeManual, disabled: isAnalyzing, className: "w-full mt-2 py-2.5 bg-amber-600 text-white rounded-lg text-xs font-black", children: isAnalyzing ? 'ĐANG PHÂN TÍCH...' : 'PHÂN TÍCH THƯ NÀY' })] }), _jsxs("div", { className: "p-4 rounded-xl border bg-slate-50 text-xs text-slate-600 leading-relaxed", children: [_jsx("b", { children: "AI m\u1EDBi \u01B0u ti\u00EAn \u0111\u1ED9 ch\u00EDnh x\u00E1c:" }), " kh\u00F4ng t\u1EF1 b\u1ECBa ng\u00E0y, gi\u00E1, l\u00F4, h\u1EA1n d\u00F9ng ho\u1EB7c cam k\u1EBFt. Ph\u1EA7n ph\u00E2n t\u00EDch d\u00F9ng m\u1EE9c suy lu\u1EADn cao; ph\u1EA7n so\u1EA1n d\u00F9ng m\u1EE9c c\u00E2n b\u1EB1ng \u0111\u1EC3 ti\u1EBFt ki\u1EC7m token."] })] })] }), (generatedLetter || isSearchingCustomers) && (_jsxs("section", { className: "border-t bg-slate-50 p-6", children: [(affectedCustomers !== null || isSearchingCustomers) && [NotificationType.OUT_OF_STOCK, NotificationType.DISCONTINUED].includes(activeTab) && (_jsxs("div", { className: "inline-flex rounded-lg overflow-hidden border mb-4", children: [_jsx("button", { onClick: () => setShowAffectedTab(false), className: `px-4 py-2 text-sm font-bold ${!showAffectedTab ? 'bg-white text-blue-600' : 'bg-slate-200 text-slate-500'}`, children: "\uD83D\uDCDD B\u1EA3n th\u1EA3o" }), _jsxs("button", { onClick: () => setShowAffectedTab(true), className: `px-4 py-2 text-sm font-bold ${showAffectedTab ? 'bg-white text-blue-600' : 'bg-slate-200 text-slate-500'}`, children: ["\uD83D\uDC65 Kh\u00E1ch b\u1ECB \u1EA3nh h\u01B0\u1EDFng ", affectedCustomers?.length ? `(${affectedCustomers.length})` : ''] })] })), !showAffectedTab ? (_jsxs("div", { className: "space-y-4", children: [_jsxs("div", { className: "flex items-center justify-between flex-wrap gap-2", children: [_jsxs("div", { children: [_jsx("h2", { className: "font-black text-lg", children: "B\u1EA2N TH\u1EA2O TH\u01AF" }), lastRoute && _jsxs("div", { className: "text-xs text-slate-500 mt-1", children: ["K\u00EAnh x\u1EED l\u00FD: ", _jsx("b", { children: routeLabel(lastRoute) })] })] }), _jsxs("div", { className: "flex flex-wrap gap-2", children: [_jsx("button", { onClick: () => handleAnalyze(), disabled: isAnalyzing, className: "px-4 py-2 rounded-lg bg-amber-600 text-white text-xs font-bold", children: isAnalyzing ? 'ĐANG PHÂN TÍCH...' : '🔎 AI PHÂN TÍCH SÂU' }), _jsx("button", { onClick: handleImprove, disabled: isImproving, className: "px-4 py-2 rounded-lg bg-violet-600 text-white text-xs font-bold", children: isImproving ? 'ĐANG TỐI ƯU...' : '✨ TỐI ƯU LẠI THƯ' }), _jsx("button", { onClick: handleCopy, className: "px-4 py-2 rounded-lg bg-blue-600 text-white text-xs font-bold", children: copyStatus ? 'ĐÃ COPY ✓' : 'COPY ZALO/EMAIL' }), activeTab === NotificationType.ORDER_LETTER && _jsx("button", { onClick: handleExportExcel, className: "px-4 py-2 rounded-lg bg-green-600 text-white text-xs font-bold", children: "XU\u1EA4T EXCEL" }), _jsx("button", { onClick: handleExportPDF, disabled: isExporting, className: "px-4 py-2 rounded-lg bg-red-600 text-white text-xs font-bold", children: isExporting ? 'ĐANG XUẤT...' : 'XUẤT PDF' })] })] }), _jsxs("div", { className: "bg-white p-6 rounded-2xl border shadow-sm border-l-4 border-l-red-600", children: [_jsxs("div", { className: "flex gap-4 items-start pb-4 mb-5 border-b", children: [_jsx("img", { src: IDECO_LOGO_SVG, className: "w-20" }), _jsxs("div", { children: [_jsx("b", { className: "text-sm", children: "C\u00D4NG TY TNHH TM - DV K\u1EBET GIAO PH\u00C1T TRI\u1EC2N QU\u1ED0C T\u1EBE (IDECO)" }), _jsx("div", { className: "text-xs text-slate-500", children: "MST: 0310280621" })] })] }), _jsx("div", { ref: letterRef, contentEditable: true, suppressContentEditableWarning: true, onBlur: e => setGeneratedLetter(sanitizeHtml(e.currentTarget.innerHTML)), dangerouslySetInnerHTML: { __html: sanitizeHtml(generatedLetter) }, className: "letter-content min-h-[300px] outline-none text-sm leading-7" })] }), _jsx("div", { className: "text-center text-xs text-slate-400", children: "C\u00F3 th\u1EC3 s\u1EEDa tr\u1EF1c ti\u1EBFp n\u1ED9i dung tr\u01B0\u1EDBc khi copy ho\u1EB7c xu\u1EA5t file." }), analysis && (_jsxs("div", { className: "rounded-2xl border border-amber-200 bg-white overflow-hidden", children: [_jsxs("div", { className: "p-4 bg-amber-50 border-b flex items-center justify-between", children: [_jsxs("div", { children: [_jsx("b", { children: "AI PH\u00C2N T\u00CDCH TH\u01AF" }), _jsx("div", { className: "text-xs text-slate-500", children: "R\u00E0 \u0111\u1ED9 r\u00F5 r\u00E0ng, r\u1EE7i ro cam k\u1EBFt v\u00E0 kh\u1EA3 n\u0103ng thuy\u1EBFt ph\u1EE5c" })] }), _jsxs("div", { className: `text-2xl font-black ${analysis.score >= 85 ? 'text-green-600' : analysis.score >= 70 ? 'text-amber-600' : 'text-red-600'}`, children: [analysis.score, "/100"] })] }), _jsxs("div", { className: "p-5 grid md:grid-cols-2 gap-5 text-sm", children: [_jsxs("div", { children: [_jsx("b", { children: "T\u00F3m t\u1EAFt" }), _jsx("p", { className: "mt-1 text-slate-600", children: analysis.summary })] }), _jsxs("div", { children: [_jsx("b", { children: "Ti\u00EAu \u0111\u1EC1 g\u1EE3i \u00FD" }), _jsx("p", { className: "mt-1 text-slate-600", children: analysis.recommendedSubject || '—' }), _jsxs("p", { className: "mt-2", children: [_jsx("b", { children: "Gi\u1ECDng \u0111i\u1EC7u:" }), " ", analysis.recommendedTone || '—'] })] }), _jsx(AnalysisList, { title: "\u0110i\u1EC3m m\u1EA1nh", items: analysis.strengths }), _jsx(AnalysisList, { title: "V\u1EA5n \u0111\u1EC1 c\u1EA7n s\u1EEDa", items: analysis.issues }), _jsx(AnalysisList, { title: "R\u1EE7i ro/cam k\u1EBFt c\u1EA7n l\u01B0u \u00FD", items: analysis.risks }), _jsx(AnalysisList, { title: "\u0110\u1EC1 xu\u1EA5t c\u1EA3i thi\u1EC7n", items: analysis.suggestions }), _jsxs("div", { className: "md:col-span-2 p-3 bg-blue-50 rounded-lg", children: [_jsx("b", { children: "H\u00E0nh \u0111\u1ED9ng ti\u1EBFp theo:" }), " ", analysis.nextAction || '—'] })] })] })), _jsxs("div", { className: "pt-5 border-t flex gap-2", children: [_jsx("input", { value: letterTitle, onChange: e => setLetterTitle(e.target.value), placeholder: "T\u00EAn th\u01B0 \u0111\u1EC3 l\u01B0u l\u1EA1i...", className: "flex-1 px-4 py-2.5 border rounded-lg" }), _jsx("button", { onClick: handleSaveLetter, disabled: isSavingLetter, className: "px-5 py-2.5 bg-slate-800 text-white rounded-lg text-xs font-bold", children: isSavingLetter ? 'ĐANG LƯU...' : 'LƯU THƯ' })] })] })) : (_jsx("div", { className: "bg-white rounded-xl border p-5 min-h-[260px]", children: isSearchingCustomers ? _jsxs("div", { className: "py-14 text-center text-slate-500", children: ["AI \u0111ang \u0111\u1ECDc Firebase v\u00E0 d\u00F2 kh\u00E1ch h\u00E0ng c\u00F3 li\u00EAn quan \u0111\u1EBFn ", _jsx("b", { children: productName }), "..."] }) : affectedCustomers?.length ? _jsxs(_Fragment, { children: [_jsxs("div", { className: "flex justify-between items-center mb-3", children: [_jsxs("b", { children: ["Danh s\u00E1ch c\u1EA7n th\u00F4ng b\u00E1o (", affectedCustomers.length, ")"] }), _jsx("button", { onClick: () => exportCustomers(affectedCustomers, `DSKH_${productName}`), className: "px-4 py-2 bg-green-600 text-white rounded-lg text-xs font-bold", children: "XU\u1EA4T EXCEL" })] }), _jsxs("table", { className: "w-full text-sm", children: [_jsx("thead", { children: _jsxs("tr", { className: "bg-slate-100", children: [_jsx("th", { className: "p-2 text-left", children: "STT" }), _jsx("th", { className: "p-2 text-left", children: "Kh\u00E1ch h\u00E0ng" }), _jsx("th", { className: "p-2 text-left", children: "\u0110i\u1EC7n tho\u1EA1i" })] }) }), _jsx("tbody", { children: affectedCustomers.map((c, i) => _jsxs("tr", { className: "border-t", children: [_jsx("td", { className: "p-2", children: i + 1 }), _jsx("td", { className: "p-2 font-semibold", children: c.name }), _jsx("td", { className: "p-2 text-blue-600", children: c.phone || '—' })] }, i)) })] })] }) : _jsx("div", { className: "py-14 text-center text-slate-500", children: "Kh\u00F4ng t\u00ECm th\u1EA5y kh\u00E1ch h\u00E0ng li\u00EAn quan trong d\u1EEF li\u1EC7u." }) }))] }))] }))] }), _jsx("footer", { className: "max-w-5xl mx-auto mt-5 text-center text-[11px] text-slate-400 font-semibold", children: "IDECO \u00B7 SO\u1EA0N TH\u1EA2O & PH\u00C2N T\u00CDCH TH\u01AF" }), showSettings && (_jsx("div", { className: "fixed inset-0 z-50 bg-slate-900/60 p-4 flex items-center justify-center", children: _jsx("div", { className: "bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[92vh] overflow-auto", children: !settingsAuthorized ? (_jsxs("form", { onSubmit: e => { e.preventDefault(); if (passwordInput === ADMIN_PASSWORD) {
+                            setSettingsAuthorized(true);
+                            setPasswordError('');
+                        }
+                        else
+                            setPasswordError('Mật khẩu không đúng.'); }, className: "p-6 space-y-4", children: [_jsxs("div", { className: "flex justify-between", children: [_jsx("h3", { className: "font-black text-lg", children: "\uD83D\uDD12 X\u00C1C TH\u1EF0C C\u00C0I \u0110\u1EB6T" }), _jsx("button", { type: "button", onClick: () => setShowSettings(false), children: "\u2715" })] }), _jsx("input", { type: "password", autoFocus: true, value: passwordInput, onChange: e => setPasswordInput(e.target.value), className: "w-full px-4 py-3 border rounded-lg", placeholder: "M\u1EADt kh\u1EA9u qu\u1EA3n tr\u1ECB" }), passwordError && _jsxs("div", { className: "text-sm text-red-600 font-bold", children: ["\u26A0 ", passwordError] }), _jsx("button", { className: "w-full py-3 bg-slate-800 text-white rounded-lg font-bold", children: "X\u00C1C TH\u1EF0C" })] })) : (_jsxs("div", { className: "p-6 space-y-6", children: [_jsxs("div", { className: "flex justify-between items-start gap-4", children: [_jsxs("div", { children: [_jsx("h3", { className: "font-black text-lg", children: "\u2699\uFE0F C\u00C0I \u0110\u1EB6T H\u1EC6 TH\u1ED0NG" }), _jsx("p", { className: "text-xs text-slate-500", children: "Qu\u1EA3n l\u00FD API d\u1EF1 ph\u00F2ng v\u00E0 d\u1EEF li\u1EC7u g\u1EE3i \u00FD d\u00F9ng chung qua Firebase Realtime Database." })] }), _jsx("button", { onClick: () => setShowSettings(false), children: "\u2715" })] }), _jsxs("section", { className: "space-y-4", children: [_jsxs("div", { className: "flex items-center gap-2", children: [_jsx("span", { className: "w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center", children: "\u26A1" }), _jsxs("div", { children: [_jsx("b", { className: "text-sm", children: "C\u1EA5u h\u00ECnh x\u1EED l\u00FD" }), _jsx("p", { className: "text-xs text-slate-500", children: "T\u00EAn c\u00F4ng ngh\u1EC7 \u0111\u01B0\u1EE3c \u1EA9n ho\u00E0n to\u00E0n tr\u00EAn giao di\u1EC7n." })] })] }), _jsxs("div", { className: "p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-sm", children: [_jsx("b", { children: "API ch\u00EDnh \u0111\u00E3 t\u00EDch h\u1EE3p:" }), " ", _jsx("span", { className: "font-mono", children: getPrimaryKeyMasked() }), _jsx("br", {}), _jsx("span", { className: "text-xs text-emerald-700", children: "Kh\u00F4ng c\u1EA7n nh\u1EADp l\u1EA1i API ch\u00EDnh." })] }), _jsxs("div", { children: [_jsx("label", { className: "text-xs font-black uppercase", children: "Ch\u1EBF \u0111\u1ED9 x\u1EED l\u00FD" }), _jsxs("select", { value: aiSettings.providerMode, onChange: e => setAiSettings(s => ({ ...s, providerMode: e.target.value })), className: "mt-1 w-full px-4 py-2.5 border rounded-lg bg-white", children: [_jsx("option", { value: "auto", children: "T\u1EF0 \u0110\u1ED8NG \u2014 API ch\u00EDnh \u2192 d\u1EF1 ph\u00F2ng 1 \u2192 d\u1EF1 ph\u00F2ng 2 \u2192 API tr\u1EA3 ph\u00ED" }), _jsx("option", { value: "google", children: "Ch\u1EC9 nh\u00F3m API ch\u00EDnh" }), _jsx("option", { value: "kie", children: "Ch\u1EC9 API tr\u1EA3 ph\u00ED" })] })] }), _jsxs("div", { className: "grid sm:grid-cols-2 gap-3", children: [_jsx(SecretField, { label: "API Key d\u1EF1 ph\u00F2ng 1", value: aiSettings.googleBackupKey1, show: showSecrets, onChange: v => setAiSettings(s => ({ ...s, googleBackupKey1: v })) }), _jsx(SecretField, { label: "API Key d\u1EF1 ph\u00F2ng 2", value: aiSettings.googleBackupKey2, show: showSecrets, onChange: v => setAiSettings(s => ({ ...s, googleBackupKey2: v })) })] }), _jsx(SecretField, { label: "API Key tr\u1EA3 ph\u00ED", value: aiSettings.kieApiKey, show: showSecrets, onChange: v => setAiSettings(s => ({ ...s, kieApiKey: v })) }), _jsxs("div", { className: "grid sm:grid-cols-2 gap-3", children: [_jsxs("div", { children: [_jsx("label", { className: "text-xs font-black uppercase", children: "M\u1EE9c x\u1EED l\u00FD khi so\u1EA1n th\u01B0" }), _jsxs("select", { value: aiSettings.draftThinking, onChange: e => setAiSettings(s => ({ ...s, draftThinking: e.target.value })), className: "mt-1 w-full px-3 py-2.5 border rounded-lg", children: [_jsx("option", { value: "low", children: "Nhanh \u2014 ti\u1EBFt ki\u1EC7m token" }), _jsx("option", { value: "medium", children: "C\u00E2n b\u1EB1ng \u2014 khuy\u00EAn d\u00F9ng" }), _jsx("option", { value: "high", children: "K\u1EF9 \u2014 ph\u00E2n t\u00EDch nhi\u1EC1u h\u01A1n" })] })] }), _jsxs("div", { children: [_jsx("label", { className: "text-xs font-black uppercase", children: "M\u1EE9c x\u1EED l\u00FD khi ph\u00E2n t\u00EDch" }), _jsxs("select", { value: aiSettings.analysisThinking, onChange: e => setAiSettings(s => ({ ...s, analysisThinking: e.target.value })), className: "mt-1 w-full px-3 py-2.5 border rounded-lg", children: [_jsx("option", { value: "medium", children: "C\u00E2n b\u1EB1ng" }), _jsx("option", { value: "high", children: "K\u1EF9 \u2014 khuy\u00EAn d\u00F9ng" })] })] })] }), _jsxs("label", { className: "flex items-center gap-2 text-sm font-semibold", children: [_jsx("input", { type: "checkbox", checked: showSecrets, onChange: e => setShowSecrets(e.target.checked) }), " Hi\u1EC7n API key"] })] }), _jsxs("section", { className: "border-t pt-5 space-y-4", children: [_jsxs("div", { children: [_jsx("h4", { className: "font-black text-base", children: "\uD83D\uDCDA D\u1EEE LI\u1EC6U G\u1EE2I \u00DD T\u1EEA EXCEL" }), _jsx("p", { className: "text-xs text-slate-500 mt-1", children: "D\u1EEF li\u1EC7u \u0111\u01B0\u1EE3c \u0111\u1ECDc t\u1EEB Excel, r\u00FAt g\u1ECDn c\u00E1c c\u1ED9t c\u1EA7n thi\u1EBFt r\u1ED3i l\u01B0u Firebase. Upload l\u1EA1i s\u1EBD thay th\u1EBF danh m\u1EE5c c\u0169 sau khi b\u1EA5m L\u01B0u Firebase." })] }), _jsxs("div", { className: "grid md:grid-cols-2 gap-4", children: [_jsx(MasterUploadCard, { title: "DANH M\u1EE4C KH\u00C1CH H\u00C0NG", description: "Nh\u1EADn di\u1EC7n T\u00EAn kh\u00E1ch h\u00E0ng/nh\u00E0 thu\u1ED1c/c\u00F4ng ty, S\u0110T v\u00E0 m\u00E3 kh\u00E1ch n\u1EBFu c\u00F3. Khi v\u00E0o \u00F4 kh\u00E1ch h\u00E0ng s\u1EBD hi\u1EC7n g\u1EE3i \u00FD ngay.", savedInfo: customerDatasetInfo, pendingCount: pendingCustomerRows?.length || 0, pendingFile: pendingCustomerFile, busy: masterBusy === 'customers', onFile: file => handleMasterFile('customers', file), onSave: () => saveMasterDataset('customers'), onDelete: () => deleteMasterDataset('customers') }), _jsx(MasterUploadCard, { title: "DANH M\u1EE4C S\u1EA2N PH\u1EA8M", description: "Nh\u1EADn di\u1EC7n T\u00EAn s\u1EA3n ph\u1EA9m/thu\u1ED1c, N\u1ED3ng \u0111\u1ED9-H\u00E0m l\u01B0\u1EE3ng, Quy c\u00E1ch v\u00E0 M\u00E3 SP. G\u00F5 v\u00E0i ch\u1EEF \u0111\u1EC3 t\u00ECm, ch\u1ECDn xong t\u1EF1 \u0111i\u1EC1n th\u00F4ng tin.", savedInfo: productDatasetInfo, pendingCount: pendingProductRows?.length || 0, pendingFile: pendingProductFile, busy: masterBusy === 'products', onFile: file => handleMasterFile('products', file), onSave: () => saveMasterDataset('products'), onDelete: () => deleteMasterDataset('products') })] })] }), _jsx("div", { className: "p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-900", children: "L\u01B0u \u00FD b\u1EA3o m\u1EADt: \u1EE9ng d\u1EE5ng ch\u1EA1y tr\u00EAn tr\u00ECnh duy\u1EC7t n\u00EAn API key l\u01B0u ph\u00EDa client/Firebase c\u00F3 th\u1EC3 b\u1ECB xem n\u1EBFu website c\u00F4ng khai. D\u1EEF li\u1EC7u kh\u00E1ch h\u00E0ng/s\u1EA3n ph\u1EA9m ch\u1EC9 n\u00EAn d\u00F9ng trong Firebase c\u00F3 Rules ph\u00F9 h\u1EE3p." }), _jsxs("div", { className: "flex flex-wrap justify-between gap-2 border-t pt-4", children: [_jsx("button", { onClick: clearSettings, className: "px-4 py-2 border border-red-200 text-red-600 rounded-lg text-xs font-bold", children: "X\u00D3A API D\u1EF0 PH\u00D2NG" }), _jsx("button", { onClick: saveSettings, className: "px-5 py-2 bg-red-600 text-white rounded-lg text-xs font-bold", children: "L\u01AFU C\u1EA4U H\u00CCNH API" })] })] })) }) }))] }));
+};
+const MasterUploadCard = ({ title, description, savedInfo, pendingCount, pendingFile, busy, onFile, onSave, onDelete }) => (_jsxs("div", { className: "rounded-xl border border-slate-200 p-4 bg-slate-50 space-y-3", children: [_jsxs("div", { children: [_jsx("b", { className: "text-sm", children: title }), _jsx("p", { className: "text-xs text-slate-500 mt-1 leading-relaxed", children: description })] }), savedInfo ? (_jsxs("div", { className: "p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-xs", children: [_jsxs("div", { className: "font-bold text-emerald-800", children: ["\u2713 \u0110ang d\u00F9ng ", Number(savedInfo.count || datasetRows(savedInfo).length).toLocaleString('vi-VN'), " d\u00F2ng"] }), _jsxs("div", { className: "text-emerald-700 mt-1 truncate", children: ["File: ", savedInfo.sourceFile || 'Dữ liệu đã lưu'] }), savedInfo.updatedAt && _jsxs("div", { className: "text-emerald-700 mt-0.5", children: ["C\u1EADp nh\u1EADt: ", new Date(savedInfo.updatedAt).toLocaleString('vi-VN')] })] })) : _jsx("div", { className: "p-3 rounded-lg bg-white border border-dashed text-xs text-slate-500", children: "Ch\u01B0a c\u00F3 d\u1EEF li\u1EC7u tr\u00EAn Firebase." }), _jsxs("label", { className: "block", children: [_jsx("span", { className: "block text-xs font-bold mb-1", children: savedInfo ? 'Chọn file để upload lại' : 'Chọn file Excel' }), _jsx("input", { type: "file", accept: ".xlsx,.xls,.csv", disabled: busy, onChange: e => onFile(e.target.files?.[0]), className: "block w-full text-xs file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-slate-800 file:text-white file:font-bold" })] }), !!pendingCount && (_jsxs("div", { className: "p-3 rounded-lg bg-blue-50 border border-blue-200 text-xs", children: [_jsxs("div", { className: "font-bold text-blue-800", children: ["\u0110\u00E3 \u0111\u1ECDc: ", pendingCount.toLocaleString('vi-VN'), " d\u00F2ng"] }), _jsx("div", { className: "text-blue-700 mt-1 truncate", children: pendingFile }), _jsx("div", { className: "text-blue-700 mt-1", children: "Ch\u01B0a ghi Firebase \u2014 b\u1EA5m L\u01B0u Firebase \u0111\u1EC3 thay th\u1EBF d\u1EEF li\u1EC7u hi\u1EC7n t\u1EA1i." })] })), _jsxs("div", { className: "flex gap-2", children: [_jsx("button", { type: "button", onClick: onSave, disabled: busy || !pendingCount, className: "flex-1 px-3 py-2 rounded-lg bg-emerald-600 text-white text-xs font-black disabled:bg-slate-300", children: busy ? 'ĐANG XỬ LÝ...' : 'LƯU FIREBASE' }), _jsx("button", { type: "button", onClick: onDelete, disabled: busy || !savedInfo, className: "px-3 py-2 rounded-lg border border-red-200 text-red-600 bg-white text-xs font-black disabled:text-slate-300 disabled:border-slate-200", children: "X\u00D3A" })] })] }));
+const SecretField = ({ label, value, show, onChange }) => (_jsxs("div", { children: [_jsx("label", { className: "text-xs font-black uppercase", children: label }), _jsx("input", { type: show ? 'text' : 'password', value: value, onChange: e => onChange(e.target.value), className: "mt-1 w-full px-3 py-2.5 border rounded-lg font-mono text-sm", placeholder: "D\u00E1n API key..." })] }));
+const AnalysisList = ({ title, items }) => (_jsxs("div", { children: [_jsx("b", { children: title }), items?.length ? _jsx("ul", { className: "mt-1 pl-5 list-disc text-slate-600 space-y-1", children: items.map((x, i) => _jsx("li", { children: x }, i)) }) : _jsx("p", { className: "mt-1 text-slate-400", children: "Kh\u00F4ng c\u00F3." })] }));
+/* ===== mount ===== */
+const rootElement = document.getElementById('root');
+if (!rootElement) throw new Error('Không tìm thấy vùng khởi động ứng dụng');
+const root = ReactDOM.createRoot(rootElement);
+root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
+
+  <\/script>
+</body>
+</html>
+</script>
+        </div>
+
+
         <div class="app-footer" id="app-footer">
             Hệ thống quản lý kho dược IDECO.
         </div>
@@ -6205,6 +7624,7 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active')); if(el)el.classList.add('active'); 
             if(id==='tab6'&&window.initForecastOrderTab)window.initForecastOrderTab(); 
             if(id==='tab7'&&window.initPriceAgentTab)window.initPriceAgentTab(); 
+            if(id==='tab8'&&window.initLetterAppTab)window.initLetterAppTab(); 
         }
         window.toggleMode=(m)=>{ document.getElementById('mode-paste').style.display=m==='paste'?'block':'none'; document.getElementById('mode-file').style.display=m==='file'?'block':'none'; }
         window.toggleMasterSection=()=>{ const el=document.getElementById('master-section'); el.style.display=el.style.display==='none'?'block':'none'; }
@@ -8843,5 +10263,46 @@ async function exportCleanElementPDF(sourceEl, fileName, orientation='p'){
   @media(max-width:1100px){#tab7 .price-agent-toolbar{align-items:flex-start}#tab7 .price-agent-frame{height:calc(100vh - 260px)!important;min-height:700px!important}}
   @media(max-width:700px){#tab7 .price-agent-toolbar{padding:7px 8px}#tab7 .price-agent-toolbar small{display:block;margin-left:0;margin-top:2px}#tab7 .price-agent-pill{font-size:.64rem}#tab7 .price-agent-frame{height:calc(100vh - 270px)!important;min-height:640px!important}}
 </style>
+
+<script id="letter-app-tab-loader">
+(()=>{
+  let letterAppLoaded=false;
+  function sourceLetterAppHtml(){
+    const src=document.getElementById('letter-app-src');
+    if(!src)return '';
+    return String(src.textContent||'').replace(/<\\\/script>/gi,'<\/script>');
+  }
+  function loadLetterApp(force=false){
+    const frame=document.getElementById('letter-app-iframe');
+    if(!frame)return;
+    if(letterAppLoaded&&!force)return;
+    const html=sourceLetterAppHtml();
+    if(!html){
+      frame.srcdoc='<div style="font-family:Arial;padding:24px;color:#b91c1c"><b>Không tìm thấy mã ứng dụng Soạn thư IDECO.</b><br>Hãy bấm Khởi động lại tab.</div>';
+      return;
+    }
+    letterAppLoaded=true;
+    frame.srcdoc=html;
+  }
+  window.initLetterAppTab=()=>loadLetterApp(false);
+  window.reloadLetterAppTab=()=>{
+    const frame=document.getElementById('letter-app-iframe');
+    if(frame)frame.srcdoc='';
+    letterAppLoaded=false;
+    setTimeout(()=>loadLetterApp(true),80);
+  };
+})();
+</script>
+<style id="letter-app-tab-shell-style">
+  #tab8{padding:0!important;background:#f1f5f9!important;width:100%!important;max-width:none!important;overflow:hidden!important}
+  #tab8 .letter-app-shell{width:100%!important;max-width:none!important;margin:0!important;border:0!important;border-radius:0!important;background:#fff;overflow:hidden!important;box-shadow:none!important}
+  #tab8 .letter-app-toolbar{box-sizing:border-box;display:flex!important;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;width:100%;padding:8px 12px;background:#7f1d1d;color:#fff;border-bottom:1px solid #991b1b}
+  #tab8 .letter-app-toolbar b{font-size:.88rem}#tab8 .letter-app-toolbar small{display:inline;margin-left:6px;color:#fecaca;font-size:.72rem}
+  #tab8 .letter-app-pill{display:inline-flex;align-items:center;gap:5px;background:#fef2f2;color:#991b1b;border:1px solid #fecaca;border-radius:999px;padding:4px 8px;font-size:.7rem;font-weight:900}
+  #tab8 .letter-app-frame{display:block!important;width:100%!important;max-width:none!important;height:calc(100vh - 244px)!important;min-height:780px!important;border:0!important;margin:0!important;padding:0!important;background:#f1f5f9!important}
+  @media(max-width:1100px){#tab8 .letter-app-toolbar{align-items:flex-start}#tab8 .letter-app-frame{height:calc(100vh - 260px)!important;min-height:720px!important}}
+  @media(max-width:700px){#tab8 .letter-app-toolbar{padding:7px 8px}#tab8 .letter-app-toolbar small{display:block;margin-left:0;margin-top:2px}#tab8 .letter-app-pill{font-size:.64rem}#tab8 .letter-app-frame{height:calc(100vh - 270px)!important;min-height:660px!important}}
+</style>
+
 </body>
 </html>

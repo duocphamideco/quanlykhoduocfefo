@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="data:,">
-    <title>Quản Lý Kho Dược GDP - IDECO V58 Master Code</title>
+    <title>Quản Lý Kho Dược GDP - IDECO V59 Firebase Save Fix</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -6396,6 +6396,21 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
 
         function safeLocalGet(key, fallback){ try{ const x=JSON.parse(localStorage.getItem(key)||'null'); return x??fallback; }catch(e){ return fallback; } }
         function safeLocalSet(key, value){ try{ localStorage.setItem(key,JSON.stringify(value)); return true; }catch(e){ showToast('Không lưu được dữ liệu cục bộ: '+e.message,'error'); return false; } }
+        // V59: bộ đọc số dùng chung cho Nhập/Xuất kho. Không để chuỗi kiểu 1.000 / 1,000 / 1 000 bị rơi về 0.
+        function warehouseNumber(v){
+            if(v===null||v===undefined||v==='')return 0;
+            if(typeof v==='number')return Number.isFinite(v)?v:0;
+            let s=String(v).trim().replace(/\s/g,'');
+            if(!s)return 0;
+            if(/^[-+]?\d{1,3}(\.\d{3})+(,\d+)?$/.test(s))s=s.replace(/\./g,'').replace(',','.');
+            else if(/^[-+]?\d{1,3}(,\d{3})+(\.\d+)?$/.test(s))s=s.replace(/,/g,'');
+            else if(/^[-+]?\d+(,\d+)$/.test(s))s=s.replace(',','.');
+            else s=s.replace(/,/g,'');
+            const x=Number(s);return Number.isFinite(x)?x:0;
+        }
+        function firebaseWriteCanBeTried(){
+            return !!(navigator.onLine&&firebaseRuntimeAvailable&&refs?.items&&String(refs.items.key||'').indexOf('offline_')!==0);
+        }
         function getOfflineQueue(){ const q=safeLocalGet(OFFLINE_QUEUE_KEY,[]); return Array.isArray(q)?q:[]; }
         function setOfflineQueue(q){ safeLocalSet(OFFLINE_QUEUE_KEY,q); renderOfflineQueue(); }
         function makeQueueId(){ return 'OFF_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,9); }
@@ -6439,13 +6454,13 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
         }
         async function syncOfflineQueue(){
             const q=getOfflineQueue(); if(!q.length)return showToast('Không có dữ liệu Offline chờ đồng bộ.','error');
-            if(!networkReady())return showToast('Chưa kết nối được Firebase. Hãy chờ mạng ổn định rồi thử lại.','error');
+            if(!firebaseWriteCanBeTried())return showToast('Chưa thể ghi Firebase. Hãy kiểm tra Internet rồi thử lại.','error');
             const valid=[],blocked=[]; q.forEach(x=>{const ck=queuedMasterCheck(x);(ck.ok?valid:blocked).push(ck.ok?x:{item:x,reason:ck.reason});});
             if(!valid.length)return showToast(`Chưa có dòng nào được phép đồng bộ. ${blocked[0]?.reason||'Hãy kiểm tra Master.'}`,'error');
             const ok=await openSafetyVerification({title:'ĐỒNG BỘ HÀNG ĐỢI OFFLINE',subtitle:`Sắp ghi ${valid.length} dòng đã lưu cục bộ lên Firebase. ${blocked.length?`${blocked.length} dòng bị giữ lại vì Master thay đổi.`:''}`,actionType:'ĐỒNG BỘ OFFLINE',items:valid,date:new Date().toISOString().slice(0,10)}); if(!ok)return;
             const remain=[...q]; let done=0;
             for(const item of valid){
-                if(!networkReady())break;
+                if(!firebaseWriteCanBeTried())break;
                 try{await saveToInventory({...item,syncedAt:new Date().toISOString(),sourceType:item.sourceType||'OFFLINE_MANUAL'}); const idx=remain.findIndex(x=>x.offlineQueueId===item.offlineQueueId); if(idx>=0)remain.splice(idx,1); setOfflineQueue(remain); done++;}
                 catch(e){showToast('Đồng bộ Offline dừng: '+(e?.message||e),'error');break;}
             }
@@ -6661,7 +6676,7 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
         window.processPaste=()=>{ const txt=document.getElementById('paste-area').value; if(!txt) return; const rows=txt.trim().split('\n').map(r=>r.split('\t')); const data=rows.map(c=>({ name:c[1], unit:c[2], lot:c[3], exp:parseDate(c[4]), qty:c[5] })); generatePreview(data); }
 
         function generatePreview(data) {
-            previewData = data.map((d, i) => { const match = findBestMatch(d.name); return { id: i, productName: d.name, productCode: match ? match.code : '', productStrength: d.strength || (match ? match.strength : ''), packSpec: d.packSpec || (match ? match.packSpec : ''), unit: d.unit || (match ? match.unit : ''), lotNumber: d.lot, expiryDate: d.exp, quantity: d.qty }; });
+            previewData = data.map((d, i) => { const match = findBestMatch(d.name); return { id: i, productName: d.name, productCode: match ? match.code : '', productStrength: d.strength || (match ? match.strength : ''), packSpec: d.packSpec || (match ? match.packSpec : ''), unit: d.unit || (match ? match.unit : ''), lotNumber: d.lot, expiryDate: d.exp, quantity: warehouseNumber(d.qty) }; });
             renderPreviewTable(); document.getElementById('preview-box').style.display='flex';
         }
 
@@ -6704,7 +6719,7 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
                 }
                 const tdLot=document.createElement('td'); tdLot.innerHTML=`<input class="table-input" value="${escapeHtml(d.lotNumber||'')}" onchange="previewData[${i}].lotNumber=this.value">`;
                 const tdExp=document.createElement('td'); tdExp.innerHTML=`<input type="date" class="table-input" value="${escapeHtml(d.expiryDate||'')}" onchange="previewData[${i}].expiryDate=this.value">`;
-                const tdQty=document.createElement('td'); tdQty.innerHTML=`<input type="number" class="table-input" value="${escapeHtml(d.quantity||'')}" onchange="previewData[${i}].quantity=this.value">`;
+                const tdQty=document.createElement('td'); tdQty.innerHTML=`<input type="number" step="any" class="table-input" value="${escapeHtml(d.quantity??'')}" onchange="previewData[${i}].quantity=warehouseNumber(this.value)">`;
                 const tdAct=document.createElement('td'); tdAct.innerHTML=`<button class="btn btn-danger" style="padding:2px 5px" onclick="removePreviewItem(${i})">X</button>`;
                 tr.append(tdCode,tdName,tdStrength,tdPack,tdUnit,tdLot,tdExp,tdQty,tdAct); tb.appendChild(tr);
             });
@@ -6730,22 +6745,22 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
             if(previewData.length === 0) return showToast('Không có dòng để nhập kho!', 'error');
             const masterErrors=previewData.map((d,i)=>({i,...verifyMasterLockedPreview(d)})).filter(x=>!x.ok);
             if(masterErrors.length) return showToast(`CHẶN ĐỒNG BỘ: ${masterErrors.length} dòng không còn đúng Master. ${masterErrors[0].reason}`, 'error');
-            const invalidCritical = previewData.filter(d => !d.productCode || !d.productName || !d.packSpec || !d.lotNumber || !d.expiryDate || !d.quantity || parseInt(d.quantity) <= 0);
+            const invalidCritical = previewData.filter(d => !d.productCode || !d.productName || !d.packSpec || !d.lotNumber || !d.expiryDate || warehouseNumber(d.quantity) <= 0);
             if(invalidCritical.length > 0) return showToast(`Có ${invalidCritical.length} dòng thiếu Mã SP / Tên SP / Quy cách / Số lô / Hạn dùng / Số lượng. Không cho phép đồng bộ!`, 'error');
             const validItems = [...previewData];
             const ok = await openSafetyVerification({
-                title: networkReady()?'KIỂM TRA TRƯỚC KHI ĐỒNG BỘ NHẬP KHO':'KIỂM TRA TRƯỚC KHI LƯU OFFLINE',
-                subtitle: networkReady()?`Sắp ghi ${validItems.length} dòng vào tồn kho. Hãy kiểm tra từng dòng.`:`Firebase chưa kết nối. ${validItems.length} dòng sẽ được lưu trên máy ở trạng thái CHƯA ĐỒNG BỘ.`,
-                actionType: networkReady()?'NHẬP KHO HÀNG LOẠT':'NHẬP KHO OFFLINE DỰ PHÒNG',
-                items: validItems.map(d => ({...d, quantity: parseInt(d.quantity)})),
+                title: firebaseWriteCanBeTried()?'KIỂM TRA TRƯỚC KHI ĐỒNG BỘ NHẬP KHO':'KIỂM TRA TRƯỚC KHI LƯU OFFLINE',
+                subtitle: firebaseWriteCanBeTried()?`Sắp ghi ${validItems.length} dòng vào tồn kho. Hãy kiểm tra từng dòng.`:`Firebase chưa thể ghi trực tiếp. ${validItems.length} dòng sẽ được lưu trên máy ở trạng thái CHƯA ĐỒNG BỘ.`,
+                actionType: firebaseWriteCanBeTried()?'NHẬP KHO HÀNG LOẠT':'NHẬP KHO OFFLINE DỰ PHÒNG',
+                items: validItems.map(d => ({...d, quantity: warehouseNumber(d.quantity)})),
                 date: new Date().toISOString().split('T')[0]
             });
             if(!ok) return;
             const prepared=validItems.map(d=>({
-                productName:d.productName,productCode:d.productCode||'',productStrength:d.productStrength||'',packSpec:d.packSpec||'',unit:d.unit||'',lotNumber:d.lotNumber,expiryDate:d.expiryDate,quantity:parseInt(d.quantity),importDate:new Date().toISOString().split('T')[0],createdAt:new Date().toISOString(),
+                productName:d.productName,productCode:d.productCode||'',productStrength:d.productStrength||'',packSpec:d.packSpec||'',unit:d.unit||'',lotNumber:d.lotNumber,expiryDate:d.expiryDate,quantity:warehouseNumber(d.quantity),importDate:new Date().toISOString().split('T')[0],createdAt:new Date().toISOString(),
                 masterCode:d.masterCode||d.productCode||'',masterName:d.masterName||d.productName,sourceType:d.sourceType||'WAREHOUSE_MANUAL',sourceNote:d.sourceType==='MANUAL_FALLBACK'?'THỦ CÔNG DỰ PHÒNG':'AI/PHIẾU NCC'
             }));
-            if(!networkReady()){
+            if(!firebaseWriteCanBeTried()){
                 enqueueOfflineItems(prepared);
                 showToast(`Đã lưu OFFLINE ${prepared.length} dòng trên máy. CHƯA ghi Firebase; khi có mạng bấm “ĐỒNG BỘ DỮ LIỆU CHỜ”.`,'success');
                 previewData=[];renderPreviewTable();document.getElementById('preview-box').style.display='none';
@@ -6774,6 +6789,13 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
                 inventoryLotKey(a.lotNumber)===inventoryLotKey(b.lotNumber) &&
                 inventoryExpiryKey(a.expiryDate)===inventoryExpiryKey(b.expiryDate);
         }
+        async function refreshStockFromFirebase(){
+            const snap=await refs.items.once('value');
+            const data=snap.val()||{};
+            stockData=Object.keys(data).map(id=>({id,...data[id]}));
+            renderStockTable();
+            return data;
+        }
         async function saveToInventory(item) {
             const txId=String(item.sourceTransactionId||'').trim();
             const code=String(item.productCode||'').trim();
@@ -6782,40 +6804,73 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
             if(mh.length!==1||masterDuplicateCodes.includes(cleanCode(code)))throw new Error(`CHẶN NHẬP KHO: Mã SP ${code} không tồn tại duy nhất trong Master.`);
             const master=mh[0];
             if(String(item.productName||'').trim()!==String(master.name||'').trim()||String(item.packSpec||'').trim()!==String(master.packSpec||'').trim())throw new Error(`CHẶN NHẬP KHO: ${code} có Tên/Quy cách không khớp Master.`);
-            const qty=parseInt(item.quantity)||0;if(qty<=0)throw new Error('Số lượng nhập phải > 0.');
+            const qty=warehouseNumber(item.quantity);if(!(qty>0))throw new Error('Số lượng nhập phải > 0.');
             const lotKey=inventoryLotKey(item.lotNumber),expKey=inventoryExpiryKey(item.expiryDate),codeKey=inventoryCodeKey(code);
             if(!lotKey||!expKey)throw new Error('Số lô và HSD là bắt buộc.');
-            const newKey=refs.items.push().key;
-            let action='';
-            const txResult=await refs.items.transaction(data=>{
-                data=data||{};
-                const ids=Object.keys(data).filter(id=>{
-                    const r=data[id]||{};return inventoryCodeKey(r.productCode)===codeKey&&inventoryLotKey(r.lotNumber)===lotKey&&inventoryExpiryKey(r.expiryDate)===expKey;
-                });
-                if(ids.length>1){action='duplicate';return;}
-                if(ids.length===1){
-                    const id=ids[0],cur=data[id]||{};
-                    if(inventoryNameKey(cur.productName)!==inventoryNameKey(master.name)||String(cur.packSpec||'').trim()!==String(master.packSpec||'').trim()){action='conflict';return;}
+
+            // V59: đọc danh sách để kiểm tra trùng, sau đó chỉ transaction đúng CHILD cần sửa.
+            // Cách này tương thích Firebase Rules chỉ cho ghi pharmaceuticals/$id và tránh bị từ chối khi transaction cả root pharmaceuticals.
+            const freshSnap=await refs.items.once('value');
+            const fresh=freshSnap.val()||{};
+            const ids=Object.keys(fresh).filter(id=>{
+                const r=fresh[id]||{};return inventoryCodeKey(r.productCode)===codeKey&&inventoryLotKey(r.lotNumber)===lotKey&&inventoryExpiryKey(r.expiryDate)===expKey;
+            });
+            if(ids.length>1)throw new Error(`CHẶN NHẬP KHO: Firebase đang có nhiều hơn 1 dòng cùng Mã SP ${code} + Lô ${item.lotNumber} + HSD ${item.expiryDate}. Hãy chạy Kiểm tra hệ thống và làm sạch dữ liệu.`);
+
+            if(ids.length===1){
+                const id=ids[0];let action='',reason='';
+                const txResult=await refs.items.child(id).transaction(cur=>{
+                    if(!cur){reason='Dòng tồn vừa bị xóa trên Firebase';return;}
+                    if(inventoryCodeKey(cur.productCode)!==codeKey||inventoryLotKey(cur.lotNumber)!==lotKey||inventoryExpiryKey(cur.expiryDate)!==expKey){reason='Khóa Mã SP + Lô + HSD đã thay đổi';return;}
+                    if(inventoryNameKey(cur.productName)!==inventoryNameKey(master.name)||String(cur.packSpec||'').trim()!==String(master.packSpec||'').trim()){reason='Tên/Quy cách tồn kho xung đột Master';return;}
                     cur.appliedTransactions=cur.appliedTransactions||{};
-                    if(txId&&cur.appliedTransactions[txId]){action='already';return data;}
-                    cur.quantity=(parseInt(cur.quantity)||0)+qty;
+                    if(txId&&cur.appliedTransactions[txId]){action='already';return cur;}
+                    cur.quantity=warehouseNumber(cur.quantity)+qty;
                     cur.productCode=master.code;cur.productName=master.name;cur.productStrength=master.strength||cur.productStrength||'';cur.packSpec=master.packSpec;cur.unit=master.unit||cur.unit||'';
                     const incomingImport=item.importDate||new Date().toISOString().slice(0,10),incomingCreated=item.createdAt||new Date().toISOString();
                     if(!cur.importDate||incomingImport<cur.importDate)cur.importDate=incomingImport;
                     if(!cur.createdAt||incomingCreated<cur.createdAt)cur.createdAt=incomingCreated;
-                    cur.lastImportAt=incomingCreated;cur.sourceType=item.sourceType||cur.sourceType||'';cur.sourceNote=item.sourceNote||cur.sourceNote||'';
-                    if(txId)cur.appliedTransactions[txId]=new Date().toISOString();data[id]=cur;action='increment';return data;
-                }
-                const payload={...item,productCode:master.code,productName:master.name,productStrength:master.strength||item.productStrength||'',packSpec:master.packSpec,unit:master.unit||item.unit||'',quantity:qty};
-                if(txId)payload.appliedTransactions={[txId]:new Date().toISOString()};
-                data[newKey]=payload;action='create';return data;
-            });
-            if(!txResult.committed){
-                if(action==='duplicate')throw new Error(`CHẶN NHẬP KHO: Firebase đang có nhiều hơn 1 dòng cùng Mã SP ${code} + Lô ${item.lotNumber} + HSD ${item.expiryDate}. Hãy chạy Kiểm tra hệ thống và làm sạch dữ liệu.`);
-                if(action==='conflict')throw new Error(`XUNG ĐỘT MASTER: ${code} + Lô ${item.lotNumber} + HSD ${item.expiryDate} có Tên/Quy cách khác Master.`);
-                throw new Error('Firebase không chấp nhận giao dịch nhập kho. Hãy tải lại dữ liệu và thử lại.');
+                    cur.lastImportAt=incomingCreated;cur.lastEditedAt=new Date().toISOString();cur.sourceType=item.sourceType||cur.sourceType||'';cur.sourceNote=item.sourceNote||cur.sourceNote||'';
+                    if(txId)cur.appliedTransactions[txId]=new Date().toISOString();action='increment';return cur;
+                });
+                if(!txResult.committed)throw new Error('Firebase không lưu được dòng nhập kho: '+(reason||'dữ liệu vừa thay đổi. Hãy tải lại và thử lại.'));
+                const saved=txResult.snapshot?.val?.();
+                const pos=stockData.findIndex(x=>x.id===id);if(saved){if(pos>=0)stockData[pos]={id,...saved};else stockData.push({id,...saved});}
+                renderStockTable();return {id,action};
             }
-            const snap=txResult.snapshot?.val?.()||{};stockData=Object.keys(snap).map(id=>({id,...snap[id]}));
+
+            const newRef=refs.items.push();
+            const payload={...item,productCode:master.code,productName:master.name,productStrength:master.strength||item.productStrength||'',packSpec:master.packSpec,unit:master.unit||item.unit||'',quantity:qty};
+            if(txId)payload.appliedTransactions={[txId]:new Date().toISOString()};
+            await newRef.set(payload);
+            stockData.push({id:newRef.key,...payload});renderStockTable();return {id:newRef.key,action:'create'};
+        }
+
+        // Trừ tồn theo từng CHILD để không cần quyền ghi ở root pharmaceuticals. Nếu một dòng lỗi, các dòng đã trừ sẽ được hoàn lại.
+        async function applyInventoryDeductions(lines){
+            const grouped=new Map();
+            (lines||[]).forEach(x=>{const id=String(x.relatedId||x.id||'').trim(),q=warehouseNumber(x.quantity??x.boxesTake??x.exportQty);if(id&&q>0)grouped.set(id,(grouped.get(id)||0)+q);});
+            const applied=[];
+            try{
+                for(const [id,take] of grouped){
+                    let reason='';
+                    const tx=await refs.items.child(id).transaction(cur=>{
+                        if(!cur){reason='Lô tồn không còn tồn tại';return;}
+                        const have=warehouseNumber(cur.quantity);if(have<take){reason=`Tồn chỉ còn ${have}, cần ${take}`;return;}
+                        cur.quantity=have-take;cur.lastExportAt=new Date().toISOString();return cur;
+                    });
+                    if(!tx.committed)throw new Error(`${reason||'Firebase từ chối cập nhật'} · lô ${id}`);
+                    applied.push({id,take});
+                }
+                await refreshStockFromFirebase();
+                return applied;
+            }catch(err){
+                for(const x of applied.reverse()){
+                    try{await refs.items.child(x.id).transaction(cur=>{if(!cur)return cur;cur.quantity=warehouseNumber(cur.quantity)+x.take;cur.lastRollbackAt=new Date().toISOString();return cur;});}catch(e){console.error('Rollback tồn kho thất bại',x,e)}
+                }
+                try{await refreshStockFromFirebase()}catch{}
+                throw err;
+            }
         }
 
         // --- MANUAL FALLBACK INPUT ---
@@ -6835,7 +6890,7 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
             if(!m.code||masterDuplicateCodes.includes(cleanCode(m.code)))return showToast(`Master “${m.name}” thiếu Mã SP duy nhất. Chưa được nhập kho.`,'error');
             if(cleanStr(document.getElementById('fallback-product').value)!==cleanStr(m.name))return showToast('Tên đang nhập đã thay đổi. Hãy chọn lại sản phẩm từ Master.','error');
             if(!m.packSpec)return showToast(`Master của “${m.name}” chưa có Quy cách. Hãy cập nhật Master trước khi nhập kho.`,'error');
-            const lot=document.getElementById('fallback-lot').value.trim(),exp=document.getElementById('fallback-exp').value,qty=parseInt(document.getElementById('fallback-qty').value);
+            const lot=document.getElementById('fallback-lot').value.trim(),exp=document.getElementById('fallback-exp').value,qty=warehouseNumber(document.getElementById('fallback-qty').value);
             if(!lot||!exp||!qty||qty<=0)return showToast('Nhập thủ công bắt buộc có Số lô + Hạn dùng + Số lượng > 0.','error');
             previewData.push({id:previewData.length,productName:m.name,productCode:m.code||'',productStrength:m.strength||'',packSpec:m.packSpec,unit:m.unit||'',lotNumber:lot,expiryDate:exp,quantity:qty,masterLocked:true,masterVerified:true,masterCode:m.code||'',masterName:m.name,sourceType:'MANUAL_FALLBACK',sourceName:'NHẬP THỦ CÔNG DỰ PHÒNG'});
             renderPreviewTable();document.getElementById('preview-box').style.display='flex';showToast(`Đã thêm ${m.name} · Lô ${lot} vào bảng Nhập kho (THỦ CÔNG DỰ PHÒNG).`,'success');resetFallbackRow(true);
@@ -6974,7 +7029,7 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
             if(!confirm('Xóa phiếu xuất và hoàn kho? Hệ thống sẽ hoàn theo ĐVT KHO (boxQuantity nếu có).')) return;
             const ex=exportData.find(x=>x.id===id);if(!ex)return showToast('Không tìm thấy phiếu xuất.','error');
             const stk=stockData.find(s=>s.id===ex.relatedId);if(!stk)return showToast('Không tìm thấy lô tồn gốc để hoàn kho. Không xóa phiếu để tránh lệch số liệu.','error');
-            const restoreQty=Number(ex.boxQuantity!==undefined&&ex.boxQuantity!==null?ex.boxQuantity:ex.quantity)||0;if(restoreQty<=0)return showToast('Phiếu xuất không có số lượng hoàn kho hợp lệ.','error');
+            const restoreQty=warehouseNumber(ex.boxQuantity!==undefined&&ex.boxQuantity!==null?ex.boxQuantity:ex.quantity);if(restoreQty<=0)return showToast('Phiếu xuất không có số lượng hoàn kho hợp lệ.','error');
             const updates={};updates[`pharmaceuticals/${stk.id}/quantity`]=firebase.database.ServerValue.increment(restoreQty);updates[`exports/${id}`]=null;
             await db.ref().update(updates);
             showToast(`Đã xóa phiếu xuất và hoàn ${restoreQty} ${stk.unit||'đv kho'} bằng cập nhật Firebase nguyên tử.`, 'success');
@@ -6984,7 +7039,7 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
             const ex = exportData.find(x => x.id === id);
             document.getElementById('edit-ex-id').value = id;
             document.getElementById('edit-ex-related').value = ex.relatedId;
-            const stockQty=Number(ex.boxQuantity!==undefined&&ex.boxQuantity!==null?ex.boxQuantity:ex.quantity)||0;
+            const stockQty=warehouseNumber(ex.boxQuantity!==undefined&&ex.boxQuantity!==null?ex.boxQuantity:ex.quantity);
             document.getElementById('edit-ex-old-qty').value = stockQty;
             document.getElementById('edit-ex-name').value = ex.productName;
             document.getElementById('edit-ex-qty').value = stockQty;
@@ -6995,20 +7050,32 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
         
         window.saveExportEdit = async () => {
             const id=document.getElementById('edit-ex-id').value,relatedId=document.getElementById('edit-ex-related').value;
-            const oldQty=Number(document.getElementById('edit-ex-old-qty').value)||0,newQty=Number(document.getElementById('edit-ex-qty').value);
+            const oldQty=warehouseNumber(document.getElementById('edit-ex-old-qty').value),newQty=warehouseNumber(document.getElementById('edit-ex-qty').value);
             const newDest=document.getElementById('edit-ex-dest').value,newDate=document.getElementById('edit-ex-date').value,ex=exportData.find(x=>x.id===id);
             if(!ex||!Number.isFinite(newQty)||newQty<0)return showToast('Số lượng không hợp lệ', 'error');
-            const ratio=(Number(ex.boxQuantity)>0)?Number(ex.quantity||0)/Number(ex.boxQuantity):1,newHistoryQty=newQty*ratio;
-            const ok=await openSafetyVerification({title:'KIỂM TRA TRƯỚC KHI SỬA PHIẾU XUẤT',subtitle:'Số lượng nhập ở đây là ĐVT KHO. Hệ thống cập nhật tồn + lịch sử xuất trong cùng một transaction.',actionType:'SỬA PHIẾU XUẤT',destination:newDest,date:newDate,items:[{...(ex||{}),quantity:newQty}]});if(!ok)return;
-            let reason='';
-            const tx=await db.ref().transaction(root=>{
-                if(!root?.pharmaceuticals?.[relatedId]||!root?.exports?.[id]){reason='Không còn lô tồn hoặc phiếu xuất trên Firebase';return;}
-                const cur=Number(root.pharmaceuticals[relatedId].quantity)||0,max=cur+oldQty;if(newQty>max){reason=`Không đủ tồn. Tối đa ${max}`;return;}
-                root.pharmaceuticals[relatedId].quantity=max-newQty;
-                root.exports[id].boxQuantity=newQty;root.exports[id].quantity=newHistoryQty;root.exports[id].destination=newDest;root.exports[id].exportDate=newDate;root.exports[id].lastEditedAt=new Date().toISOString();return root;
-            });
-            if(!tx.committed)return showToast('Không cập nhật phiếu xuất: '+(reason||'dữ liệu đã thay đổi'),'error');
-            document.getElementById('edit-export-modal').style.display='none';showToast('Đã cập nhật tồn kho + phiếu xuất nguyên tử', 'success');
+            const oldBox=warehouseNumber(ex.boxQuantity),oldHistory=warehouseNumber(ex.quantity),ratio=oldBox>0?oldHistory/oldBox:1,newHistoryQty=newQty*ratio;
+            const ok=await openSafetyVerification({title:'KIỂM TRA TRƯỚC KHI SỬA PHIẾU XUẤT',subtitle:'Số lượng ở đây là ĐVT KHO. V59 lưu đè đúng phiếu cũ và chỉ transaction đúng lô tồn liên quan.',actionType:'SỬA PHIẾU XUẤT',destination:newDest,date:newDate,items:[{...(ex||{}),quantity:newQty}]});if(!ok)return;
+            const delta=oldQty-newQty;let stockChanged=false;
+            try{
+                if(delta!==0){
+                    if(!relatedId)throw new Error('Phiếu cũ thiếu relatedId nên không thể thay đổi số lượng tồn. Có thể sửa thông tin nếu giữ nguyên số lượng.');
+                    let reason='';
+                    const tx=await refs.items.child(relatedId).transaction(cur=>{
+                        if(!cur){reason='Không còn lô tồn gốc trên Firebase';return;}
+                        const next=warehouseNumber(cur.quantity)+delta;if(next<0){reason=`Không đủ tồn; thiếu ${Math.abs(next)}`;return;}
+                        cur.quantity=next;cur.lastEditedAt=new Date().toISOString();return cur;
+                    });
+                    if(!tx.committed)throw new Error(reason||'Firebase từ chối cập nhật lô tồn');stockChanged=true;
+                }
+                const exRef=refs.exports.child(id);const exSnap=await exRef.once('value');if(!exSnap.val())throw new Error('Phiếu xuất cũ không còn trên Firebase.');
+                await exRef.update({boxQuantity:newQty,quantity:newHistoryQty,destination:newDest,exportDate:newDate,lastEditedAt:new Date().toISOString()});
+                await refreshStockFromFirebase();
+                document.getElementById('edit-export-modal').style.display='none';showToast('Đã LƯU ĐÈ đúng phiếu xuất cũ + cập nhật tồn kho','success');
+            }catch(e){
+                if(stockChanged&&delta!==0&&relatedId){try{await refs.items.child(relatedId).transaction(cur=>{if(!cur)return cur;cur.quantity=warehouseNumber(cur.quantity)-delta;cur.lastRollbackAt=new Date().toISOString();return cur;});}catch(rb){console.error('Rollback sửa phiếu xuất thất bại',rb)}}
+                try{await refreshStockFromFirebase()}catch{}
+                showToast('Không cập nhật phiếu xuất: '+(e?.message||e),'error');
+            }
         }
 
         // --- SIGNATURE EXPORT with Date Filter ---
@@ -7185,18 +7252,18 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
         function processBulkExportInput(inputData) {
             bulkExportPreviewData = [];
             inputData.forEach((req) => {
-                const reqQty=parseInt(req.qty); if(!reqQty||reqQty<=0)return;
+                const reqQty=warehouseNumber(req.qty); if(!(reqQty>0))return;
                 const rawCode=String(req.code||'').trim(),codeKey=cleanCode(rawCode);
                 if(!rawCode){bulkExportPreviewData.push({isError:true,productCode:'?',productName:req.name||'Chưa xác định',reqQty,totalStock:0,msg:'Thiếu Mã SP. Xuất kho bắt buộc đối chiếu Master bằng Mã SP.'});return;}
                 const mh=masterData.filter(m=>m.code&&cleanCode(m.code)===codeKey);
                 if(mh.length!==1||masterDuplicateCodes.includes(codeKey)){bulkExportPreviewData.push({isError:true,productCode:rawCode,productName:req.name||'Chưa xác định',reqQty,totalStock:0,msg:mh.length?'Mã SP không duy nhất trong Master.':'Mã SP không tồn tại trong Master.'});return;}
                 const master=mh[0];
                 if(req.name&&cleanStr(req.name)!==cleanStr(master.name)){bulkExportPreviewData.push({isError:true,productCode:master.code,productName:req.name,reqQty,totalStock:0,msg:`Mã SP khớp Master nhưng Tên đơn “${req.name}” khác “${master.name}”.`});return;}
-                let matches=stockData.filter(x=>cleanCode(x.productCode)===codeKey&&parseInt(x.quantity)>0).sort(fefoFifoCompare);
-                const totalStock=matches.reduce((sum,item)=>sum+(parseInt(item.quantity)||0),0);
+                let matches=stockData.filter(x=>cleanCode(x.productCode)===codeKey&&warehouseNumber(x.quantity)>0).sort(fefoFifoCompare);
+                const totalStock=matches.reduce((sum,item)=>sum+warehouseNumber(item.quantity),0);
                 if(reqQty>totalStock){bulkExportPreviewData.push({isError:true,productCode:master.code,productName:master.name,reqQty,totalStock,msg:`Thiếu hàng! (Cần: ${reqQty}, Có: ${totalStock})`});return;}
                 let left=reqQty;
-                for(const batch of matches){if(left<=0)break;const available=parseInt(batch.quantity)||0,take=Math.min(available,left);if(take<=0)continue;bulkExportPreviewData.push({isError:false,relatedId:batch.id,productCode:master.code,productName:master.name,productStrength:master.strength||batch.productStrength||'',packSpec:master.packSpec||batch.packSpec||'',unit:master.unit||batch.unit||'',lotNumber:batch.lotNumber,expiryDate:batch.expiryDate,exportQty:take,originalStock:available});left-=take;}
+                for(const batch of matches){if(left<=0)break;const available=warehouseNumber(batch.quantity),take=Math.min(available,left);if(take<=0)continue;bulkExportPreviewData.push({isError:false,relatedId:batch.id,productCode:master.code,productName:master.name,productStrength:master.strength||batch.productStrength||'',packSpec:master.packSpec||batch.packSpec||'',unit:master.unit||batch.unit||'',lotNumber:batch.lotNumber,expiryDate:batch.expiryDate,exportQty:take,originalStock:available});left-=take;}
             });
             renderBulkExportPreview(); document.getElementById('exp-preview-box').style.display = 'flex';
         }
@@ -7230,22 +7297,20 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
                 items: bulkExportPreviewData.map(i => ({...i, quantity:i.exportQty}))
             });
             if(!ok) return;
-            // GDP: lập lại FEFO/FIFO trên dữ liệu Firebase NGAY lúc xác nhận, tránh dùng preview cũ khi tồn đã thay đổi.
+            // GDP V59: lập lại FEFO/FIFO từ Firebase mới nhất, sau đó transaction từng CHILD thay vì transaction cả pharmaceuticals.
             const demandMap={};
-            for(const x of bulkExportPreviewData){if(!String(x.productCode||'').trim())return showToast('Có dòng thiếu Mã SP; không cho phép trừ kho.','error');const k=`C:${cleanCode(x.productCode)}`;if(!demandMap[k])demandMap[k]={productCode:x.productCode,productName:x.productName,qty:0};demandMap[k].qty+=parseInt(x.exportQty)||0;}
+            for(const x of bulkExportPreviewData){if(!String(x.productCode||'').trim())return showToast('Có dòng thiếu Mã SP; không cho phép trừ kho.','error');const k=`C:${cleanCode(x.productCode)}`;if(!demandMap[k])demandMap[k]={productCode:x.productCode,productName:x.productName,qty:0};demandMap[k].qty+=warehouseNumber(x.exportQty);}
             let committed=[];
-            const tx=await refs.items.transaction(data=>{
-                if(!data)return;const rows=Object.keys(data).map(id=>({id,...data[id]})),plan=[];
+            try{
+                const snap=await refs.items.once('value'),data=snap.val()||{},rows=Object.keys(data).map(id=>({id,...data[id]})),plan=[];
                 for(const d of Object.values(demandMap)){
-                    const codeKey=cleanCode(d.productCode||'');if(!codeKey)return;
-                    let matches=rows.filter(x=>cleanCode(x.productCode)===codeKey&&parseInt(x.quantity)>0).sort(fefoFifoCompare);let left=d.qty;
-                    for(const lot of matches){if(left<=0)break;const take=Math.min(parseInt(lot.quantity)||0,left);if(take<=0)continue;plan.push({relatedId:lot.id,productName:lot.productName||'',productCode:lot.productCode||'',productStrength:lot.productStrength||'',packSpec:lot.packSpec||'',unit:lot.unit||'',lotNumber:lot.lotNumber||'',expiryDate:lot.expiryDate||'',quantity:take});left-=take;}
-                    if(left>0)return;
+                    const codeKey=cleanCode(d.productCode||'');if(!codeKey)throw new Error('Thiếu Mã SP khi lập kế hoạch FEFO/FIFO.');
+                    let matches=rows.filter(x=>cleanCode(x.productCode)===codeKey&&warehouseNumber(x.quantity)>0).sort(fefoFifoCompare);let left=d.qty;
+                    for(const lot of matches){if(left<=0)break;const take=Math.min(warehouseNumber(lot.quantity),left);if(take<=0)continue;plan.push({relatedId:lot.id,productName:lot.productName||'',productCode:lot.productCode||'',productStrength:lot.productStrength||'',packSpec:lot.packSpec||'',unit:lot.unit||'',lotNumber:lot.lotNumber||'',expiryDate:lot.expiryDate||'',quantity:take});left-=take;}
+                    if(left>0)throw new Error(`Không đủ tồn mới nhất cho ${d.productName||d.productCode}.`);
                 }
-                for(const x of plan){if(!data[x.relatedId]||parseInt(data[x.relatedId].quantity)<x.quantity)return;}
-                for(const x of plan)data[x.relatedId].quantity=(parseInt(data[x.relatedId].quantity)||0)-x.quantity;committed=plan;return data;
-            });
-            if(!tx.committed)return showToast('Tồn kho đã thay đổi hoặc không còn đáp ứng FEFO/FIFO. Hệ thống KHÔNG trừ kho; hãy soi lại.','error');
+                await applyInventoryDeductions(plan);committed=plan;
+            }catch(e){return showToast('Tồn kho đã thay đổi hoặc Firebase không cho lưu: '+(e?.message||e),'error');}
             let count=0;for(const item of committed){await refs.exports.push({productName:item.productName,productCode:item.productCode||'',productStrength:item.productStrength||'',packSpec:item.packSpec||'',unit:item.unit||'',lotNumber:item.lotNumber,expiryDate:item.expiryDate,quantity:item.quantity,boxQuantity:item.quantity,destination:dest,exportDate:date,relatedId:item.relatedId,fefoFifo:'FEFO_HSD_TRUOC__FIFO_NHAP_TRUOC',sourceType:'BULK_EXPORT_GDP'});count++;}
             showToast(`Đã xuất thành công ${count} dòng/lô theo FEFO/FIFO!`, 'success');
             document.getElementById('exp-preview-box').style.display = 'none';
@@ -7406,7 +7471,7 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
                 unit: master.unit || '',
                 lotNumber: document.getElementById('imp-lot').value.trim(),
                 expiryDate: document.getElementById('imp-exp').value,
-                quantity: parseInt(document.getElementById('imp-qty').value),
+                quantity: warehouseNumber(document.getElementById('imp-qty').value),
                 importDate: document.getElementById('imp-date').value,
                 createdAt: new Date().toISOString()
             };
@@ -7419,9 +7484,14 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
                 date: item.importDate
             });
             if(!ok) return;
-            await saveToInventory(item);
-            showToast('Đã lưu nhập kho an toàn', 'success');
-            ['imp-name','imp-code','imp-strength','imp-pack','imp-unit','imp-lot','imp-qty'].forEach(id=>document.getElementById(id).value='');
+            try{
+                await saveToInventory(item);
+                showToast('Đã lưu nhập kho lên Firebase an toàn', 'success');
+                ['imp-name','imp-code','imp-strength','imp-pack','imp-unit','imp-lot','imp-qty'].forEach(id=>document.getElementById(id).value='');
+            }catch(e){
+                console.error('Lưu nhập kho thất bại:',e);
+                showToast('Không lưu được Firebase: '+(e?.message||e),'error');
+            }
         }
         function renderStockTable() { const tb=document.getElementById('stock-body'); tb.innerHTML=''; const term=document.getElementById('search-stock').value.toLowerCase(); stockData.filter(d=>(d.productName||'').toLowerCase().includes(term)).forEach((d,i)=>{ tb.innerHTML+=`<tr><td>${i+1}</td><td>${d.productCode||''}</td><td><b>${d.productName}</b></td><td>${d.productStrength||'<span style="color:#b91c1c">Chưa khai báo</span>'}</td><td>${d.packSpec||'<span style="color:#b91c1c">Chưa khai báo</span>'}</td><td>${d.unit||''}</td><td>${d.lotNumber}</td><td>${d.expiryDate}</td><td><b>${d.quantity}</b></td><td><button class="btn btn-warning" onclick="editStock('${d.id}')">Sửa</button> <button class="btn btn-danger" onclick="requestDeleteStock('${d.id}')">Xóa</button></td></tr>`; }); }
         document.getElementById('search-stock').addEventListener('input', renderStockTable);
@@ -7433,19 +7503,24 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
             const mh=masterData.filter(m=>m.code&&cleanCode(m.code)===cleanCode(code));
             if(mh.length!==1||masterDuplicateCodes.includes(cleanCode(code)))return showToast(`Mã SP ${code} không tồn tại duy nhất trong Master. Không cho phép sửa tồn.`, 'error');
             const master=mh[0];
-            const item={ productName:master.name, productCode:master.code, unit:master.unit||'', productStrength:master.strength||'', packSpec:master.packSpec||'', lotNumber:document.getElementById('edit-lot').value.trim(), expiryDate:document.getElementById('edit-exp').value, quantity:parseInt(document.getElementById('edit-qty').value) };
-            if(!item.productName || !item.packSpec || !item.lotNumber || !item.expiryDate || Number.isNaN(item.quantity) || item.quantity < 0) return showToast('Thiếu Mã/Tên/Quy cách/Lô/HSD hoặc số lượng không hợp lệ!', 'error');
-            const ok=await openSafetyVerification({ title:'KIỂM TRA TRƯỚC KHI SỬA TỒN KHO', subtitle:'Mã/Tên/Quy cách/ĐVT/Hàm lượng sẽ lấy lại từ Master. Hệ thống chặn tạo trùng Mã SP + Lô + HSD.', actionType:'SỬA TỒN KHO', items:[item] });
+            const item={ productName:master.name, productCode:master.code, unit:master.unit||'', productStrength:master.strength||'', packSpec:master.packSpec||'', lotNumber:document.getElementById('edit-lot').value.trim(), expiryDate:document.getElementById('edit-exp').value, quantity:warehouseNumber(document.getElementById('edit-qty').value) };
+            if(!item.productName || !item.packSpec || !item.lotNumber || !item.expiryDate || !Number.isFinite(item.quantity) || item.quantity < 0) return showToast('Thiếu Mã/Tên/Quy cách/Lô/HSD hoặc số lượng không hợp lệ!', 'error');
+            const ok=await openSafetyVerification({ title:'KIỂM TRA TRƯỚC KHI SỬA TỒN KHO', subtitle:'Mã/Tên/Quy cách/ĐVT/Hàm lượng sẽ lấy lại từ Master. Hệ thống chặn tạo trùng Mã SP + Lô + HSD và lưu đè đúng dòng cũ.', actionType:'SỬA TỒN KHO', items:[item] });
             if(!ok) return;
-            let reason='';
-            const tx=await refs.items.transaction(data=>{
-                if(!data||!data[id]){reason='Dòng tồn không còn tồn tại';return;}
-                const dup=Object.keys(data).find(k=>k!==id&&cleanCode(data[k]?.productCode)===cleanCode(item.productCode)&&inventoryLotKey(data[k]?.lotNumber)===inventoryLotKey(item.lotNumber)&&inventoryExpiryKey(data[k]?.expiryDate)===inventoryExpiryKey(item.expiryDate));
-                if(dup){reason='Đã có dòng khác cùng Mã SP + Lô + HSD';return;}
-                data[id]={...data[id],...item,lastEditedAt:new Date().toISOString()};return data;
-            });
-            if(!tx.committed)return showToast('Không lưu sửa tồn: '+(reason||'dữ liệu đã thay đổi trên Firebase'),'error');
-            const snap=tx.snapshot?.val?.()||{};stockData=Object.keys(snap).map(k=>({id:k,...snap[k]}));renderStockTable();document.getElementById('edit-modal').style.display='none'; showToast('Đã lưu sau khi kiểm tra Master + khóa lô','success');
+            try{
+                const freshSnap=await refs.items.once('value'),fresh=freshSnap.val()||{};
+                if(!fresh[id])return showToast('Không lưu sửa tồn: dòng tồn cũ không còn trên Firebase.','error');
+                const dup=Object.keys(fresh).find(k=>k!==id&&cleanCode(fresh[k]?.productCode)===cleanCode(item.productCode)&&inventoryLotKey(fresh[k]?.lotNumber)===inventoryLotKey(item.lotNumber)&&inventoryExpiryKey(fresh[k]?.expiryDate)===inventoryExpiryKey(item.expiryDate));
+                if(dup)return showToast('Không lưu sửa tồn: đã có dòng khác cùng Mã SP + Lô + HSD.','error');
+                let reason='';
+                const tx=await refs.items.child(id).transaction(cur=>{
+                    if(!cur){reason='Dòng tồn không còn tồn tại';return;}
+                    return {...cur,...item,lastEditedAt:new Date().toISOString()};
+                });
+                if(!tx.committed)return showToast('Không lưu sửa tồn: '+(reason||'Firebase từ chối cập nhật dòng cũ'),'error');
+                const saved=tx.snapshot?.val?.();const pos=stockData.findIndex(x=>x.id===id);if(saved){if(pos>=0)stockData[pos]={id,...saved};else stockData.push({id,...saved});}
+                renderStockTable();document.getElementById('edit-modal').style.display='none'; showToast('Đã LƯU ĐÈ đúng dòng tồn kho cũ trên Firebase','success');
+            }catch(e){console.error(e);showToast('Không lưu sửa tồn Firebase: '+(e?.message||e),'error');}
         }
         window.downloadMasterTemplate = () => {
             const wb = XLSX.utils.book_new();
@@ -9114,7 +9189,7 @@ YÊU CẦU BẮT BUỘC:
             return aiState.rows.filter(isWarehouseReady).map((r,i)=>{
                 const p=rowWarehouseProduct(r);
                 return {id:i,productName:p.name,productCode:p.code,productStrength:p.strength,packSpec:p.packSpec,unit:p.unit,
-                    lotNumber:r.lotNumber,expiryDate:r.expiryDate,quantity:Number(r.quantity)||0,
+                    lotNumber:r.lotNumber,expiryDate:r.expiryDate,quantity:(parseAINumber(r.quantity)??0),
                     masterLocked:true,masterVerified:true,masterCode:p.code,masterName:p.name,sourceName:r.sourceName,sourceOriginalName:r.sourceOriginalName||r.sourceName,sourceUnit:r.sourceUnit,sourceType:'AI_NCC_MASTER'};
             });
         }
@@ -9381,7 +9456,7 @@ QUY TẮC CỰC KỲ QUAN TRỌNG:
         const S={file:null,parsed:null,requests:[],compare:[],allocations:[],logo:'',busy:false,sourceType:'',loadedVoucherId:null,loadedVoucherStatus:'',voucherCreatedAt:null,voucherConfirmedAt:null,voucherMode:'new',archive:[]};
         const $=id=>document.getElementById(id);
         const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-        const n=v=>{const x=Number(String(v??'').replace(/\s/g,'').replace(/,/g,''));return Number.isFinite(x)?x:0};
+        const n=v=>{if(v===null||v===undefined||v==='')return 0;if(typeof v==='number')return Number.isFinite(v)?v:0;let s=String(v).trim().replace(/\s/g,'');if(/^[-+]?\d{1,3}(\.\d{3})+(,\d+)?$/.test(s))s=s.replace(/\./g,'').replace(',','.');else if(/^[-+]?\d{1,3}(,\d{3})+(\.\d+)?$/.test(s))s=s.replace(/,/g,'');else if(/^[-+]?\d+(,\d+)$/.test(s))s=s.replace(',','.');else s=s.replace(/,/g,'');const x=Number(s);return Number.isFinite(x)?x:0};
         const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/đ/g,'d').replace(/[^a-z0-9]+/g,' ').trim();
         const fmt=v=>Number(v||0).toLocaleString('vi-VN');
         const today=()=>new Date().toISOString().slice(0,10);
@@ -9539,12 +9614,16 @@ QUY TẮC CỰC KỲ QUAN TRỌNG:
 
         function voucherSnapshot(status){return {name:ensureVoucherName(),status,sourceType:S.sourceType||'KHONG_XAC_DINH',createdAt:S.voucherCreatedAt||new Date().toISOString(),updatedAt:new Date().toISOString(),confirmedAt:status==='CONFIRMED'?(S.voucherConfirmedAt||new Date().toISOString()):null,meta:collectMeta(),requests:S.requests.map(x=>({stt:x.stt,maSP:x.maSP||'',tenSP:x.tenSP||'',dvt:x.dvt||'',soLuong:n(x.soLuong),_lotPlan:x._lotPlan?{...x._lotPlan}:null})),compare:S.compare.map(x=>({stt:x.stt,maSP:x.maSP||'',tenSP:x.tenSP||'',dvt:x.dvt||'',soLuong:n(x.soLuong),boxes:n(x.boxes??x.soLuong),total:n(x.total),packSpec:x.packSpec||'',conversion:{factor:x.conversion?.factor??null,unit:x.conversion?.unit||'',explain:x.conversion?.explain||''},status:x.status||'',msg:x.msg||''})),allocations:S.allocations.map(x=>({relatedId:x.relatedId||'',productCode:x.productCode||'',productName:x.productName||'',lotNumber:x.lotNumber||'',expiryDate:x.expiryDate||'',boxesTake:n(x.boxesTake),smallUnit:x.smallUnit||'',smallQty:n(x.smallQty),packSpec:x.packSpec||'',unit:x.unit||''})),snapshotVersion:2}}
         async function saveVoucherRecord(status='DRAFT',silent=false){
-            if(!S.requests.length)return silent?null:showToast('Chưa có dữ liệu phiếu để lưu.','error');
-            if(typeof networkReady==='function'&&!networkReady())return silent?null:showToast('Firebase chưa kết nối. Chưa thể lưu phiếu để máy khác xem.','error');
+            if(!S.requests.length&&!S.allocations.length)return silent?null:showToast('Chưa có dữ liệu phiếu để lưu.','error');
+            if(typeof firebaseWriteCanBeTried==='function'&&!firebaseWriteCanBeTried())return silent?null:showToast('Firebase chưa thể ghi. Hãy kiểm tra Internet rồi thử lại.','error');
             if(S.loadedVoucherStatus==='CONFIRMED'&&status!=='CONFIRMED')return silent?null:showToast('Phiếu này đã xác nhận trừ kho. Không ghi đè bản đã xác nhận. Hãy tạo phiếu mới.','error');
             const data=voucherSnapshot(status);
             try{
-                if(S.loadedVoucherId){await refs.exportVouchers.child(S.loadedVoucherId).set(data)}else{const r=refs.exportVouchers.push();S.loadedVoucherId=r.key;S.voucherCreatedAt=data.createdAt;await r.set(data)}
+                if(S.loadedVoucherId){
+                    const oldRef=refs.exportVouchers.child(S.loadedVoucherId),oldSnap=await oldRef.once('value');
+                    if(!oldSnap.val())throw new Error('Phiếu cũ không còn trên Firebase; không tự tạo lại để tránh trùng hồ sơ.');
+                    await oldRef.update(data);
+                }else{const r=refs.exportVouchers.push();S.loadedVoucherId=r.key;S.voucherCreatedAt=data.createdAt;await r.set(data)}
                 S.loadedVoucherStatus=status;if(status==='CONFIRMED')S.voucherConfirmedAt=data.confirmedAt||S.voucherConfirmedAt;setSaveStatus(`✅ Đã lưu Firebase: ${data.name} · ${status==='CONFIRMED'?'ĐÃ TRỪ KHO':'PHIẾU NHÁP'}${S.voucherMode==='edit'?' · ĐÃ GHI ĐÈ PHIẾU CŨ':''}`,'ok');
                 if(!silent)showToast('Đã lưu phiếu xuất kho lên Firebase Realtime.','success');return S.loadedVoucherId;
             }catch(e){console.error(e);setSaveStatus('❌ Lưu Firebase thất bại: '+(e.message||e),'error');if(!silent)showToast('Không lưu được phiếu Firebase: '+(e.message||e),'error');return null}
@@ -9594,29 +9673,24 @@ QUY TẮC CỰC KỲ QUAN TRỌNG:
             const ok=await openSafetyVerification({title:'KIỂM TRA TRƯỚC KHI TRỪ KHO THEO PHIẾU',subtitle:`Phiếu ${$('xk-slip-no').value||''} · ${$('xk-customer').value||''}. Hãy kiểm tra số hộp, lô, HSD và số lượng quy đổi trước khi xác nhận.`,actionType:S.sourceType==='THU_CONG_DU_PHONG'?'XUẤT KHO THỦ CÔNG DỰ PHÒNG':'XUẤT KHO AI',destination:meta.destination,date:meta.date,items:S.allocations.map(x=>({productCode:x.productCode,productName:x.productName,unit:x.smallUnit,lotNumber:x.lotNumber,expiryDate:x.expiryDate,quantity:x.smallQty,packSpec:x.packSpec}))});if(!ok)return;
             try{
                 let committedAllocations=[];
-                const tx=await refs.items.transaction(data=>{
-                    if(!data)return;
-                    const rows=Object.keys(data).map(id=>({id,...data[id]})),fresh=[];
-                    for(const req of S.requests){
-                        const master=masterFor(req); if(!master)return;
-                        const code=norm(master.code||master.productCode);if(!code)return;
-                        let matches=rows.filter(x=>norm(x.productCode)===code&&n(x.quantity)>0).sort(fefoFifoCompare);
-                        const pack=(master?.packSpec||master?.['Quy Cách']||matches[0]?.packSpec||req.dvt||''),conv=smallestConversion(pack,req.dvt);if(!conv.factor)return;
-                        let left=n(req.soLuong);
-                        const plan=req._lotPlan&&typeof req._lotPlan==='object'?req._lotPlan:null;
-                        if(plan&&Object.values(plan).some(v=>n(v)>0)){
-                            const entries=Object.entries(plan).filter(([,v])=>n(v)>0),sum=entries.reduce((a,[,v])=>a+n(v),0);if(Math.abs(sum-left)>.000001)return;
-                            for(const [lotId,q0] of entries){const lot=matches.find(x=>String(x.id)===String(lotId)),take=n(q0);if(!lot||take<=0||take>n(lot.quantity))return;fresh.push({relatedId:lot.id,productCode:lot.productCode||'',productName:lot.productName||'',lotNumber:lot.lotNumber||'',expiryDate:lot.expiryDate||'',boxesTake:take,smallUnit:conv.unit,smallQty:take*conv.factor,packSpec:lot.packSpec||pack||'',unit:lot.unit||'',importDate:lot.importDate||'',createdAt:lot.createdAt||'',manualLot:true});}left=0;
-                        }else{
-                            for(const lot of matches){if(left<=0)break;const take=Math.min(n(lot.quantity),left);if(take<=0)continue;fresh.push({relatedId:lot.id,productCode:lot.productCode||'',productName:lot.productName||'',lotNumber:lot.lotNumber||'',expiryDate:lot.expiryDate||'',boxesTake:take,smallUnit:conv.unit,smallQty:take*conv.factor,packSpec:lot.packSpec||pack||'',unit:lot.unit||'',importDate:lot.importDate||'',createdAt:lot.createdAt||'',manualLot:false});left-=take;}
-                        }
-                        if(left>0)return;
+                const invSnap=await refs.items.once('value'),invData=invSnap.val()||{},rows=Object.keys(invData).map(id=>({id,...invData[id]})),fresh=[];
+                for(const req of S.requests){
+                    const master=masterFor(req); if(!master)throw new Error(`Không xác định được Master cho ${req.tenSP||req.maSP||'dòng hàng'}.`);
+                    const code=norm(master.code||master.productCode);if(!code)throw new Error('Thiếu Mã SP Master khi xác nhận xuất kho.');
+                    let matches=rows.filter(x=>norm(x.productCode)===code&&n(x.quantity)>0).sort(fefoFifoCompare);
+                    const pack=(master?.packSpec||master?.['Quy Cách']||matches[0]?.packSpec||req.dvt||''),conv=smallestConversion(pack,req.dvt);if(!conv.factor)throw new Error(`Không xác định được quy đổi cho ${req.tenSP||master.name||code}.`);
+                    let left=n(req.soLuong);
+                    const plan=req._lotPlan&&typeof req._lotPlan==='object'?req._lotPlan:null;
+                    if(plan&&Object.values(plan).some(v=>n(v)>0)){
+                        const entries=Object.entries(plan).filter(([,v])=>n(v)>0),sum=entries.reduce((a,[,v])=>a+n(v),0);if(Math.abs(sum-left)>.000001)throw new Error(`Tổng chọn lô không bằng số lượng phiếu của ${req.tenSP||code}.`);
+                        for(const [lotId,q0] of entries){const lot=matches.find(x=>String(x.id)===String(lotId)),take=n(q0);if(!lot||take<=0||take>n(lot.quantity))throw new Error(`Lô đã chọn không còn đủ tồn cho ${req.tenSP||code}.`);fresh.push({relatedId:lot.id,productCode:lot.productCode||'',productName:lot.productName||'',lotNumber:lot.lotNumber||'',expiryDate:lot.expiryDate||'',boxesTake:take,smallUnit:conv.unit,smallQty:take*conv.factor,packSpec:lot.packSpec||pack||'',unit:lot.unit||'',importDate:lot.importDate||'',createdAt:lot.createdAt||'',manualLot:true});}left=0;
+                    }else{
+                        for(const lot of matches){if(left<=0)break;const take=Math.min(n(lot.quantity),left);if(take<=0)continue;fresh.push({relatedId:lot.id,productCode:lot.productCode||'',productName:lot.productName||'',lotNumber:lot.lotNumber||'',expiryDate:lot.expiryDate||'',boxesTake:take,smallUnit:conv.unit,smallQty:take*conv.factor,packSpec:lot.packSpec||pack||'',unit:lot.unit||'',importDate:lot.importDate||'',createdAt:lot.createdAt||'',manualLot:false});left-=take;}
                     }
-                    for(const x of fresh){if(!data[x.relatedId]||n(data[x.relatedId].quantity)<n(x.boxesTake))return;}
-                    for(const x of fresh)data[x.relatedId].quantity=n(data[x.relatedId].quantity)-n(x.boxesTake);
-                    committedAllocations=fresh;return data;
-                });
-                if(!tx.committed)throw new Error('Tồn kho đã thay đổi, không đủ hoặc lô đã chọn không còn đáp ứng tại thời điểm xác nhận. Hệ thống không trừ kho. Hãy SOI TỒN / chọn lại lô.');
+                    if(left>0)throw new Error(`Tồn kho mới nhất không đủ cho ${req.tenSP||code}.`);
+                }
+                await applyInventoryDeductions(fresh.map(x=>({relatedId:x.relatedId,quantity:x.boxesTake})));
+                committedAllocations=fresh;
                 S.allocations=committedAllocations;renderAlloc();renderVoucher();
                 for(const x of committedAllocations){await refs.exports.push({productName:x.productName,productCode:x.productCode,productStrength:'',packSpec:x.packSpec||'',unit:x.smallUnit,lotNumber:x.lotNumber,expiryDate:x.expiryDate,quantity:x.smallQty,boxQuantity:x.boxesTake,destination:meta.destination,exportDate:meta.date,relatedId:x.relatedId,sourceType:S.sourceType==='THU_CONG_DU_PHONG'?'MANUAL_VOUCHER':'AI_PHIEU_XUAT',slipNo:$('xk-slip-no').value||'',orderNo:$('xk-order-no').value||'',invoiceNo:$('xk-invoice-no').value||'',invoiceSymbol:$('xk-invoice-symbol').value||'',invoiceDate:$('xk-invoice-date').value||'',customer:$('xk-customer').value||'',customerAddress:$('xk-customer-address').value||'',deliveryAddress:$('xk-delivery-address').value||'',preparer:$('xk-preparer').value||'',accountant:$('xk-accountant').value||'',manager:$('xk-manager').value||'',fefoFifo:'FEFO_HSD_TRUOC__FIFO_NHAP_TRUOC'})}
                 const savedId=await saveVoucherRecord('CONFIRMED',true);S.loadedVoucherStatus='CONFIRMED';$('xk-confirm-btn').disabled=true;setSaveStatus(savedId?'✅ Đã trừ kho và lưu hồ sơ phiếu trên Firebase.':'⚠️ Đã trừ kho nhưng chưa lưu được hồ sơ phiếu Firebase. Hãy kiểm tra kết nối và lưu lại. ',savedId?'ok':'error');showToast(`Đã trừ kho theo phiếu: ${S.allocations.length} dòng/lô.`,'success');

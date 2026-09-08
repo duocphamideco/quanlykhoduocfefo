@@ -6458,13 +6458,18 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
             const valid=[],blocked=[]; q.forEach(x=>{const ck=queuedMasterCheck(x);(ck.ok?valid:blocked).push(ck.ok?x:{item:x,reason:ck.reason});});
             if(!valid.length)return showToast(`Chưa có dòng nào được phép đồng bộ. ${blocked[0]?.reason||'Hãy kiểm tra Master.'}`,'error');
             const ok=await openSafetyVerification({title:'ĐỒNG BỘ HÀNG ĐỢI OFFLINE',subtitle:`Sắp ghi ${valid.length} dòng đã lưu cục bộ lên Firebase. ${blocked.length?`${blocked.length} dòng bị giữ lại vì Master thay đổi.`:''}`,actionType:'ĐỒNG BỘ OFFLINE',items:valid,date:new Date().toISOString().slice(0,10)}); if(!ok)return;
-            const remain=[...q]; let done=0;
-            for(const item of valid){
-                if(!firebaseWriteCanBeTried())break;
-                try{await saveToInventory({...item,syncedAt:new Date().toISOString(),sourceType:item.sourceType||'OFFLINE_MANUAL'}); const idx=remain.findIndex(x=>x.offlineQueueId===item.offlineQueueId); if(idx>=0)remain.splice(idx,1); setOfflineQueue(remain); done++;}
-                catch(e){showToast('Đồng bộ Offline dừng: '+(e?.message||e),'error');break;}
-            }
-            if(done)showToast(`Đã đồng bộ ${done} dòng Offline. Còn ${remain.length} dòng chờ.`,'success'); renderOfflineQueue();
+            try{
+                const prepared=valid.map(x=>({...x,syncedAt:new Date().toISOString(),sourceType:x.sourceType||'OFFLINE_MANUAL'}));
+                const result=await saveInventoryBatch(prepared),failedIdx=new Set(result.failedRows.flatMap(x=>x.sourceIndexes));
+                const succeededIds=new Set(valid.filter((_,i)=>!failedIdx.has(i)).map(x=>x.offlineQueueId));
+                const remain=q.filter(x=>!succeededIds.has(x.offlineQueueId));
+                setOfflineQueue(remain);
+                if(result.failedRows.length){
+                    console.warn('IDECO V60 · Offline chưa đồng bộ hết',result.failedRows);
+                    showToast(`Đã đồng bộ ${result.savedSourceRows}/${valid.length} dòng Offline. Còn ${remain.length} dòng chờ; dòng lỗi không làm dừng các dòng phía sau.`,'error');
+                }else showToast(`✅ Đã đồng bộ đủ ${result.savedSourceRows}/${valid.length} dòng Offline. Còn ${remain.length} dòng chờ do Master thay đổi.`,'success');
+            }catch(e){console.error(e);showToast('Đồng bộ Offline lỗi: '+(e?.message||e),'error');}
+            renderOfflineQueue();
         }
         restoreMasterCache();
         db.ref('.info/connected').on('value',s=>{firebaseConnected=!!s.val();updateNetworkUI();});
@@ -6767,14 +6772,23 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
                 document.getElementById('manual-fallback-details')?.setAttribute('open','');
                 return;
             }
-            let c=0;
             try{
-                for(const item of prepared){ await saveToInventory(item); c++; }
-                showToast(`Đã nhập ${c} dòng`, 'success'); previewData=[];renderPreviewTable();document.getElementById('preview-box').style.display='none';
+                const result=await saveInventoryBatch(prepared);
+                if(result.failedRows.length){
+                    // V60: không dừng ở dòng lỗi đầu tiên. Giữ lại đúng các dòng lỗi trên màn hình để sửa/thử lại.
+                    const failedIndex=new Set(result.failedRows.flatMap(x=>x.sourceIndexes));
+                    previewData=validItems.filter((_,i)=>failedIndex.has(i));
+                    renderPreviewTable();
+                    document.getElementById('preview-box').style.display=previewData.length?'flex':'none';
+                    console.warn('IDECO V60 · Các dòng nhập kho chưa lưu được',result.failedRows);
+                    showToast(`Đã lưu ${result.savedSourceRows}/${validItems.length} dòng. ${result.failedSourceRows} dòng chưa lưu và vẫn được giữ trên màn hình. ${result.failedRows[0]?.error||''}`,'error');
+                }else{
+                    previewData=[];renderPreviewTable();document.getElementById('preview-box').style.display='none';
+                    showToast(`✅ Đã lưu đủ ${result.savedSourceRows}/${validItems.length} dòng vào Firebase${result.duplicateExistingGroups?` · ${result.duplicateExistingGroups} nhóm tồn cũ bị trùng nhưng không còn làm dừng đồng bộ`:''}.`,'success');
+                }
             }catch(e){
-                const remaining=prepared.slice(c);
-                if(remaining.length){enqueueOfflineItems(remaining);showToast(`Firebase bị gián đoạn: đã ghi ${c} dòng; ${remaining.length} dòng còn lại đã lưu Hàng đợi Offline.`, 'error');}
-                else showToast('Lỗi Firebase: '+(e?.message||e),'error');
+                console.error('Đồng bộ nhập kho V60 thất bại:',e);
+                showToast('Lỗi Firebase khi lưu danh sách: '+(e?.message||e),'error');
             }
         }
 
@@ -6796,6 +6810,108 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
             renderStockTable();
             return data;
         }
+
+        // ===== V60 · GHI NHẬP KHO DỮ LIỆU DÀI =====
+        // Đọc Firebase đúng 1 lần, gộp các dòng cùng Mã SP + Lô + HSD, rồi ghi song song từng CHILD.
+        // Một dòng lỗi KHÔNG được phép làm dừng các dòng phía sau.
+        function inventoryIdentityKey(row){
+            return `${inventoryCodeKey(row?.productCode)}|${inventoryLotKey(row?.lotNumber)}|${inventoryExpiryKey(row?.expiryDate)}`;
+        }
+        function firebaseClean(value){
+            if(value===undefined||typeof value==='function')return null;
+            if(value===null||typeof value==='string'||typeof value==='boolean')return value;
+            if(typeof value==='number')return Number.isFinite(value)?value:0;
+            if(Array.isArray(value))return value.map(v=>firebaseClean(v));
+            if(typeof value==='object'){
+                const out={};
+                Object.keys(value).forEach(k=>{const v=value[k];if(v!==undefined&&typeof v!=='function')out[k]=firebaseClean(v);});
+                return out;
+            }
+            return String(value);
+        }
+        function inventoryMasterNormalize(item){
+            const code=String(item?.productCode||'').trim();
+            if(!code)throw new Error(`“${item?.productName||'?'}” thiếu Mã SP Master.`);
+            const mh=masterData.filter(m=>m.code&&cleanCode(m.code)===cleanCode(code));
+            if(mh.length!==1||masterDuplicateCodes.includes(cleanCode(code)))throw new Error(`Mã SP ${code} không tồn tại duy nhất trong Master.`);
+            const master=mh[0],qty=warehouseNumber(item?.quantity);
+            if(!(qty>0))throw new Error(`${master.name||code}: số lượng nhập phải > 0.`);
+            const lot=String(item?.lotNumber||'').trim(),exp=String(item?.expiryDate||'').trim();
+            if(!lot||!exp)throw new Error(`${master.name||code}: thiếu Số lô hoặc HSD.`);
+            return firebaseClean({
+                productName:master.name||'',productCode:master.code||code,productStrength:master.strength||'',packSpec:master.packSpec||'',unit:master.unit||'',
+                lotNumber:lot,expiryDate:exp,quantity:qty,importDate:item?.importDate||new Date().toISOString().slice(0,10),createdAt:item?.createdAt||new Date().toISOString(),
+                masterCode:master.code||code,masterName:master.name||'',sourceType:item?.sourceType||'WAREHOUSE_MANUAL',sourceNote:item?.sourceNote||'AI/PHIẾU NCC',
+                sourceTransactionId:String(item?.sourceTransactionId||'').trim()
+            });
+        }
+        async function saveInventoryBatch(items){
+            if(!Array.isArray(items)||!items.length)return {savedSourceRows:0,failedSourceRows:0,failedRows:[],duplicateExistingGroups:0};
+            if(!firebaseWriteCanBeTried())throw new Error('Firebase chưa sẵn sàng để ghi.');
+            const groups=new Map(),preFailed=[];
+            items.forEach((raw,index)=>{
+                try{
+                    const item=inventoryMasterNormalize(raw),key=inventoryIdentityKey(item);
+                    if(!key||key.startsWith('|'))throw new Error('Không tạo được khóa Mã SP + Lô + HSD.');
+                    if(!groups.has(key))groups.set(key,{key,masterItem:item,rows:[],sourceIndexes:[]});
+                    const g=groups.get(key);g.rows.push(item);g.sourceIndexes.push(index);
+                }catch(e){preFailed.push({key:'',sourceIndexes:[index],error:e?.message||String(e)});}
+            });
+            const freshSnap=await refs.items.once('value'),fresh=freshSnap.val()||{};
+            const existingByKey=new Map();
+            Object.keys(fresh).forEach(id=>{
+                const row=fresh[id]||{},key=inventoryIdentityKey(row);if(!key)return;
+                if(!existingByKey.has(key))existingByKey.set(key,[]);
+                existingByKey.get(key).push({id,row});
+            });
+            let duplicateExistingGroups=0;
+            const jobs=[];
+            for(const g of groups.values()){
+                const existing=(existingByKey.get(g.key)||[]).sort((a,b)=>String(a.row.importDate||a.row.createdAt||a.id).localeCompare(String(b.row.importDate||b.row.createdAt||b.id)));
+                if(existing.length>1)duplicateExistingGroups++;
+                if(existing.length){
+                    const canonical=existing[0],preApplied={};
+                    existing.forEach(x=>Object.assign(preApplied,x.row?.appliedTransactions||{}));
+                    jobs.push((async()=>{
+                        let reason='';
+                        const tx=await refs.items.child(canonical.id).transaction(cur=>{
+                            if(!cur){reason='Dòng tồn vừa bị xóa trên Firebase';return;}
+                            if(inventoryIdentityKey(cur)!==g.key){reason='Mã SP/Lô/HSD của dòng tồn đã thay đổi';return;}
+                            const applied={...(cur.appliedTransactions||{}),...preApplied};
+                            let add=0;
+                            for(const row of g.rows){
+                                const txId=String(row.sourceTransactionId||'').trim();
+                                if(txId&&applied[txId])continue;
+                                add+=warehouseNumber(row.quantity);
+                                if(txId)applied[txId]=new Date().toISOString();
+                            }
+                            const m=g.masterItem,now=new Date().toISOString();
+                            return firebaseClean({...cur,productCode:m.productCode,productName:m.productName,productStrength:m.productStrength,packSpec:m.packSpec,unit:m.unit,lotNumber:m.lotNumber,expiryDate:m.expiryDate,quantity:warehouseNumber(cur.quantity)+add,importDate:cur.importDate||m.importDate,createdAt:cur.createdAt||m.createdAt,lastImportAt:now,lastEditedAt:now,sourceType:m.sourceType,sourceNote:m.sourceNote,appliedTransactions:applied});
+                        });
+                        if(!tx.committed)throw new Error(reason||'Firebase từ chối cập nhật dòng tồn cũ.');
+                        return {key:g.key,sourceIndexes:g.sourceIndexes,id:canonical.id,action:'update'};
+                    })());
+                }else{
+                    jobs.push((async()=>{
+                        const first=g.masterItem,newRef=refs.items.push(),applied={};let total=0;
+                        g.rows.forEach(row=>{const txId=String(row.sourceTransactionId||'').trim();total+=warehouseNumber(row.quantity);if(txId)applied[txId]=new Date().toISOString();});
+                        const payload=firebaseClean({...first,quantity:total,appliedTransactions:applied,lastImportAt:new Date().toISOString()});
+                        await newRef.set(payload);
+                        return {key:g.key,sourceIndexes:g.sourceIndexes,id:newRef.key,action:'create'};
+                    })());
+                }
+            }
+            const settled=await Promise.allSettled(jobs),failedRows=[...preFailed];let savedSourceRows=0;
+            settled.forEach((r,i)=>{
+                const g=[...groups.values()][i];
+                if(r.status==='fulfilled')savedSourceRows+=g.sourceIndexes.length;
+                else failedRows.push({key:g.key,sourceIndexes:g.sourceIndexes,error:r.reason?.message||String(r.reason||'Không rõ lỗi Firebase')});
+            });
+            try{await refreshStockFromFirebase()}catch(e){console.warn('Không tải lại tồn sau batch',e)}
+            const failedSourceRows=failedRows.reduce((n,x)=>n+x.sourceIndexes.length,0);
+            return {savedSourceRows,failedSourceRows,failedRows,duplicateExistingGroups};
+        }
+        window.IDECO_saveInventoryBatch=saveInventoryBatch;
         async function saveToInventory(item) {
             const txId=String(item.sourceTransactionId||'').trim();
             const code=String(item.productCode||'').trim();
@@ -9616,16 +9732,23 @@ QUY TẮC CỰC KỲ QUAN TRỌNG:
         async function saveVoucherRecord(status='DRAFT',silent=false){
             if(!S.requests.length&&!S.allocations.length)return silent?null:showToast('Chưa có dữ liệu phiếu để lưu.','error');
             if(typeof firebaseWriteCanBeTried==='function'&&!firebaseWriteCanBeTried())return silent?null:showToast('Firebase chưa thể ghi. Hãy kiểm tra Internet rồi thử lại.','error');
-            if(S.loadedVoucherStatus==='CONFIRMED'&&status!=='CONFIRMED')return silent?null:showToast('Phiếu này đã xác nhận trừ kho. Không ghi đè bản đã xác nhận. Hãy tạo phiếu mới.','error');
-            const data=voucherSnapshot(status);
+            // V60: phiếu đã CONFIRMED khi sửa vẫn được ghi đè HỒ SƠ tại đúng ID cũ, nhưng tuyệt đối không đổi về DRAFT và không trừ kho lần hai.
+            if(S.loadedVoucherStatus==='CONFIRMED')status='CONFIRMED';
+            const data=firebaseClean(voucherSnapshot(status));
             try{
+                let targetRef;
                 if(S.loadedVoucherId){
-                    const oldRef=refs.exportVouchers.child(S.loadedVoucherId),oldSnap=await oldRef.once('value');
-                    if(!oldSnap.val())throw new Error('Phiếu cũ không còn trên Firebase; không tự tạo lại để tránh trùng hồ sơ.');
-                    await oldRef.update(data);
-                }else{const r=refs.exportVouchers.push();S.loadedVoucherId=r.key;S.voucherCreatedAt=data.createdAt;await r.set(data)}
-                S.loadedVoucherStatus=status;if(status==='CONFIRMED')S.voucherConfirmedAt=data.confirmedAt||S.voucherConfirmedAt;setSaveStatus(`✅ Đã lưu Firebase: ${data.name} · ${status==='CONFIRMED'?'ĐÃ TRỪ KHO':'PHIẾU NHÁP'}${S.voucherMode==='edit'?' · ĐÃ GHI ĐÈ PHIẾU CŨ':''}`,'ok');
-                if(!silent)showToast('Đã lưu phiếu xuất kho lên Firebase Realtime.','success');return S.loadedVoucherId;
+                    targetRef=refs.exportVouchers.child(S.loadedVoucherId);const oldSnap=await targetRef.once('value');
+                    if(!oldSnap.val())throw new Error('Phiếu cũ không còn trên Firebase; không tự tạo phiếu mới để tránh trùng hồ sơ.');
+                    await targetRef.set(data); // GHI ĐÈ TOÀN BỘ đúng ID cũ, không để sót mảng/dòng cũ.
+                }else{targetRef=refs.exportVouchers.push();S.loadedVoucherId=targetRef.key;S.voucherCreatedAt=data.createdAt;await targetRef.set(data)}
+                const verify=await targetRef.once('value'),saved=verify.val();
+                if(!saved)throw new Error('Firebase chưa xác nhận phiếu vừa lưu.');
+                const rq=Array.isArray(saved.requests)?saved.requests.filter(Boolean).length:Object.keys(saved.requests||{}).length;
+                const al=Array.isArray(saved.allocations)?saved.allocations.filter(Boolean).length:Object.keys(saved.allocations||{}).length;
+                if(rq!==(data.requests?.length||0)||al!==(data.allocations?.length||0))throw new Error(`Firebase xác nhận thiếu dòng: yêu cầu ${data.requests?.length||0}/${data.allocations?.length||0}, đọc lại ${rq}/${al}.`);
+                S.loadedVoucherStatus=status;if(status==='CONFIRMED')S.voucherConfirmedAt=data.confirmedAt||S.voucherConfirmedAt;setSaveStatus(`✅ Đã lưu Firebase: ${data.name} · ${status==='CONFIRMED'?'ĐÃ TRỪ KHO':'PHIẾU NHÁP'}${S.voucherMode==='edit'?' · ĐÃ GHI ĐÈ TOÀN BỘ PHIẾU CŨ':''} · ${rq} SP / ${al} dòng lô`,'ok');
+                if(!silent)showToast(`Đã lưu đủ phiếu Firebase: ${rq} sản phẩm / ${al} dòng lô.`,'success');return S.loadedVoucherId;
             }catch(e){console.error(e);setSaveStatus('❌ Lưu Firebase thất bại: '+(e.message||e),'error');if(!silent)showToast('Không lưu được phiếu Firebase: '+(e.message||e),'error');return null}
         }
         window.saveCurrentExportVoucherFirebase=()=>{
@@ -9692,7 +9815,9 @@ QUY TẮC CỰC KỲ QUAN TRỌNG:
                 await applyInventoryDeductions(fresh.map(x=>({relatedId:x.relatedId,quantity:x.boxesTake})));
                 committedAllocations=fresh;
                 S.allocations=committedAllocations;renderAlloc();renderVoucher();
-                for(const x of committedAllocations){await refs.exports.push({productName:x.productName,productCode:x.productCode,productStrength:'',packSpec:x.packSpec||'',unit:x.smallUnit,lotNumber:x.lotNumber,expiryDate:x.expiryDate,quantity:x.smallQty,boxQuantity:x.boxesTake,destination:meta.destination,exportDate:meta.date,relatedId:x.relatedId,sourceType:S.sourceType==='THU_CONG_DU_PHONG'?'MANUAL_VOUCHER':'AI_PHIEU_XUAT',slipNo:$('xk-slip-no').value||'',orderNo:$('xk-order-no').value||'',invoiceNo:$('xk-invoice-no').value||'',invoiceSymbol:$('xk-invoice-symbol').value||'',invoiceDate:$('xk-invoice-date').value||'',customer:$('xk-customer').value||'',customerAddress:$('xk-customer-address').value||'',deliveryAddress:$('xk-delivery-address').value||'',preparer:$('xk-preparer').value||'',accountant:$('xk-accountant').value||'',manager:$('xk-manager').value||'',fefoFifo:'FEFO_HSD_TRUOC__FIFO_NHAP_TRUOC'})}
+                const exportUpdates={};
+                for(const x of committedAllocations){const k=refs.exports.push().key;exportUpdates[k]=firebaseClean({productName:x.productName,productCode:x.productCode,productStrength:'',packSpec:x.packSpec||'',unit:x.smallUnit,lotNumber:x.lotNumber,expiryDate:x.expiryDate,quantity:x.smallQty,boxQuantity:x.boxesTake,destination:meta.destination,exportDate:meta.date,relatedId:x.relatedId,sourceType:S.sourceType==='THU_CONG_DU_PHONG'?'MANUAL_VOUCHER':'AI_PHIEU_XUAT',slipNo:$('xk-slip-no').value||'',orderNo:$('xk-order-no').value||'',invoiceNo:$('xk-invoice-no').value||'',invoiceSymbol:$('xk-invoice-symbol').value||'',invoiceDate:$('xk-invoice-date').value||'',customer:$('xk-customer').value||'',customerAddress:$('xk-customer-address').value||'',deliveryAddress:$('xk-delivery-address').value||'',preparer:$('xk-preparer').value||'',accountant:$('xk-accountant').value||'',manager:$('xk-manager').value||'',fefoFifo:'FEFO_HSD_TRUOC__FIFO_NHAP_TRUOC'});}
+                if(Object.keys(exportUpdates).length)await refs.exports.update(exportUpdates);
                 const savedId=await saveVoucherRecord('CONFIRMED',true);S.loadedVoucherStatus='CONFIRMED';$('xk-confirm-btn').disabled=true;setSaveStatus(savedId?'✅ Đã trừ kho và lưu hồ sơ phiếu trên Firebase.':'⚠️ Đã trừ kho nhưng chưa lưu được hồ sơ phiếu Firebase. Hãy kiểm tra kết nối và lưu lại. ',savedId?'ok':'error');showToast(`Đã trừ kho theo phiếu: ${S.allocations.length} dòng/lô.`,'success');
             }catch(e){console.error(e);showToast('Không trừ kho: '+e.message,'error')}
         };

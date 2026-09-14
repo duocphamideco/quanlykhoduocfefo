@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="data:,">
-    <title>Quản Lý Kho Dược GDP - IDECO V61 Nhập Thủ Công An Toàn</title>
+    <title>Quản Lý Kho Dược GDP - IDECO V59 Firebase Save Fix</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -276,9 +276,6 @@
         .master-manual-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}.master-manual-note{font-size:.76rem;color:#64748b;line-height:1.5}.master-manual-status{margin-top:8px;font-size:.8rem;font-weight:700}.master-saved-list{margin-top:12px;padding-top:10px;border-top:1px dashed #fdba74}.master-saved-item{display:grid;grid-template-columns:minmax(120px,.7fr) minmax(220px,1.5fr) minmax(90px,.55fr) minmax(130px,.8fr) minmax(180px,1fr) auto;gap:6px;align-items:center;padding:7px 8px;border:1px solid #e2e8f0;border-radius:7px;margin-top:6px;background:#f8fafc;font-size:.76rem}.master-saved-item b{color:#0f172a}.master-saved-item small{color:#64748b}.master-required-star{color:#dc2626;font-weight:900}
         @media(max-width:800px){.master-saved-item{grid-template-columns:1fr}.master-manual-editor{padding:9px}}
         .manual-master-box b{color:#0f172a}.manual-ref{background:#f8fafc!important;color:#475569}
-        .manual-guard{background:#eff6ff;border:1px solid #93c5fd;border-left:5px solid #2563eb;border-radius:9px;padding:10px 12px;color:#1e3a8a;font-size:.8rem;line-height:1.5}
-        .manual-guard.ok{background:#ecfdf5;border-color:#86efac;border-left-color:#16a34a;color:#166534}.manual-guard.bad{background:#fef2f2;border-color:#fca5a5;border-left-color:#dc2626;color:#991b1b}.manual-guard.warn{background:#fff7ed;border-color:#fdba74;border-left-color:#f97316;color:#9a3412}
-        .manual-ack-row{display:flex;gap:9px;align-items:flex-start;background:#fff;border:1px solid #cbd5e1;border-radius:9px;padding:9px 10px}.manual-ack-row input{width:18px!important;height:18px;margin:2px 0 0!important;flex:0 0 auto}.manual-ack-row label{margin:0;font-size:.8rem;line-height:1.45;color:#334155;cursor:pointer}
         .network-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;font-size:.72rem;font-weight:900;background:#e2e8f0;color:#334155}
         .network-badge.online{background:#dcfce7;color:#166534}.network-badge.offline{background:#fee2e2;color:#991b1b}.network-badge.wait{background:#fef3c7;color:#92400e}
         .offline-queue-box{margin-top:12px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;padding:11px 12px}
@@ -579,36 +576,28 @@
             <div class="grid-layout">
                 <div class="card">
                     <div class="card-header">A. Nhập Kho Thủ Công</div>
-                    <div class="manual-warning" style="margin-bottom:10px"><b>Nhập tay an toàn:</b> Tên/Mã/Quy cách lấy khóa từ Master. Khi Internet/Firebase lỗi, hệ thống chuyển sang Hàng đợi Offline có mã giao dịch chống ghi lặp; không báo thành công nếu chưa đọc kiểm tra lại dữ liệu đã lưu.</div>
                     <label>Tên Hàng Hóa (*)</label>
                     <div class="autocomplete-wrapper">
-                        <input type="text" id="imp-name" placeholder="Gõ tên hoặc mã rồi chọn đúng Master..." autocomplete="off">
+                        <input type="text" id="imp-name" placeholder="Gõ tên thuốc..." autocomplete="off">
                         <div id="imp-suggest" class="autocomplete-items"></div>
                     </div>
                     <div style="display:flex; gap:10px">
-                        <div style="flex:1"><label>Mã SP MASTER (*)</label><input type="text" id="imp-code" class="manual-ref" readonly placeholder="Tự load..."></div>
-                        <div style="flex:1"><label>Đơn Vị</label><input type="text" id="imp-unit" class="manual-ref" readonly></div>
+                        <div style="flex:1"><label>Mã SP</label><input type="text" id="imp-code" placeholder="Tự load..." style="background:#f1f5f9; font-weight:bold; color:var(--primary)"></div>
+                        <div style="flex:1"><label>Đơn Vị</label><input type="text" id="imp-unit" placeholder="Hộp/Viên..."></div>
                     </div>
                     <div style="display:flex; gap:10px">
-                        <div style="flex:1"><label>Hàm lượng / Nồng độ</label><input type="text" id="imp-strength" class="manual-ref" readonly></div>
-                        <div style="flex:1"><label>Quy cách MASTER (*)</label><input type="text" id="imp-pack" class="manual-ref" readonly></div>
+                        <div style="flex:1"><label>Hàm lượng / Nồng độ</label><input type="text" id="imp-strength" placeholder="VD: 500mg, 0,1%..."></div>
+                        <div style="flex:1"><label>Quy cách</label><input type="text" id="imp-pack" placeholder="VD: Hộp 10 vỉ x 10 viên"></div>
                     </div>
                     <div style="display:flex; gap:10px">
-                        <div style="flex:1"><label>Số Lô (*)</label><input type="text" id="imp-lot" maxlength="80"></div>
-                        <div style="flex:1"><label>Hạn Dùng (*)</label><input type="date" id="imp-exp"></div>
+                        <div style="flex:1"><label>Số Lô</label><input type="text" id="imp-lot"></div>
+                        <div style="flex:1"><label>Hạn Dùng</label><input type="date" id="imp-exp"></div>
                     </div>
                     <div style="display:flex; gap:10px">
-                        <div style="flex:1"><label>Số Lượng thực nhận (*)</label><input type="number" id="imp-qty" min="1" step="1" inputmode="numeric"></div>
-                        <div style="flex:1"><label>Ngày Nhập / chứng từ (*)</label><input type="date" id="imp-date"></div>
+                        <div style="flex:1"><label>Số Lượng</label><input type="number" id="imp-qty"></div>
+                        <div style="flex:1"><label>Ngày Nhập</label><input type="date" id="imp-date"></div>
                     </div>
-                    <div style="display:flex; gap:10px">
-                        <div style="flex:1"><label>Số chứng từ / Phiếu NCC / Hóa đơn (*)</label><input type="text" id="imp-document" maxlength="120" placeholder="PNK / số hóa đơn..."></div>
-                        <div style="flex:1"><label>Người nhập & đối chiếu (*)</label><input type="text" id="imp-operator" maxlength="100" placeholder="Họ tên"></div>
-                    </div>
-                    <label>Ghi chú kiểm tra</label><input type="text" id="imp-note" maxlength="250" placeholder="Tùy chọn: tình trạng bao bì, đối chiếu thực nhận...">
-                    <div class="manual-ack-row" style="margin-bottom:10px"><input id="imp-ack" type="checkbox"><label for="imp-ack"><b>TÔI ĐÃ ĐỐI CHIẾU TRỰC TIẾP</b> sản phẩm, lô, HSD, số lượng với chứng từ/nhãn thực tế.</label></div>
-                    <div id="imp-guard-status" class="manual-guard bad" style="margin-bottom:10px">⛔ Chưa đủ điều kiện lưu.</div>
-                    <button id="imp-save-btn" class="btn btn-success" style="width:100%" onclick="saveManual()" disabled>💾 LƯU NHẬP KHO AN TOÀN</button>
+                    <button class="btn btn-success" style="width:100%" onclick="saveManual()">LƯU NHẬP KHO</button>
                 </div>
 
                 <div class="card">
@@ -1056,18 +1045,12 @@
                                 <div><label>Hàm lượng/Nồng độ · tham khảo</label><input id="fallback-strength" class="manual-ref" readonly></div>
                                 <div><label>ĐVT · tham khảo</label><input id="fallback-unit" class="manual-ref" readonly></div>
                                 <div><label>Quy cách MASTER (*)</label><input id="fallback-pack" class="manual-ref" readonly></div>
-                                <div><label>Số lô (*)</label><input id="fallback-lot" placeholder="Nhập đúng theo phiếu/nhãn" maxlength="80"></div>
+                                <div><label>Số lô (*)</label><input id="fallback-lot" placeholder="Nhập đúng theo phiếu/nhãn"></div>
                                 <div><label>Hạn dùng (*)</label><input id="fallback-exp" type="date"></div>
-                                <div><label>Số lượng thực nhận (*)</label><input id="fallback-qty" type="number" min="1" step="1" inputmode="numeric" placeholder="0"></div>
-                                <div><label>Ngày nhập kho / ngày chứng từ (*)</label><input id="fallback-import-date" type="date"></div>
-                                <div><label>Số chứng từ / Phiếu NCC / Hóa đơn (*)</label><input id="fallback-document" maxlength="120" placeholder="Ví dụ: PNK-080926 / HĐ 000123"></div>
-                                <div><label>Người nhập & đối chiếu (*)</label><input id="fallback-operator" maxlength="100" placeholder="Họ tên người kiểm tra thực tế"></div>
-                                <div class="full"><label>Ghi chú kiểm tra (tùy chọn)</label><input id="fallback-note" maxlength="250" placeholder="Ví dụ: đối chiếu nguyên đai, đủ số lượng, bao bì nguyên vẹn..."></div>
+                                <div><label>Số lượng thực nhận (*)</label><input id="fallback-qty" type="number" min="1" step="1" placeholder="0"></div>
                                 <div class="full manual-master-box" id="fallback-master-info"><b>Chưa chọn Master.</b> Khi chọn đúng sản phẩm, hệ thống sẽ khóa Tên + Quy cách theo Master và chuẩn bị dòng nhập kho dự phòng.</div>
-                                <div class="full manual-ack-row"><input id="fallback-ack" type="checkbox"><label for="fallback-ack"><b>TÔI ĐÃ ĐỐI CHIẾU TRỰC TIẾP</b> tên thuốc, mã sản phẩm, quy cách, số lô, HSD và số lượng với chứng từ/nhãn thực tế. Không xác nhận nếu dữ liệu chưa chắc chắn.</label></div>
-                                <div class="full manual-guard" id="fallback-guard-status">Chưa đủ điều kiện thêm dòng. Hệ thống sẽ kiểm tra Master, lô/HSD, số lượng nguyên, chứng từ và người nhập.</div>
                                 <div class="full" style="display:flex;gap:8px;flex-wrap:wrap">
-                                    <button id="fallback-add-btn" type="button" class="btn btn-warning" disabled>➕ THÊM DÒNG THỦ CÔNG VÀO NHẬP KHO</button>
+                                    <button id="fallback-add-btn" type="button" class="btn btn-warning">➕ THÊM DÒNG THỦ CÔNG VÀO NHẬP KHO</button>
                                     <button id="fallback-open-warehouse-btn" type="button" class="btn btn-success">📦 MỞ BẢNG NHẬP KHO</button>
                                     <button id="fallback-reset-btn" type="button" class="btn" style="background:#64748b">Làm trống dòng</button>
                                 </div>
@@ -1185,7 +1168,7 @@
             <div class="ic-header">
               <div class="ic-brand">
                 <div class="ic-logo">📄</div>
-                <div><h2>KIỂM TRA HÓA ĐƠN THUỐC</h2><small>Kiểm soát cứng theo Mã SP → Master → Quy cách → Lô → HSD → Tồn kho Firebase TEST</small></div>
+                <div><h2>KIỂM TRA HÓA ĐƠN THUỐC</h2><small>Đối chiếu Tên thuốc → Quy cách → Số lô → Hạn dùng → Số lượng tồn kho (không yêu cầu mã)</small></div>
               </div>
               <div class="ic-head-right">
                 <span id="ic-firebase-status" class="ic-fb-status">⏳ Đang kết nối dữ liệu hóa đơn...</span>
@@ -6168,10 +6151,9 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
                                 1. Mở <b>🚨 NHẬP THỦ CÔNG DỰ PHÒNG</b> trong tab Nhập phiếu NCC.<br>
                                 2. Gõ Tên/Mã SP và <b>chọn đúng sản phẩm từ danh sách Master</b>.<br>
                                 3. Hệ thống tự đưa lên Tên, Quy cách, Mã SP, Hàm lượng, ĐVT từ Master.<br>
-                                4. Nhập bắt buộc <b>Số lô · Hạn dùng · Số lượng thực nhận · Ngày nhập · Số chứng từ · Người nhập/đối chiếu</b> theo phiếu/nhãn.<br>
-                                5. Đánh dấu <b>ĐÃ ĐỐI CHIẾU TRỰC TIẾP</b>. Hệ thống chặn số lượng không nguyên, HSD không hợp lệ và cảnh báo lô đã tồn/HSD gần.<br>
-                                6. Bấm <b>THÊM DÒNG THỦ CÔNG VÀO NHẬP KHO</b>. Mỗi dòng được tạo mã giao dịch chống ghi lặp; nếu cùng Mã + Lô + HSD đã có trong bảng, chỉ gộp sau khi người dùng xác nhận.<br>
-                                7. Mở bảng Nhập kho, kiểm tra lần cuối và bấm Đồng bộ. Chỉ báo thành công sau khi đọc lại Firebase thấy đúng mã giao dịch vừa ghi.<br>
+                                4. Nhập bắt buộc <b>Số lô · Hạn dùng · Số lượng thực nhận</b> theo phiếu/nhãn.<br>
+                                5. Bấm <b>THÊM DÒNG THỦ CÔNG VÀO NHẬP KHO</b>. Có thể thêm nhiều dòng liên tiếp.<br>
+                                6. Mở bảng Nhập kho, kiểm tra và bấm Đồng bộ như quy trình bình thường.<br>
                                 <b>Không được gõ tự do tên thuốc để bỏ qua Master.</b> Nếu thuốc mới chưa có Master, phải bổ sung Master trước.
                             </div>
                         </div>
@@ -6180,7 +6162,7 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
                             <h3>C. Khi mất Internet / Firebase</h3>
                             <div style="font-size:.83rem;color:#475569;line-height:1.65">
                                 • Master đã tải trước đó được lưu cache trên máy để tiếp tục chọn sản phẩm khi mạng đứt.<br>
-                                • Sau popup kiểm tra GDP/SOP, nếu Firebase chưa kết nối, dữ liệu chỉ được xóa khỏi màn hình sau khi ứng dụng <b>ghi và đọc kiểm tra lại hàng đợi cục bộ thành công</b>; có thêm bản sao dự phòng LocalStorage.<br>
+                                • Sau popup kiểm tra GDP/SOP, nếu Firebase chưa kết nối, dữ liệu sẽ được lưu cục bộ với trạng thái <b>🟠 CHƯA ĐỒNG BỘ FIREBASE</b>.<br>
                                 • Mở mục <b>HÀNG ĐỢI OFFLINE</b> để xem số dòng đang chờ.<br>
                                 • Khi mạng trở lại, bấm <b>☁️ ĐỒNG BỘ DỮ LIỆU CHỜ</b>. Hệ thống kiểm tra lại Tên + Quy cách với Master hiện tại trước khi ghi tồn.<br>
                                 • Nếu Master đã thay đổi, dòng không còn khớp sẽ bị giữ lại, không tự ghi vào kho.<br>
@@ -6407,14 +6389,8 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
         let masterDuplicateCodes=[]; // V57: Mã SP Master phải duy nhất để làm khóa kiểm soát kho.
         const MASTER_CACHE_KEY='ideco_kho_master_cache_v1';
         const OFFLINE_QUEUE_KEY='ideco_kho_offline_import_queue_v1';
-        const OFFLINE_QUEUE_BACKUP_KEY='ideco_kho_offline_import_queue_backup_v2';
         let firebaseConnected=false;
         let fallbackSelectedMaster=null;
-        let manualAddBusy=false;
-        let manualWarehouseSelectedMaster=null;
-        let manualWarehousePendingTx='';
-        let manualWarehousePendingFingerprint='';
-        let manualWarehouseWriteState='';
         let bulkExportPreviewData = []; 
         let filteredExportData = []; // For date-filtered exports
 
@@ -6435,24 +6411,9 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
         function firebaseWriteCanBeTried(){
             return !!(navigator.onLine&&firebaseRuntimeAvailable&&refs?.items&&String(refs.items.key||'').indexOf('offline_')!==0);
         }
-        function getOfflineQueue(){
-            const q=safeLocalGet(OFFLINE_QUEUE_KEY,null); if(Array.isArray(q))return q;
-            const b=safeLocalGet(OFFLINE_QUEUE_BACKUP_KEY,null); return Array.isArray(b?.data)?b.data:[];
-        }
-        function setOfflineQueue(q){
-            try{
-                const json=JSON.stringify(q); localStorage.setItem(OFFLINE_QUEUE_KEY,json);
-                const verify=localStorage.getItem(OFFLINE_QUEUE_KEY); if(verify!==json)throw new Error('Không đọc lại đúng dữ liệu vừa lưu cục bộ.');
-                try{localStorage.setItem(OFFLINE_QUEUE_BACKUP_KEY,JSON.stringify({savedAt:new Date().toISOString(),data:q}));}catch(e){console.warn('Không ghi được bản sao Offline',e)}
-                renderOfflineQueue(); return true;
-            }catch(e){console.error('Lưu hàng đợi Offline thất bại',e);showToast('KHÔNG LƯU ĐƯỢC OFFLINE: '+(e?.message||e)+'. Dữ liệu vẫn giữ trên màn hình, không được đóng trang.','error');return false;}
-        }
+        function getOfflineQueue(){ const q=safeLocalGet(OFFLINE_QUEUE_KEY,[]); return Array.isArray(q)?q:[]; }
+        function setOfflineQueue(q){ safeLocalSet(OFFLINE_QUEUE_KEY,q); renderOfflineQueue(); }
         function makeQueueId(){ return 'OFF_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,9); }
-        function makeImportTransactionId(prefix='IMP'){
-            let rand='';try{rand=crypto?.randomUUID?.().replace(/-/g,'').slice(0,14)||'';}catch{}
-            if(!rand)rand=Math.random().toString(36).slice(2,16);
-            return `${prefix}_${Date.now().toString(36)}_${rand}`;
-        }
         function networkReady(){ return navigator.onLine && firebaseConnected; }
         function updateNetworkUI(){
             const b=document.getElementById('fallback-network-badge');
@@ -6466,26 +6427,21 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
         function renderOfflineQueue(){
             const q=getOfflineQueue(), st=document.getElementById('offline-queue-status'), root=document.getElementById('offline-queue-list');
             if(st)st.innerHTML=q.length?`🟠 <b>${q.length} dòng CHƯA ĐỒNG BỘ FIREBASE</b> · dữ liệu đang lưu trên máy này.`:'✅ Không có dữ liệu chờ đồng bộ.';
-            if(root)root.innerHTML=q.length?q.slice(0,30).map(x=>`<div class="offline-queue-row"><div class="q-name"><b>${escapeHtml(x.productName||'')}</b><div>${escapeHtml(x.packSpec||'')}${x.sourceDocument?` · CT: ${escapeHtml(x.sourceDocument)}`:''}</div></div><div>Lô: <b>${escapeHtml(x.lotNumber||'')}</b></div><div>SL: <b>${escapeHtml(x.quantity||'')}</b></div><div>${escapeHtml(x.expiryDate||'')}<br><small>${escapeHtml(x.sourceOperator||'')}</small></div></div>`).join('')+(q.length>30?`<div style="padding:7px 0">… và ${q.length-30} dòng khác</div>`:''):'';
+            if(root)root.innerHTML=q.length?q.slice(0,30).map(x=>`<div class="offline-queue-row"><div class="q-name"><b>${escapeHtml(x.productName||'')}</b><div>${escapeHtml(x.packSpec||'')}</div></div><div>Lô: <b>${escapeHtml(x.lotNumber||'')}</b></div><div>SL: <b>${escapeHtml(x.quantity||'')}</b></div><div>${escapeHtml(x.expiryDate||'')}</div></div>`).join('')+(q.length>30?`<div style="padding:7px 0">… và ${q.length-30} dòng khác</div>`:''):'';
             updateNetworkUI();
         }
         function cacheMasterData(){ if(masterData.length)safeLocalSet(MASTER_CACHE_KEY,{savedAt:new Date().toISOString(),data:masterData.map(({name,code,unit,strength,packSpec,searchKey,masterSource})=>({name,code,unit,strength,packSpec,searchKey,masterSource}))}); }
         function restoreMasterCache(){
             const c=safeLocalGet(MASTER_CACHE_KEY,null); if(!c?.data?.length)return false;
             masterData=c.data.map(m=>({...m,searchKey:m.searchKey||cleanStr(m.name),masterSource:m.masterSource||'CACHE OFFLINE'}));
-            const cc={};masterData.forEach(m=>{const k=cleanCode(m.code||'');if(k)cc[k]=(cc[k]||0)+1;});masterDuplicateCodes=Object.keys(cc).filter(k=>cc[k]>1);
-            const el=document.getElementById('master-status'); if(el)el.innerText=`🟠 MASTER OFFLINE CACHE: ${masterData.length} sản phẩm · lưu ${c.savedAt?new Date(c.savedAt).toLocaleString('vi-VN'):'trước đó'}${masterDuplicateCodes.length?` · ⚠️ ${masterDuplicateCodes.length} mã trùng bị khóa`:''}. Khi có mạng hệ thống sẽ cập nhật lại Firebase.`;
+            const el=document.getElementById('master-status'); if(el)el.innerText=`🟠 MASTER OFFLINE CACHE: ${masterData.length} sản phẩm · lưu ${c.savedAt?new Date(c.savedAt).toLocaleString('vi-VN'):'trước đó'}. Khi có mạng hệ thống sẽ cập nhật lại Firebase.`;
             const dl=document.getElementById('master-code-list'); if(dl)dl.innerHTML=masterData.filter(m=>m.code).map(m=>`<option value="${escapeHtml(m.code)}">${escapeHtml(m.name)}</option>`).join('');
             return true;
         }
         function enqueueOfflineItems(items){
-            const q=getOfflineQueue(),known=new Set(q.map(x=>String(x.sourceTransactionId||'')).filter(Boolean));let added=0;
-            items.forEach(it=>{
-                const offlineQueueId=it.offlineQueueId||makeQueueId(),sourceTransactionId=it.sourceTransactionId||makeImportTransactionId(it.sourceType==='MANUAL_FALLBACK'?'MAN':'OFF');
-                if(known.has(sourceTransactionId))return;
-                known.add(sourceTransactionId);q.push({...it,offlineQueueId,sourceTransactionId,queuedAt:it.queuedAt||new Date().toISOString(),syncStatus:'PENDING'});added++;
-            });
-            const ok=setOfflineQueue(q);return {ok,added,total:q.length};
+            const q=getOfflineQueue();
+            items.forEach(it=>q.push({...it,offlineQueueId:it.offlineQueueId||makeQueueId(),sourceTransactionId:it.sourceTransactionId||it.offlineQueueId||makeQueueId(),queuedAt:new Date().toISOString(),syncStatus:'PENDING'}));
+            setOfflineQueue(q);
         }
         function queuedMasterCheck(d){
             const c=String(d.masterCode||d.productCode||'').trim(), n=String(d.masterName||d.productName||'').trim();
@@ -6568,7 +6524,7 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
         };
 
         // INIT DATE
-        const _todayD=new Date(),_todayO=_todayD.getTimezoneOffset(); const today = new Date(_todayD.getTime()-_todayO*60000).toISOString().split('T')[0];
+        const today = new Date().toISOString().split('T')[0];
         document.getElementById('imp-date').value = today;
         document.getElementById('exp-date').value = today;
         document.getElementById('bulk-exp-date').value = today;
@@ -6682,66 +6638,25 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
             });
         }
 
-        function manualWarehouseFingerprint(st){return [st?.m?.code||'',st?.lot||'',st?.exp||'',st?.qty||'',st?.date||'',st?.doc||'',st?.operator||''].join('|')}
-        function manualWarehouseState(){
-            const m=manualWarehouseSelectedMaster,name=document.getElementById('imp-name')?.value.trim()||'',lot=document.getElementById('imp-lot')?.value.trim()||'',exp=document.getElementById('imp-exp')?.value||'',qty=warehouseNumber(document.getElementById('imp-qty')?.value),date=document.getElementById('imp-date')?.value||'',doc=document.getElementById('imp-document')?.value.trim()||'',operator=document.getElementById('imp-operator')?.value.trim()||'',note=document.getElementById('imp-note')?.value.trim()||'',ack=!!document.getElementById('imp-ack')?.checked;
-            let error='';
-            if(!m)error='Hãy chọn đúng sản phẩm từ Master.';
-            else if(!m.code||masterDuplicateCodes.includes(cleanCode(m.code)))error='Mã SP Master thiếu hoặc bị trùng.';
-            else if(vnNorm(m.name)!==vnNorm(name))error='Tên đang nhập không còn khớp Master đã chọn.';
-            else if(!String(m.packSpec||'').trim())error='Master chưa có Quy cách.';
-            else if(!lot)error='Thiếu Số lô.';
-            else if(!/^\d{4}-\d{2}-\d{2}$/.test(exp))error='Thiếu Hạn dùng hợp lệ.';
-            else if(!/^\d{4}-\d{2}-\d{2}$/.test(date))error='Thiếu Ngày nhập/chứng từ.';
-            else if(exp<=date)error='HSD phải sau Ngày nhập/chứng từ.';
-            else if(!(qty>0)||!Number.isInteger(qty))error='Số lượng phải là số nguyên > 0.';
-            else if(!doc)error='Thiếu Số chứng từ/Phiếu NCC/Hóa đơn.';
-            else if(!operator)error='Thiếu Người nhập & đối chiếu.';
-            else if(!ack)error='Chưa xác nhận đã đối chiếu trực tiếp.';
-            return {ok:!error,error,m,name,lot,exp,qty,date,doc,operator,note,ack};
-        }
-        function setManualWarehouseInputsLocked(locked){
-            ['imp-name','imp-lot','imp-exp','imp-qty','imp-date','imp-document','imp-operator','imp-note','imp-ack'].forEach(id=>{const e=document.getElementById(id);if(e)e.disabled=!!locked;});
-        }
-        function updateManualWarehouseState(){
-            const st=manualWarehouseState(),btn=document.getElementById('imp-save-btn'),box=document.getElementById('imp-guard-status');
-            if(manualWarehouseWriteState==='UNCERTAIN'){
-                if(btn){btn.disabled=false;btn.textContent='🔁 THỬ LẠI & XÁC MINH FIREBASE';}
-                if(box){box.className='manual-guard bad';box.innerHTML='⚠️ <b>CHƯA XÁC ĐỊNH LẦN GHI TRƯỚC.</b> Các ô đang khóa để tránh thay đổi dữ liệu. Bấm “THỬ LẠI & XÁC MINH FIREBASE”; hệ thống dùng lại cùng mã giao dịch nên không cộng tồn lần hai.';}
-                setManualWarehouseInputsLocked(true);return st;
-            }
-            setManualWarehouseInputsLocked(false);
-            if(btn){btn.disabled=!st.ok;btn.textContent=firebaseWriteCanBeTried()?'💾 LƯU NHẬP KHO AN TOÀN':'💾 LƯU OFFLINE AN TOÀN';}
-            if(!box)return st;
-            if(!st.ok){box.className='manual-guard bad';box.innerHTML=`⛔ <b>CHƯA ĐƯỢC LƯU:</b> ${escapeHtml(st.error)}`;return st;}
-            const existing=manualExistingLots(st.m.code,st.lot,st.exp),days=manualDaysUntil(st.exp);
-            if(existing.length>1){box.className='manual-guard bad';box.innerHTML=`⛔ <b>CHẶN:</b> đang có ${existing.length} dòng tồn trùng Mã SP + Lô + HSD. Phải kiểm tra dữ liệu tồn trước.`;if(btn)btn.disabled=true;return {...st,ok:false,error:'Tồn kho có nhiều dòng trùng cùng Mã SP + Lô + HSD.'};}
-            if(days>=0&&days<=180){box.className='manual-guard warn';box.innerHTML=`⚠️ HSD còn <b>${days} ngày</b>. Kiểm tra kỹ điều kiện nhận hàng trước khi lưu.`;}
-            else if(existing.length===1){box.className='manual-guard warn';box.innerHTML=`⚠️ Lô này đang có tồn <b>${warehouseNumber(existing[0].quantity).toLocaleString('vi-VN')}</b>. Nếu đúng chứng từ, hệ thống sẽ cộng thêm bằng transaction và chống ghi lặp.`;}
-            else{box.className='manual-guard ok';box.innerHTML='✅ <b>ĐỦ ĐIỀU KIỆN LƯU.</b> Dữ liệu Master khớp, trường bắt buộc đầy đủ; sau ghi sẽ đọc lại Firebase xác nhận mã giao dịch.';}
-            return st;
-        }
         function applyMasterToManual(m) {
-            if(!m) return;manualWarehouseSelectedMaster=m;
+            if(!m) return;
             document.getElementById('imp-name').value = m.name || '';
             document.getElementById('imp-code').value = m.code || '';
             document.getElementById('imp-unit').value = m.unit || '';
             document.getElementById('imp-strength').value = m.strength || '';
             document.getElementById('imp-pack').value = m.packSpec || '';
-            updateManualWarehouseState();
+            ['imp-code','imp-unit','imp-strength','imp-pack'].forEach(id => {
+                const el=document.getElementById(id); el.style.background = el.value ? '#ecfdf5' : '#fff7ed';
+            });
         }
         document.getElementById('imp-name').addEventListener('input', function() {
-            if(manualWarehouseWriteState==='UNCERTAIN')return;
-            manualWarehouseSelectedMaster=null;['imp-code','imp-unit','imp-strength','imp-pack'].forEach(id=>document.getElementById(id).value='');
-            showSuggestions(this, 'name', document.getElementById('imp-suggest'), applyMasterToManual);updateManualWarehouseState();
+            showSuggestions(this, 'name', document.getElementById('imp-suggest'), applyMasterToManual);
         });
         document.getElementById('imp-name').addEventListener('change', function() {
-            const exact = masterData.filter(m => m.searchKey === cleanStr(this.value)||cleanCode(m.code||'')===cleanCode(this.value));
-            if(exact.length===1) applyMasterToManual(exact[0]); else updateManualWarehouseState();
+            const exact = masterData.find(m => m.searchKey === cleanStr(this.value));
+            if(exact) applyMasterToManual(exact);
         });
         document.getElementById('imp-name').addEventListener('blur', () => setTimeout(() => document.getElementById('imp-suggest').innerHTML='', 200));
-        ['imp-lot','imp-exp','imp-qty','imp-date','imp-document','imp-operator','imp-note','imp-ack'].forEach(id=>{const e=document.getElementById(id);if(e){e.addEventListener('input',updateManualWarehouseState);e.addEventListener('change',updateManualWarehouseState);}});
-        setTimeout(updateManualWarehouseState,0);
 
         // --- IMPORT LOGIC ---
         document.getElementById('import-file').addEventListener('change', e => {
@@ -6774,8 +6689,7 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
             const tb = document.getElementById('preview-body'); tb.innerHTML = '';
             previewData.forEach((d, i) => {
                 const tr = document.createElement('tr');
-                if(d.writeState==='UNCERTAIN'){tr.style.background='#fff7ed';tr.style.borderLeft='4px solid #dc2626';tr.title='Lần ghi trước chưa xác định. Không sửa/xóa; hãy Đồng bộ lại với cùng mã giao dịch.';}
-                else if(d.masterLocked){ tr.style.background='#f0fdf4'; tr.style.borderLeft='4px solid #16a34a'; }
+                if(d.masterLocked){ tr.style.background='#f0fdf4'; tr.style.borderLeft='4px solid #16a34a'; }
                 else if(d.newProduct){ tr.style.background='#fff7ed'; tr.style.borderLeft='4px solid #f59e0b'; }
 
                 const makeLockedInput=(value,cls='')=>{ const inp=document.createElement('input'); inp.className='table-input '+cls; inp.value=value||''; inp.readOnly=true; inp.style.background='#ecfdf5'; inp.style.fontWeight='700'; inp.title='Khóa theo Dữ liệu Master KHO'; return inp; };
@@ -6784,7 +6698,7 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
                 if(d.masterLocked){
                     tdCode.appendChild(makeLockedInput(d.productCode));
                     const n=makeLockedInput(d.productName,'inp-name'); tdName.appendChild(n);
-                    const tag=document.createElement('div'); tag.style.cssText='margin-top:4px;color:#15803d;font-size:.72rem;font-weight:800'; tag.textContent=d.writeState==='UNCERTAIN'?`⚠️ CHƯA XÁC ĐỊNH FIREBASE · GIỮ NGUYÊN DÒNG VÀ BẤM ĐỒNG BỘ LẠI`:d.sourceType==='MANUAL_FALLBACK'?`🔒 THỦ CÔNG · CT: ${d.sourceDocument||'—'} · Người đối chiếu: ${d.sourceOperator||'—'}`:'🔒 Tên + Quy cách theo MASTER · Mã SP nếu có · Hàm lượng/ĐVT được tham khảo hoặc bổ sung'; tdName.appendChild(tag);
+                    const tag=document.createElement('div'); tag.style.cssText='margin-top:4px;color:#15803d;font-size:.72rem;font-weight:800'; tag.textContent='🔒 Tên + Quy cách theo MASTER · Mã SP nếu có · Hàm lượng/ĐVT được tham khảo hoặc bổ sung'; tdName.appendChild(tag);
                 }else{
                     const inpCode=document.createElement('input'); inpCode.className='table-input '+(d.productCode?'code-found':''); inpCode.list='master-code-list'; inpCode.value=d.productCode||'';
                     const sugCode=document.createElement('div'); sugCode.className='autocomplete-items';
@@ -6808,25 +6722,14 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
                     tdPack.innerHTML=`<input class="table-input inp-pack" value="${escapeHtml(d.packSpec||'')}" onchange="previewData[${i}].packSpec=this.value">`;
                     tdUnit.innerHTML=`<input class="table-input inp-unit" value="${escapeHtml(d.unit||'')}" onchange="previewData[${i}].unit=this.value">`;
                 }
-                const tdLot=document.createElement('td'); tdLot.innerHTML=`<input class="table-input" value="${escapeHtml(d.lotNumber||'')}" onchange="updatePreviewField(${i},'lotNumber',this.value)">`;
-                const tdExp=document.createElement('td'); tdExp.innerHTML=`<input type="date" class="table-input" value="${escapeHtml(d.expiryDate||'')}" onchange="updatePreviewField(${i},'expiryDate',this.value)">`;
-                const tdQty=document.createElement('td'); tdQty.innerHTML=`<input type="number" step="any" class="table-input" value="${escapeHtml(d.quantity??'')}" onchange="updatePreviewField(${i},'quantity',this.value)">`;
-                const tdAct=document.createElement('td'); tdAct.innerHTML=d.writeState==='UNCERTAIN'?`<button class="btn btn-danger" style="padding:2px 5px" disabled title="Chưa xác định trạng thái Firebase">🔒</button>`:`<button class="btn btn-danger" style="padding:2px 5px" onclick="removePreviewItem(${i})">X</button>`;
+                const tdLot=document.createElement('td'); tdLot.innerHTML=`<input class="table-input" value="${escapeHtml(d.lotNumber||'')}" onchange="previewData[${i}].lotNumber=this.value">`;
+                const tdExp=document.createElement('td'); tdExp.innerHTML=`<input type="date" class="table-input" value="${escapeHtml(d.expiryDate||'')}" onchange="previewData[${i}].expiryDate=this.value">`;
+                const tdQty=document.createElement('td'); tdQty.innerHTML=`<input type="number" step="any" class="table-input" value="${escapeHtml(d.quantity??'')}" onchange="previewData[${i}].quantity=warehouseNumber(this.value)">`;
+                const tdAct=document.createElement('td'); tdAct.innerHTML=`<button class="btn btn-danger" style="padding:2px 5px" onclick="removePreviewItem(${i})">X</button>`;
                 tr.append(tdCode,tdName,tdStrength,tdPack,tdUnit,tdLot,tdExp,tdQty,tdAct); tb.appendChild(tr);
             });
         }
-        window.removePreviewItem = (i) => { const d=previewData[i];if(d?.writeState==='UNCERTAIN')return showToast('Dòng này đang ở trạng thái CHƯA XÁC ĐỊNH đã ghi Firebase hay chưa. Không xóa/sửa; hãy kết nối lại và bấm Đồng bộ để hệ thống dùng cùng mã giao dịch kiểm tra an toàn.','error');previewData.splice(i, 1); renderPreviewTable(); }
-        window.updatePreviewField=(i,key,value)=>{
-            const d=previewData[i];if(!d)return;const old=String(d[key]??'');
-            const next=key==='quantity'?warehouseNumber(value):value;
-            if(d.writeState==='UNCERTAIN'&&['productCode','productName','packSpec','lotNumber','expiryDate','quantity'].includes(key)&&String(next??'')!==old){
-                showToast('CHẶN SỬA: lần ghi trước chưa xác định thành công/thất bại. Hãy bấm Đồng bộ lại với cùng mã giao dịch trước để tránh cộng tồn hai lần.','error');renderPreviewTable();return;
-            }
-            d[key]=next;
-            if(['productCode','productName','packSpec','lotNumber','expiryDate','quantity'].includes(key)&&String(next??'')!==old){
-                d.sourceTransactionId='';d.transactionInvalidatedAt=new Date().toISOString();d.writeState='EDITED';
-            }
-        };
+        window.removePreviewItem = (i) => { previewData.splice(i, 1); renderPreviewTable(); }
         function verifyMasterLockedPreview(d){
             if(!d.masterLocked)return {ok:true};
             const refCode=String(d.masterCode||d.productCode||'').trim();
@@ -6849,7 +6752,7 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
             if(masterErrors.length) return showToast(`CHẶN ĐỒNG BỘ: ${masterErrors.length} dòng không còn đúng Master. ${masterErrors[0].reason}`, 'error');
             const invalidCritical = previewData.filter(d => !d.productCode || !d.productName || !d.packSpec || !d.lotNumber || !d.expiryDate || warehouseNumber(d.quantity) <= 0);
             if(invalidCritical.length > 0) return showToast(`Có ${invalidCritical.length} dòng thiếu Mã SP / Tên SP / Quy cách / Số lô / Hạn dùng / Số lượng. Không cho phép đồng bộ!`, 'error');
-            const validItems = previewData.map(d=>{if(!d.sourceTransactionId)d.sourceTransactionId=makeImportTransactionId(d.sourceType==='MANUAL_FALLBACK'?'MAN':'IMP');return d;});
+            const validItems = [...previewData];
             const ok = await openSafetyVerification({
                 title: firebaseWriteCanBeTried()?'KIỂM TRA TRƯỚC KHI ĐỒNG BỘ NHẬP KHO':'KIỂM TRA TRƯỚC KHI LƯU OFFLINE',
                 subtitle: firebaseWriteCanBeTried()?`Sắp ghi ${validItems.length} dòng vào tồn kho. Hãy kiểm tra từng dòng.`:`Firebase chưa thể ghi trực tiếp. ${validItems.length} dòng sẽ được lưu trên máy ở trạng thái CHƯA ĐỒNG BỘ.`,
@@ -6859,25 +6762,22 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
             });
             if(!ok) return;
             const prepared=validItems.map(d=>({
-                productName:d.productName,productCode:d.productCode||'',productStrength:d.productStrength||'',packSpec:d.packSpec||'',unit:d.unit||'',lotNumber:d.lotNumber,expiryDate:d.expiryDate,quantity:warehouseNumber(d.quantity),importDate:d.importDate||new Date().toISOString().split('T')[0],createdAt:d.createdAt||new Date().toISOString(),
-                masterCode:d.masterCode||d.productCode||'',masterName:d.masterName||d.productName,sourceType:d.sourceType||'WAREHOUSE_MANUAL',sourceNote:d.sourceNote||(d.sourceType==='MANUAL_FALLBACK'?'THỦ CÔNG DỰ PHÒNG':'AI/PHIẾU NCC'),sourceTransactionId:d.sourceTransactionId||'',
-                sourceDocument:d.sourceDocument||'',sourceOperator:d.sourceOperator||'',sourceCheckNote:d.sourceCheckNote||'',manualEntryAt:d.manualEntryAt||'',manualSchemaVersion:d.manualSchemaVersion||0
+                productName:d.productName,productCode:d.productCode||'',productStrength:d.productStrength||'',packSpec:d.packSpec||'',unit:d.unit||'',lotNumber:d.lotNumber,expiryDate:d.expiryDate,quantity:warehouseNumber(d.quantity),importDate:new Date().toISOString().split('T')[0],createdAt:new Date().toISOString(),
+                masterCode:d.masterCode||d.productCode||'',masterName:d.masterName||d.productName,sourceType:d.sourceType||'WAREHOUSE_MANUAL',sourceNote:d.sourceType==='MANUAL_FALLBACK'?'THỦ CÔNG DỰ PHÒNG':'AI/PHIẾU NCC'
             }));
             if(!firebaseWriteCanBeTried()){
-                const queued=enqueueOfflineItems(prepared);
-                if(!queued.ok)return showToast('KHÔNG THỂ xác nhận lưu Offline. Dữ liệu vẫn giữ nguyên trên màn hình; không đóng trang cho đến khi sao lưu/khôi phục kết nối.','error');
-                showToast(`✅ Đã xác minh lưu OFFLINE ${queued.added} dòng mới trên máy. CHƯA ghi Firebase; khi có mạng bấm “ĐỒNG BỘ DỮ LIỆU CHỜ”.`,'success');
+                enqueueOfflineItems(prepared);
+                showToast(`Đã lưu OFFLINE ${prepared.length} dòng trên máy. CHƯA ghi Firebase; khi có mạng bấm “ĐỒNG BỘ DỮ LIỆU CHỜ”.`,'success');
                 previewData=[];renderPreviewTable();document.getElementById('preview-box').style.display='none';
                 document.getElementById('manual-fallback-details')?.setAttribute('open','');
                 return;
             }
             try{
-                validItems.forEach(d=>d.writeState='ATTEMPTING');
                 const result=await saveInventoryBatch(prepared);
                 if(result.failedRows.length){
+                    // V60: không dừng ở dòng lỗi đầu tiên. Giữ lại đúng các dòng lỗi trên màn hình để sửa/thử lại.
                     const failedIndex=new Set(result.failedRows.flatMap(x=>x.sourceIndexes));
-                    const uncertainIndex=new Set(result.failedRows.filter(x=>x.uncertain).flatMap(x=>x.sourceIndexes));
-                    previewData=validItems.filter((_,i)=>failedIndex.has(i)).map((d)=>{const originalIndex=validItems.indexOf(d);d.writeState=uncertainIndex.has(originalIndex)?'UNCERTAIN':'FAILED_SAFE';return d;});
+                    previewData=validItems.filter((_,i)=>failedIndex.has(i));
                     renderPreviewTable();
                     document.getElementById('preview-box').style.display=previewData.length?'flex':'none';
                     console.warn('IDECO V60 · Các dòng nhập kho chưa lưu được',result.failedRows);
@@ -6887,9 +6787,8 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
                     showToast(`✅ Đã lưu đủ ${result.savedSourceRows}/${validItems.length} dòng vào Firebase${result.duplicateExistingGroups?` · ${result.duplicateExistingGroups} nhóm tồn cũ bị trùng nhưng không còn làm dừng đồng bộ`:''}.`,'success');
                 }
             }catch(e){
-                console.error('Đồng bộ nhập kho V61 chưa xác định hoàn tất:',e);
-                validItems.forEach(d=>d.writeState='UNCERTAIN');previewData=validItems;renderPreviewTable();document.getElementById('preview-box').style.display='flex';
-                showToast('KẾT QUẢ GHI FIREBASE CHƯA XÁC ĐỊNH: '+(e?.message||e)+'. KHÔNG sửa/xóa dòng; hãy kết nối lại và bấm Đồng bộ lại để mã giao dịch chống ghi lặp tự đối chiếu.','error');
+                console.error('Đồng bộ nhập kho V60 thất bại:',e);
+                showToast('Lỗi Firebase khi lưu danh sách: '+(e?.message||e),'error');
             }
         }
 
@@ -6936,31 +6835,23 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
             const mh=masterData.filter(m=>m.code&&cleanCode(m.code)===cleanCode(code));
             if(mh.length!==1||masterDuplicateCodes.includes(cleanCode(code)))throw new Error(`Mã SP ${code} không tồn tại duy nhất trong Master.`);
             const master=mh[0],qty=warehouseNumber(item?.quantity);
-            if(!(qty>0)||!Number.isInteger(qty))throw new Error(`${master.name||code}: số lượng nhập phải là số nguyên > 0.`);
-            const lot=String(item?.lotNumber||'').trim(),exp=String(item?.expiryDate||'').trim(),imp=String(item?.importDate||new Date().toISOString().slice(0,10)).trim();
-            if(!lot||!/^\d{4}-\d{2}-\d{2}$/.test(exp))throw new Error(`${master.name||code}: thiếu hoặc sai Số lô/HSD.`);
-            if(!/^\d{4}-\d{2}-\d{2}$/.test(imp))throw new Error(`${master.name||code}: ngày nhập kho không hợp lệ.`);
-            if(exp<=imp)throw new Error(`${master.name||code}: HSD phải sau ngày nhập kho.`);
-            if(Number(item?.manualSchemaVersion||0)>=2&&item?.sourceType==='MANUAL_FALLBACK'){
-                if(!String(item?.sourceDocument||'').trim())throw new Error(`${master.name||code}: nhập thủ công thiếu Số chứng từ/Phiếu NCC.`);
-                if(!String(item?.sourceOperator||'').trim())throw new Error(`${master.name||code}: nhập thủ công thiếu Người nhập & đối chiếu.`);
-            }
+            if(!(qty>0))throw new Error(`${master.name||code}: số lượng nhập phải > 0.`);
+            const lot=String(item?.lotNumber||'').trim(),exp=String(item?.expiryDate||'').trim();
+            if(!lot||!exp)throw new Error(`${master.name||code}: thiếu Số lô hoặc HSD.`);
             return firebaseClean({
                 productName:master.name||'',productCode:master.code||code,productStrength:master.strength||'',packSpec:master.packSpec||'',unit:master.unit||'',
-                lotNumber:lot,expiryDate:exp,quantity:qty,importDate:imp,createdAt:item?.createdAt||new Date().toISOString(),
+                lotNumber:lot,expiryDate:exp,quantity:qty,importDate:item?.importDate||new Date().toISOString().slice(0,10),createdAt:item?.createdAt||new Date().toISOString(),
                 masterCode:master.code||code,masterName:master.name||'',sourceType:item?.sourceType||'WAREHOUSE_MANUAL',sourceNote:item?.sourceNote||'AI/PHIẾU NCC',
-                sourceTransactionId:String(item?.sourceTransactionId||'').trim(),sourceDocument:String(item?.sourceDocument||'').trim(),sourceOperator:String(item?.sourceOperator||'').trim(),sourceCheckNote:String(item?.sourceCheckNote||'').trim(),manualEntryAt:item?.manualEntryAt||'',manualSchemaVersion:Number(item?.manualSchemaVersion||0)
+                sourceTransactionId:String(item?.sourceTransactionId||'').trim()
             });
         }
         async function saveInventoryBatch(items){
-            if(!Array.isArray(items)||!items.length)return {savedSourceRows:0,failedSourceRows:0,failedRows:[],duplicateExistingGroups:0,verifiedRows:0};
+            if(!Array.isArray(items)||!items.length)return {savedSourceRows:0,failedSourceRows:0,failedRows:[],duplicateExistingGroups:0};
             if(!firebaseWriteCanBeTried())throw new Error('Firebase chưa sẵn sàng để ghi.');
             const groups=new Map(),preFailed=[];
             items.forEach((raw,index)=>{
                 try{
-                    const withTx={...raw,sourceTransactionId:String(raw?.sourceTransactionId||'').trim()||makeImportTransactionId(raw?.sourceType==='MANUAL_FALLBACK'?'MAN':'IMP')};
-                    if(raw&&typeof raw==='object')raw.sourceTransactionId=withTx.sourceTransactionId;
-                    const item=inventoryMasterNormalize(withTx),key=inventoryIdentityKey(item);
+                    const item=inventoryMasterNormalize(raw),key=inventoryIdentityKey(item);
                     if(!key||key.startsWith('|'))throw new Error('Không tạo được khóa Mã SP + Lô + HSD.');
                     if(!groups.has(key))groups.set(key,{key,masterItem:item,rows:[],sourceIndexes:[]});
                     const g=groups.get(key);g.rows.push(item);g.sourceIndexes.push(index);
@@ -6977,65 +6868,48 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
             const jobs=[];
             for(const g of groups.values()){
                 const existing=(existingByKey.get(g.key)||[]).sort((a,b)=>String(a.row.importDate||a.row.createdAt||a.id).localeCompare(String(b.row.importDate||b.row.createdAt||b.id)));
-                if(existing.length>1){
-                    duplicateExistingGroups++;
-                    preFailed.push({key:g.key,sourceIndexes:g.sourceIndexes,error:`CHẶN AN TOÀN: Firebase đang có ${existing.length} dòng trùng cùng Mã SP + Lô + HSD. Không tự chọn dòng để cộng tồn. Hãy kiểm tra/làm sạch dữ liệu tồn trước.`});
-                    continue;
-                }
-                if(existing.length===1){
-                    const canonical=existing[0];
-                    const promise=(async()=>{
+                if(existing.length>1)duplicateExistingGroups++;
+                if(existing.length){
+                    const canonical=existing[0],preApplied={};
+                    existing.forEach(x=>Object.assign(preApplied,x.row?.appliedTransactions||{}));
+                    jobs.push((async()=>{
                         let reason='';
                         const tx=await refs.items.child(canonical.id).transaction(cur=>{
                             if(!cur){reason='Dòng tồn vừa bị xóa trên Firebase';return;}
                             if(inventoryIdentityKey(cur)!==g.key){reason='Mã SP/Lô/HSD của dòng tồn đã thay đổi';return;}
-                            const applied={...(cur.appliedTransactions||{})};let add=0;const now=new Date().toISOString();
+                            const applied={...(cur.appliedTransactions||{}),...preApplied};
+                            let add=0;
                             for(const row of g.rows){
                                 const txId=String(row.sourceTransactionId||'').trim();
                                 if(txId&&applied[txId])continue;
                                 add+=warehouseNumber(row.quantity);
-                                if(txId)applied[txId]={at:now,quantity:warehouseNumber(row.quantity),document:row.sourceDocument||'',operator:row.sourceOperator||'',sourceType:row.sourceType||''};
+                                if(txId)applied[txId]=new Date().toISOString();
                             }
-                            const m=g.masterItem;
-                            return firebaseClean({...cur,productCode:m.productCode,productName:m.productName,productStrength:m.productStrength,packSpec:m.packSpec,unit:m.unit,lotNumber:m.lotNumber,expiryDate:m.expiryDate,quantity:warehouseNumber(cur.quantity)+add,importDate:cur.importDate||m.importDate,createdAt:cur.createdAt||m.createdAt,lastImportAt:now,lastEditedAt:now,sourceType:m.sourceType,sourceNote:m.sourceNote,lastImportDocument:m.sourceDocument||'',lastImportOperator:m.sourceOperator||'',lastImportCheckNote:m.sourceCheckNote||'',appliedTransactions:applied});
+                            const m=g.masterItem,now=new Date().toISOString();
+                            return firebaseClean({...cur,productCode:m.productCode,productName:m.productName,productStrength:m.productStrength,packSpec:m.packSpec,unit:m.unit,lotNumber:m.lotNumber,expiryDate:m.expiryDate,quantity:warehouseNumber(cur.quantity)+add,importDate:cur.importDate||m.importDate,createdAt:cur.createdAt||m.createdAt,lastImportAt:now,lastEditedAt:now,sourceType:m.sourceType,sourceNote:m.sourceNote,appliedTransactions:applied});
                         });
                         if(!tx.committed)throw new Error(reason||'Firebase từ chối cập nhật dòng tồn cũ.');
-                        return {key:g.key,sourceIndexes:g.sourceIndexes,id:canonical.id,action:'update',rows:g.rows};
-                    })();
-                    jobs.push({g,promise});
+                        return {key:g.key,sourceIndexes:g.sourceIndexes,id:canonical.id,action:'update'};
+                    })());
                 }else{
-                    const promise=(async()=>{
-                        const first=g.masterItem,newRef=refs.items.push(),applied={};let total=0;const now=new Date().toISOString();
-                        g.rows.forEach(row=>{const txId=String(row.sourceTransactionId||'').trim();total+=warehouseNumber(row.quantity);if(txId)applied[txId]={at:now,quantity:warehouseNumber(row.quantity),document:row.sourceDocument||'',operator:row.sourceOperator||'',sourceType:row.sourceType||''};});
-                        const payload=firebaseClean({...first,quantity:total,appliedTransactions:applied,lastImportAt:now,lastImportDocument:first.sourceDocument||'',lastImportOperator:first.sourceOperator||'',lastImportCheckNote:first.sourceCheckNote||''});
+                    jobs.push((async()=>{
+                        const first=g.masterItem,newRef=refs.items.push(),applied={};let total=0;
+                        g.rows.forEach(row=>{const txId=String(row.sourceTransactionId||'').trim();total+=warehouseNumber(row.quantity);if(txId)applied[txId]=new Date().toISOString();});
+                        const payload=firebaseClean({...first,quantity:total,appliedTransactions:applied,lastImportAt:new Date().toISOString()});
                         await newRef.set(payload);
-                        return {key:g.key,sourceIndexes:g.sourceIndexes,id:newRef.key,action:'create',rows:g.rows};
-                    })();
-                    jobs.push({g,promise});
+                        return {key:g.key,sourceIndexes:g.sourceIndexes,id:newRef.key,action:'create'};
+                    })());
                 }
             }
-            const settled=await Promise.allSettled(jobs.map(j=>j.promise)),failedRows=[...preFailed],successes=[];
+            const settled=await Promise.allSettled(jobs),failedRows=[...preFailed];let savedSourceRows=0;
             settled.forEach((r,i)=>{
-                const g=jobs[i].g;
-                if(r.status==='fulfilled')successes.push(r.value);
+                const g=[...groups.values()][i];
+                if(r.status==='fulfilled')savedSourceRows+=g.sourceIndexes.length;
                 else failedRows.push({key:g.key,sourceIndexes:g.sourceIndexes,error:r.reason?.message||String(r.reason||'Không rõ lỗi Firebase')});
             });
-
-            // V61: đọc lại Firebase và xác nhận từng sourceTransactionId đã hiện diện trước khi báo thành công.
-            let verifiedRows=0;
-            if(successes.length){
-                const verifySnap=await refs.items.once('value'),verifyData=verifySnap.val()||{};
-                for(const ok of successes){
-                    const saved=verifyData[ok.id]||{},applied=saved.appliedTransactions||{};
-                    const missingIndexes=[];
-                    ok.rows.forEach((row,j)=>{const txId=String(row.sourceTransactionId||'').trim();if(!txId||!applied[txId])missingIndexes.push(ok.sourceIndexes[j]);else verifiedRows++;});
-                    if(missingIndexes.length)failedRows.push({key:ok.key,sourceIndexes:missingIndexes,uncertain:true,error:'ĐỌC LẠI FIREBASE KHÔNG THẤY mã giao dịch vừa ghi. Không xác nhận thành công; giữ nguyên dòng và mã giao dịch để thử lại an toàn.'});
-                }
-            }
             try{await refreshStockFromFirebase()}catch(e){console.warn('Không tải lại tồn sau batch',e)}
-            const failedIndex=new Set(failedRows.flatMap(x=>x.sourceIndexes));
-            const savedSourceRows=items.length-failedIndex.size,failedSourceRows=failedIndex.size;
-            return {savedSourceRows,failedSourceRows,failedRows,duplicateExistingGroups,verifiedRows};
+            const failedSourceRows=failedRows.reduce((n,x)=>n+x.sourceIndexes.length,0);
+            return {savedSourceRows,failedSourceRows,failedRows,duplicateExistingGroups};
         }
         window.IDECO_saveInventoryBatch=saveInventoryBatch;
         async function saveToInventory(item) {
@@ -7115,89 +6989,38 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
             }
         }
 
-        // --- MANUAL FALLBACK INPUT · V61 STRICT ---
-        function manualToday(){const d=new Date(),o=d.getTimezoneOffset();return new Date(d.getTime()-o*60000).toISOString().slice(0,10)}
-        function manualDaysUntil(dateStr){const a=new Date(manualToday()+'T00:00:00'),b=new Date(String(dateStr||'')+'T00:00:00');return Number.isFinite(b.getTime())?Math.floor((b-a)/86400000):NaN}
-        function manualExistingLots(code,lot,exp){const key=`${inventoryCodeKey(code)}|${inventoryLotKey(lot)}|${inventoryExpiryKey(exp)}`;return stockData.filter(x=>inventoryIdentityKey(x)===key)}
-        function manualFormState(){
-            const m=fallbackSelectedMaster,product=document.getElementById('fallback-product')?.value||'',lot=document.getElementById('fallback-lot')?.value.trim()||'',exp=document.getElementById('fallback-exp')?.value||'',qty=warehouseNumber(document.getElementById('fallback-qty')?.value),imp=document.getElementById('fallback-import-date')?.value||'',doc=document.getElementById('fallback-document')?.value.trim()||'',operator=document.getElementById('fallback-operator')?.value.trim()||'',note=document.getElementById('fallback-note')?.value.trim()||'',ack=!!document.getElementById('fallback-ack')?.checked;
-            let error='';
-            if(!m)error='Hãy chọn sản phẩm từ Master.';
-            else if(!m.code||masterDuplicateCodes.includes(cleanCode(m.code)))error='Mã SP Master thiếu hoặc đang bị trùng.';
-            else if(cleanStr(product)!==cleanStr(m.name))error='Tên sản phẩm đã thay đổi sau khi chọn Master.';
-            else if(!String(m.packSpec||'').trim())error='Master chưa có Quy cách.';
-            else if(!lot)error='Chưa nhập Số lô.';
-            else if(!/^\d{4}-\d{2}-\d{2}$/.test(exp))error='Chưa nhập Hạn dùng hợp lệ.';
-            else if(!/^\d{4}-\d{2}-\d{2}$/.test(imp))error='Chưa nhập Ngày nhập kho/chứng từ.';
-            else if(exp<=imp)error='HSD phải sau ngày nhập kho/chứng từ.';
-            else if(!(qty>0)||!Number.isInteger(qty))error='Số lượng thực nhận phải là số nguyên > 0.';
-            else if(!doc)error='Chưa nhập Số chứng từ/Phiếu NCC/Hóa đơn.';
-            else if(!operator)error='Chưa nhập Người nhập & đối chiếu.';
-            else if(!ack)error='Chưa đánh dấu xác nhận đã đối chiếu trực tiếp.';
-            return {ok:!error,error,m,product,lot,exp,qty,imp,doc,operator,note,ack};
-        }
-        function updateManualAddState(){
-            const st=manualFormState(),btn=document.getElementById('fallback-add-btn'),box=document.getElementById('fallback-guard-status');
-            if(btn)btn.disabled=manualAddBusy||!st.ok;
-            if(!box)return st;
-            if(!st.ok){box.className='full manual-guard bad';box.innerHTML=`⛔ <b>CHƯA ĐƯỢC THÊM:</b> ${escapeHtml(st.error)}`;return st;}
-            const days=manualDaysUntil(st.exp),existing=manualExistingLots(st.m.code,st.lot,st.exp);
-            if(existing.length>1){box.className='full manual-guard bad';box.innerHTML=`⛔ <b>PHÁT HIỆN ${existing.length} DÒNG TỒN TRÙNG</b> cùng Mã SP + Lô + HSD trong dữ liệu đang tải. Không tự chọn dòng để cộng tồn.`;if(btn)btn.disabled=true;return {...st,ok:false,error:'Tồn kho đang có nhiều dòng trùng cùng Mã SP + Lô + HSD.'};}
-            if(days>=0&&days<=180){box.className='full manual-guard warn';box.innerHTML=`⚠️ <b>HSD CÒN ${days} NGÀY.</b> Dòng đủ dữ liệu nhưng cần kiểm tra kỹ chính sách nhận hàng/HSD trước khi thêm. Mã giao dịch chống ghi lặp sẽ được tạo tự động.`;}
-            else if(existing.length===1){box.className='full manual-guard warn';box.innerHTML=`⚠️ Lô này đã có trong tồn hiện tải: <b>${warehouseNumber(existing[0].quantity).toLocaleString('vi-VN')}</b>. Khi đồng bộ hợp lệ, hệ thống sẽ cộng thêm bằng transaction và chống ghi lặp.`;}
-            else{box.className='full manual-guard ok';box.innerHTML='✅ <b>ĐỦ ĐIỀU KIỆN THÊM DÒNG.</b> Master khớp, dữ liệu bắt buộc đầy đủ. Khi lưu sẽ dùng mã giao dịch chống ghi lặp và đọc lại Firebase để xác nhận.';}
-            return st;
-        }
+        // --- MANUAL FALLBACK INPUT ---
         function resetFallbackRow(keepProduct=false){
             if(!keepProduct){fallbackSelectedMaster=null;['fallback-product','fallback-code','fallback-strength','fallback-unit','fallback-pack'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});}
-            ['fallback-lot','fallback-exp','fallback-qty','fallback-note'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
-            const ack=document.getElementById('fallback-ack');if(ack)ack.checked=false;
-            const imp=document.getElementById('fallback-import-date');if(imp&&!imp.value)imp.value=manualToday();
+            ['fallback-lot','fallback-exp','fallback-qty'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
             const info=document.getElementById('fallback-master-info');if(info)info.innerHTML=fallbackSelectedMaster?`<b>✅ Master đã chọn:</b> ${escapeHtml(fallbackSelectedMaster.name)} · Quy cách: ${escapeHtml(fallbackSelectedMaster.packSpec||'CHƯA CÓ')}`:'<b>Chưa chọn Master.</b> Khi chọn đúng sản phẩm, hệ thống sẽ khóa Tên + Quy cách theo Master và chuẩn bị dòng nhập kho dự phòng.';
-            updateManualAddState();
         }
         function applyFallbackMaster(m){
             fallbackSelectedMaster=m;
             document.getElementById('fallback-product').value=m.name||'';document.getElementById('fallback-code').value=m.code||'';document.getElementById('fallback-strength').value=m.strength||'';document.getElementById('fallback-unit').value=m.unit||'';document.getElementById('fallback-pack').value=m.packSpec||'';
-            const info=document.getElementById('fallback-master-info');if(info)info.innerHTML=`<b>✅ Đã chọn Master:</b> ${escapeHtml(m.code||'--')} · ${escapeHtml(m.name)}<br>Quy cách bắt buộc: <b>${escapeHtml(m.packSpec||'⚠️ MASTER CHƯA CÓ QUY CÁCH')}</b>${m.strength?` · Hàm lượng: ${escapeHtml(m.strength)}`:''}${m.unit?` · ĐVT: ${escapeHtml(m.unit)}`:''}<br><small>Nguồn Master: ${escapeHtml(m.masterSource||'Firebase/Cache')}</small>`;
-            updateManualAddState();
+            const info=document.getElementById('fallback-master-info');if(info)info.innerHTML=`<b>✅ Đã chọn Master:</b> ${escapeHtml(m.code||'--')} · ${escapeHtml(m.name)}<br>Quy cách bắt buộc: <b>${escapeHtml(m.packSpec||'⚠️ MASTER CHƯA CÓ QUY CÁCH')}</b>${m.strength?` · Hàm lượng: ${escapeHtml(m.strength)}`:''}${m.unit?` · ĐVT: ${escapeHtml(m.unit)}`:''}`;
         }
-        async function addFallbackToPreview(){
-            if(manualAddBusy)return;let st=updateManualAddState();if(!st.ok)return showToast(st.error||'Dữ liệu thủ công chưa đạt điều kiện.','error');
-            manualAddBusy=true;updateManualAddState();
-            try{
-                const existingStock=manualExistingLots(st.m.code,st.lot,st.exp),days=manualDaysUntil(st.exp),warnings=[];
-                if(existingStock.length>1)return showToast('CHẶN: tồn kho đang có nhiều dòng trùng cùng Mã SP + Lô + HSD. Hãy kiểm tra dữ liệu trước.','error');
-                if(existingStock.length===1)warnings.push(`Lô này đang có tồn ${warehouseNumber(existingStock[0].quantity).toLocaleString('vi-VN')}; nhập mới sẽ CỘNG THÊM ${st.qty.toLocaleString('vi-VN')}.`);
-                if(days>=0&&days<=180)warnings.push(`HSD chỉ còn ${days} ngày.`);
-                const key=`${inventoryCodeKey(st.m.code)}|${inventoryLotKey(st.lot)}|${inventoryExpiryKey(st.exp)}`;
-                const duplicateIndex=previewData.findIndex(x=>inventoryIdentityKey(x)===key);
-                if(duplicateIndex>=0&&previewData[duplicateIndex]?.writeState==='UNCERTAIN')return showToast('CHẶN GỘP: dòng cùng lô đang ở trạng thái chưa xác định Firebase. Hãy Đồng bộ lại dòng đó trước.','error');
-                if(duplicateIndex>=0)warnings.push(`Bảng nhập đang có sẵn cùng Mã SP + Lô + HSD với SL ${warehouseNumber(previewData[duplicateIndex].quantity).toLocaleString('vi-VN')}.`);
-                if(warnings.length&&!confirm('KIỂM TRA TRƯỚC KHI THÊM DÒNG THỦ CÔNG:\n\n- '+warnings.join('\n- ')+'\n\nNếu chứng từ/nhãn thực tế đúng, bấm OK để tiếp tục.'))return;
-                const row={id:previewData.length,productName:st.m.name,productCode:st.m.code||'',productStrength:st.m.strength||'',packSpec:st.m.packSpec,unit:st.m.unit||'',lotNumber:st.lot,expiryDate:st.exp,quantity:st.qty,importDate:st.imp,createdAt:new Date().toISOString(),masterLocked:true,masterVerified:true,masterCode:st.m.code||'',masterName:st.m.name,sourceType:'MANUAL_FALLBACK',sourceName:'NHẬP THỦ CÔNG DỰ PHÒNG',sourceNote:'THỦ CÔNG DỰ PHÒNG · ĐÃ ĐỐI CHIẾU TRỰC TIẾP',sourceDocument:st.doc,sourceOperator:st.operator,sourceCheckNote:st.note,manualEntryAt:new Date().toISOString(),manualSchemaVersion:2,sourceTransactionId:makeImportTransactionId('MAN')};
-                if(duplicateIndex>=0){
-                    // Chỉ gộp sau xác nhận; thay đổi số lượng => tạo mã giao dịch mới để lần lưu sau là một thao tác bất biến.
-                    const old=previewData[duplicateIndex];old.quantity=warehouseNumber(old.quantity)+st.qty;old.sourceDocument=st.doc;old.sourceOperator=st.operator;old.sourceCheckNote=[old.sourceCheckNote,st.note].filter(Boolean).join(' | ');old.importDate=st.imp;old.sourceTransactionId=makeImportTransactionId('MAN');old.manualEntryAt=new Date().toISOString();old.manualSchemaVersion=2;
-                    showToast(`Đã gộp có xác nhận vào dòng ${duplicateIndex+1}: ${st.m.name} · Lô ${st.lot} · tổng SL ${old.quantity}.`,'success');
-                }else{
-                    previewData.push(row);showToast(`Đã thêm ${st.m.name} · Lô ${st.lot} · SL ${st.qty}. Mã giao dịch chống ghi lặp đã tạo.`,'success');
-                }
-                renderPreviewTable();document.getElementById('preview-box').style.display='flex';resetFallbackRow(true);
-            }finally{manualAddBusy=false;updateManualAddState();}
+        function addFallbackToPreview(){
+            const m=fallbackSelectedMaster;
+            if(!m)return showToast('Hãy chọn đúng sản phẩm từ danh sách Master, không gõ tên tự do.','error');
+            if(!m.code||masterDuplicateCodes.includes(cleanCode(m.code)))return showToast(`Master “${m.name}” thiếu Mã SP duy nhất. Chưa được nhập kho.`,'error');
+            if(cleanStr(document.getElementById('fallback-product').value)!==cleanStr(m.name))return showToast('Tên đang nhập đã thay đổi. Hãy chọn lại sản phẩm từ Master.','error');
+            if(!m.packSpec)return showToast(`Master của “${m.name}” chưa có Quy cách. Hãy cập nhật Master trước khi nhập kho.`,'error');
+            const lot=document.getElementById('fallback-lot').value.trim(),exp=document.getElementById('fallback-exp').value,qty=warehouseNumber(document.getElementById('fallback-qty').value);
+            if(!lot||!exp||!qty||qty<=0)return showToast('Nhập thủ công bắt buộc có Số lô + Hạn dùng + Số lượng > 0.','error');
+            previewData.push({id:previewData.length,productName:m.name,productCode:m.code||'',productStrength:m.strength||'',packSpec:m.packSpec,unit:m.unit||'',lotNumber:lot,expiryDate:exp,quantity:qty,masterLocked:true,masterVerified:true,masterCode:m.code||'',masterName:m.name,sourceType:'MANUAL_FALLBACK',sourceName:'NHẬP THỦ CÔNG DỰ PHÒNG'});
+            renderPreviewTable();document.getElementById('preview-box').style.display='flex';showToast(`Đã thêm ${m.name} · Lô ${lot} vào bảng Nhập kho (THỦ CÔNG DỰ PHÒNG).`,'success');resetFallbackRow(true);
         }
         function initManualFallback(){
             const inp=document.getElementById('fallback-product'),sug=document.getElementById('fallback-suggest'); if(!inp)return;
-            const imp=document.getElementById('fallback-import-date');if(imp&&!imp.value)imp.value=manualToday();
-            inp.addEventListener('input',function(){fallbackSelectedMaster=null;document.getElementById('fallback-code').value='';document.getElementById('fallback-strength').value='';document.getElementById('fallback-unit').value='';document.getElementById('fallback-pack').value='';showSuggestions(this,'name',sug,applyFallbackMaster);updateManualAddState();});
-            inp.addEventListener('change',function(){const exact=masterData.filter(m=>m.searchKey===cleanStr(this.value)||cleanCode(m.code||'')===cleanCode(this.value));if(exact.length===1)applyFallbackMaster(exact[0]);else updateManualAddState();});
+            inp.addEventListener('input',function(){fallbackSelectedMaster=null;document.getElementById('fallback-code').value='';document.getElementById('fallback-strength').value='';document.getElementById('fallback-unit').value='';document.getElementById('fallback-pack').value='';showSuggestions(this,'name',sug,applyFallbackMaster);});
+            inp.addEventListener('change',function(){const exact=masterData.filter(m=>m.searchKey===cleanStr(this.value));if(exact.length===1)applyFallbackMaster(exact[0]);});
             inp.addEventListener('blur',()=>setTimeout(()=>sug.innerHTML='',200));
-            ['fallback-lot','fallback-exp','fallback-qty','fallback-import-date','fallback-document','fallback-operator','fallback-note','fallback-ack'].forEach(id=>{const e=document.getElementById(id);if(e){e.addEventListener('input',updateManualAddState);e.addEventListener('change',updateManualAddState);}});
             document.getElementById('fallback-add-btn').onclick=addFallbackToPreview;
             document.getElementById('fallback-reset-btn').onclick=()=>resetFallbackRow(false);
             document.getElementById('fallback-open-warehouse-btn').onclick=()=>{const tab=document.querySelector('.nav-tab[onclick*="tab1"]');switchTab('tab1',tab);setTimeout(()=>document.getElementById('preview-box')?.scrollIntoView({behavior:'smooth',block:'start'}),100);};
             document.getElementById('offline-sync-btn').onclick=syncOfflineQueue;
-            renderOfflineQueue();updateNetworkUI();updateManualAddState();
+            renderOfflineQueue();updateNetworkUI();
         }
         setTimeout(initManualFallback,0);
 
@@ -7221,7 +7044,7 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
             ack.onchange = () => { confirmBtn.disabled = !ack.checked; };
 
             const first = items[0] || {};
-            const totalQty = items.reduce((sum, i) => sum + warehouseNumber(i.quantity ?? i.exportQty), 0);
+            const totalQty = items.reduce((sum, i) => sum + (parseInt(i.quantity ?? i.exportQty) || 0), 0);
             const summary = document.getElementById('safety-summary');
             if(items.length === 1) {
                 summary.innerHTML = [
@@ -7234,9 +7057,7 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
                     safetyChip('Số lô', first.lotNumber),
                     safetyChip('Hạn dùng', first.expiryDate),
                     safetyChip('Số lượng', first.quantity ?? first.exportQty),
-                    safetyChip(destination ? 'Nơi nhận' : 'Ngày chứng từ', destination || first.importDate || date),
-                    ...(first.sourceDocument?[safetyChip('Số chứng từ',first.sourceDocument)]:[]),
-                    ...(first.sourceOperator?[safetyChip('Người đối chiếu',first.sourceOperator)]:[])
+                    safetyChip(destination ? 'Nơi nhận' : 'Ngày chứng từ', destination || date)
                 ].join('');
             } else {
                 summary.innerHTML = [
@@ -7249,7 +7070,7 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
 
             const box = document.getElementById('safety-detail-container');
             if(items.length > 1) {
-                box.innerHTML = `<div class="safety-table-wrap"><table class="safety-table"><thead><tr><th>STT</th><th>Mã SP</th><th>Tên sản phẩm</th><th>Hàm lượng/NĐ</th><th>Quy cách/ĐVT</th><th>Số lô</th><th>Hạn dùng</th><th>Số lượng</th><th>Chứng từ</th><th>Người đối chiếu</th></tr></thead><tbody>${items.map((i,idx)=>`<tr><td>${idx+1}</td><td>${htmlSafe(i.productCode||'')}</td><td><b>${htmlSafe(displayValue(i.productName))}</b></td><td class="${i.productStrength?'':'critical-value'}">${htmlSafe(displayValue(i.productStrength))}</td><td>${htmlSafe(displayValue(i.packSpec || i.unit))}</td><td class="critical-value">${htmlSafe(displayValue(i.lotNumber))}</td><td class="critical-value">${htmlSafe(displayValue(i.expiryDate))}</td><td class="critical-value" style="text-align:center">${htmlSafe(displayValue(i.quantity ?? i.exportQty))}</td><td>${htmlSafe(i.sourceDocument||'—')}</td><td>${htmlSafe(i.sourceOperator||'—')}</td></tr>`).join('')}</tbody></table></div>`;
+                box.innerHTML = `<div class="safety-table-wrap"><table class="safety-table"><thead><tr><th>STT</th><th>Mã SP</th><th>Tên sản phẩm</th><th>Hàm lượng/NĐ</th><th>Quy cách/ĐVT</th><th>Số lô</th><th>Hạn dùng</th><th>Số lượng</th></tr></thead><tbody>${items.map((i,idx)=>`<tr><td>${idx+1}</td><td>${htmlSafe(i.productCode||'')}</td><td><b>${htmlSafe(displayValue(i.productName))}</b></td><td class="${i.productStrength?'':'critical-value'}">${htmlSafe(displayValue(i.productStrength))}</td><td>${htmlSafe(displayValue(i.packSpec || i.unit))}</td><td class="critical-value">${htmlSafe(displayValue(i.lotNumber))}</td><td class="critical-value">${htmlSafe(displayValue(i.expiryDate))}</td><td class="critical-value" style="text-align:center">${htmlSafe(displayValue(i.quantity ?? i.exportQty))}</td></tr>`).join('')}</tbody></table></div>`;
             } else {
                 box.innerHTML = '';
             }
@@ -7751,42 +7572,41 @@ root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
         // UTILS
         function parseDate(v) { if(!v)return ''; if(typeof v==='number') return new Date((v-25569)*86400000).toISOString().split('T')[0]; if(v.includes('/')){const p=v.split('/'); if(p.length===3) return `${p[2]}-${p[1]}-${p[0]}`;} return v; }
         window.saveManual = async () => {
-            let st=manualWarehouseState();
-            if(manualWarehouseWriteState!=='UNCERTAIN'){
-                st=updateManualWarehouseState();if(!st.ok)return showToast(st.error||'Dữ liệu chưa đủ điều kiện lưu.','error');
-                const existing=manualExistingLots(st.m.code,st.lot,st.exp),days=manualDaysUntil(st.exp),warnings=[];
-                if(existing.length>1)return showToast('CHẶN: có nhiều dòng tồn trùng cùng Mã SP + Lô + HSD. Không tự chọn dòng để cộng.','error');
-                if(existing.length===1)warnings.push(`Lô đã có tồn ${warehouseNumber(existing[0].quantity).toLocaleString('vi-VN')}; sẽ cộng thêm ${st.qty.toLocaleString('vi-VN')}.`);
-                if(days>=0&&days<=180)warnings.push(`HSD còn ${days} ngày.`);
-                if(warnings.length&&!confirm('KIỂM TRA NHẬP KHO THỦ CÔNG:\n\n- '+warnings.join('\n- ')+'\n\nChỉ bấm OK khi chứng từ/nhãn thực tế đúng.'))return;
-                const fp=manualWarehouseFingerprint(st);if(!manualWarehousePendingTx||manualWarehousePendingFingerprint!==fp){manualWarehousePendingTx=makeImportTransactionId('MAN');manualWarehousePendingFingerprint=fp;}
-            }
-            // Khi UNCERTAIN, các ô đã khóa nên dữ liệu/fingerprint không thay đổi; dùng lại cùng transactionId.
-            st=manualWarehouseState();
-            const item={productName:st.m.name,productCode:st.m.code,productStrength:st.m.strength||'',packSpec:st.m.packSpec,unit:st.m.unit||'',lotNumber:st.lot,expiryDate:st.exp,quantity:st.qty,importDate:st.date,createdAt:new Date().toISOString(),masterCode:st.m.code,masterName:st.m.name,sourceType:'MANUAL_FALLBACK',sourceNote:'NHẬP KHO THỦ CÔNG TRỰC TIẾP · ĐÃ ĐỐI CHIẾU',sourceDocument:st.doc,sourceOperator:st.operator,sourceCheckNote:st.note,manualEntryAt:new Date().toISOString(),manualSchemaVersion:2,sourceTransactionId:manualWarehousePendingTx};
-            const ok = await openSafetyVerification({title:firebaseWriteCanBeTried()?'KIỂM TRA TRƯỚC KHI LƯU NHẬP KHO THỦ CÔNG':'KIỂM TRA TRƯỚC KHI LƯU OFFLINE',subtitle:`Chứng từ ${st.doc} · Người đối chiếu ${st.operator}. Hãy kiểm tra Mã/Tên/Quy cách/Lô/HSD/Số lượng lần cuối.`,actionType:firebaseWriteCanBeTried()?'NHẬP KHO THỦ CÔNG':'NHẬP KHO THỦ CÔNG OFFLINE',items:[item],date:item.importDate});
+            const typedName=document.getElementById('imp-name').value.trim(),typedCode=document.getElementById('imp-code').value.trim();
+            if(!typedCode)return showToast('Thiếu Mã SP Master. Hãy chọn lại sản phẩm từ Dữ Liệu Gốc!', 'error');
+            const masterHits=masterData.filter(m=>m.code&&cleanCode(m.code)===cleanCode(typedCode));
+            if(masterHits.length!==1||masterDuplicateCodes.includes(cleanCode(typedCode)))return showToast(`Mã SP ${typedCode} không tồn tại duy nhất trong Master. Không cho phép nhập kho.`, 'error');
+            const master=masterHits[0];
+            if(vnNorm(master.name)!==vnNorm(typedName))return showToast(`Mã SP ${master.code} thuộc “${master.name}”, không khớp tên đang nhập “${typedName}”.`, 'error');
+            if(!String(master.packSpec||'').trim())return showToast(`Master của “${master.name}” chưa có Quy cách. Hãy bổ sung Quy cách trước khi nhập kho!`, 'error');
+            const item={
+                productName: master.name,
+                productCode: master.code,
+                productStrength: master.strength || '',
+                packSpec: master.packSpec,
+                unit: master.unit || '',
+                lotNumber: document.getElementById('imp-lot').value.trim(),
+                expiryDate: document.getElementById('imp-exp').value,
+                quantity: warehouseNumber(document.getElementById('imp-qty').value),
+                importDate: document.getElementById('imp-date').value,
+                createdAt: new Date().toISOString()
+            };
+            if(!item.lotNumber || !item.expiryDate || !item.quantity || item.quantity <= 0) return showToast('Thiếu Số lô / Hạn dùng / Số lượng!', 'error');
+            const ok = await openSafetyVerification({
+                title: 'KIỂM TRA TRƯỚC KHI LƯU NHẬP KHO',
+                subtitle: 'Dữ liệu này sẽ được cộng vào tồn kho. Hãy đối chiếu trực tiếp với hàng và chứng từ nhập.',
+                actionType: 'NHẬP KHO',
+                items: [item],
+                date: item.importDate
+            });
             if(!ok) return;
-            if(!firebaseWriteCanBeTried()){
-                const q=enqueueOfflineItems([item]);
-                if(!q.ok)return showToast('Không xác minh được lưu Offline. Dữ liệu vẫn giữ nguyên trên form; không đóng trang.','error');
-                showToast('✅ Đã lưu và đọc kiểm tra lại Hàng đợi Offline. Chưa ghi Firebase; khi có mạng dùng ĐỒNG BỘ DỮ LIỆU CHỜ.','success');
-                manualWarehouseWriteState='';manualWarehousePendingTx='';manualWarehousePendingFingerprint='';
-                ['imp-name','imp-code','imp-unit','imp-strength','imp-pack','imp-lot','imp-exp','imp-qty','imp-document','imp-note'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});document.getElementById('imp-ack').checked=false;manualWarehouseSelectedMaster=null;updateManualWarehouseState();renderOfflineQueue();return;
-            }
             try{
-                manualWarehouseWriteState='ATTEMPTING';
-                const result=await saveInventoryBatch([item]);
-                if(result.failedRows.length){
-                    const uncertain=result.failedRows.some(x=>x.uncertain);manualWarehouseWriteState=uncertain?'UNCERTAIN':'';
-                    if(uncertain){updateManualWarehouseState();return showToast('Chưa xác định Firebase đã ghi hay chưa. Form đã khóa; bấm THỬ LẠI & XÁC MINH để tránh cộng hai lần.','error');}
-                    manualWarehousePendingTx='';manualWarehousePendingFingerprint='';updateManualWarehouseState();return showToast('KHÔNG LƯU: '+(result.failedRows[0]?.error||'Firebase từ chối dữ liệu.'),'error');
-                }
-                showToast(`✅ Đã lưu và đọc xác minh Firebase thành công (${result.verifiedRows}/1 mã giao dịch).`,'success');
-                manualWarehouseWriteState='';manualWarehousePendingTx='';manualWarehousePendingFingerprint='';
-                ['imp-name','imp-code','imp-unit','imp-strength','imp-pack','imp-lot','imp-exp','imp-qty','imp-document','imp-note'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});document.getElementById('imp-ack').checked=false;manualWarehouseSelectedMaster=null;updateManualWarehouseState();
+                await saveToInventory(item);
+                showToast('Đã lưu nhập kho lên Firebase an toàn', 'success');
+                ['imp-name','imp-code','imp-strength','imp-pack','imp-unit','imp-lot','imp-qty'].forEach(id=>document.getElementById(id).value='');
             }catch(e){
-                console.error('Nhập kho thủ công: kết quả Firebase chưa xác định',e);manualWarehouseWriteState='UNCERTAIN';updateManualWarehouseState();
-                showToast('KẾT QUẢ CHƯA XÁC ĐỊNH: '+(e?.message||e)+'. Form đã khóa; bấm THỬ LẠI & XÁC MINH bằng cùng mã giao dịch.','error');
+                console.error('Lưu nhập kho thất bại:',e);
+                showToast('Không lưu được Firebase: '+(e?.message||e),'error');
             }
         }
         function renderStockTable() { const tb=document.getElementById('stock-body'); tb.innerHTML=''; const term=document.getElementById('search-stock').value.toLowerCase(); stockData.filter(d=>(d.productName||'').toLowerCase().includes(term)).forEach((d,i)=>{ tb.innerHTML+=`<tr><td>${i+1}</td><td>${d.productCode||''}</td><td><b>${d.productName}</b></td><td>${d.productStrength||'<span style="color:#b91c1c">Chưa khai báo</span>'}</td><td>${d.packSpec||'<span style="color:#b91c1c">Chưa khai báo</span>'}</td><td>${d.unit||''}</td><td>${d.lotNumber}</td><td>${d.expiryDate}</td><td><b>${d.quantity}</b></td><td><button class="btn btn-warning" onclick="editStock('${d.id}')">Sửa</button> <button class="btn btn-danger" onclick="requestDeleteStock('${d.id}')">Xóa</button></td></tr>`; }); }
@@ -10285,63 +10105,73 @@ function packSignature(v){const s=normKey(v),nums=(s.match(/\d+(?:[.,]\d+)?/g)||
 function packCompatible(a,b){if(!a||!b)return {known:false,ok:true,reason:'Thiếu quy cách trên một nguồn'};const x=packSignature(a),y=packSignature(b);if(x.raw===y.raw)return {known:true,ok:true,reason:'Quy cách trùng chuẩn hóa'};const numsOk=x.nums.length&&y.nums.length&&x.nums.join('x')===y.nums.join('x');const unitOverlap=!x.units.length||!y.units.length||x.units.some(u=>y.units.includes(u));const contain=x.raw.includes(y.raw)||y.raw.includes(x.raw);return {known:true,ok:!!((numsOk&&unitOverlap)||contain),reason:(numsOk&&unitOverlap)?'Cùng cấu trúc số lượng/đơn vị':contain?'Một mô tả bao hàm mô tả còn lại':'Quy cách khác Master'}}
 function invoicePackFactor(packSpec){const s=normKey(packSpec);if(!s)return {factor:null,smallUnit:''};let m=s.match(/(\d+(?:[.,]\d+)?)\s*vi\s*(?:x|\*)\s*(\d+(?:[.,]\d+)?)\s*vien/);if(m)return {factor:numberVal(m[1])*numberVal(m[2]),smallUnit:'vien'};for(const [u,re] of [['vien',/(\d+(?:[.,]\d+)?)\s*vien\b/],['tuyp',/(\d+(?:[.,]\d+)?)\s*tuyp\b/],['chai',/(\d+(?:[.,]\d+)?)\s*chai\b/],['lo',/(\d+(?:[.,]\d+)?)\s*lo\b/],['ong',/(\d+(?:[.,]\d+)?)\s*ong\b/],['goi',/(\d+(?:[.,]\d+)?)\s*goi\b/],['vi',/(\d+(?:[.,]\d+)?)\s*vi\b/]]){const x=s.match(re);if(x)return {factor:numberVal(x[1])||1,smallUnit:u}}return {factor:null,smallUnit:''}}
 function invoiceQtyInStockUnit(inv,master){const qty=numberVal(inv.quantity),iu=unitCanonical(inv.unit),mu=unitCanonical(master?.unit);if(qty<=0)return {known:false,stockQty:0,note:'Không đọc được số lượng'};if(iu&&mu&&iu===mu)return {known:true,stockQty:qty,note:`${qty} ${master.unit||inv.unit}`};const pf=invoicePackFactor(master?.packSpec||'');if(mu==='hop'&&pf.factor&&iu===pf.smallUnit){const stockQty=qty/pf.factor,whole=Math.abs(stockQty-Math.round(stockQty))<1e-9;return {known:true,stockQty,note:`${qty} ${inv.unit} ÷ ${pf.factor} = ${stockQty.toLocaleString('vi-VN',{maximumFractionDigits:4})} hộp`,wholePack:whole}}return {known:false,stockQty:qty,note:`Không quy đổi chắc chắn ĐVT hóa đơn “${inv.unit||'—'}” về ĐVT kho “${master?.unit||'—'}”`}}
+// Match invoice names against inventory names only; invoice codes are informational.
+function invoiceNameKey(v){return String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/đ/g,'d').replace(/(\d),(\d)/g,'$1.$2').replace(/[^a-z0-9.%/+]+/g,' ').replace(/(\d)\s+(mg|mcg|ml|g|iu)\b/g,'$1$2').replace(/\s+/g,' ').trim()}
 function findMasterForInvoice(inv){
-  const code=cleanCodeLocal(inv.productCode||'');
-  if(!code){
-    const name=normKey(inv.productName),candidates=name?state.masterData.map(m=>({m,c:masterCompatibility(inv.productName,m.name)})).filter(x=>x.c?.accepted).sort((a,b)=>(b.c.score||0)-(a.c.score||0)).slice(0,5):[];
-    return {master:candidates[0]?.m||null,type:'missing_code',compat:candidates[0]?.c||null,candidates:candidates.map(x=>x.m),reason:'Hóa đơn không có/AI không đọc được Mã SP. Không được xác nhận OK chỉ bằng tên.'};
+  const name=invoiceNameKey(inv.productName);
+  if(!name)return {master:null,type:'missing_name',reason:'Không đọc được tên thuốc trên hóa đơn; cần kiểm tra lại PDF.'};
+  const rows=state.stockData.filter(s=>invoiceNameKey(s.name)===name);
+  if(!rows.length){
+    const names=[...new Set(state.stockData.map(s=>s.name).filter(Boolean))];
+    const near=names.filter(n=>masterCompatibility(inv.productName,n).accepted).slice(0,5);
+    return {master:null,type:near.length?'near_name':'name_not_found',reason:near.length?`Tên chưa khớp chính xác. Gợi ý cần xác nhận: ${near.join('; ')}. Không tự ghép thuốc gần giống.`:`Chưa tìm thấy tên thuốc “${inv.productName}” trong dữ liệu tồn kho.`};
   }
-  const byCode=state.masterData.filter(m=>cleanCodeLocal(m.code)===code);
-  if(!byCode.length)return {master:null,type:'code_not_found',candidates:[],reason:`Mã SP ${inv.productCode} không tồn tại trong Master.`};
-  if(byCode.length>1)return {master:null,type:'duplicate_code',candidates:byCode,reason:`Mã SP ${inv.productCode} bị trùng ${byCode.length} dòng trong Master; cần làm sạch Master.`};
-  const master=byCode[0],compat=masterCompatibility(inv.productName,master.name);
-  if(inv.productName&&!compat.accepted)return {master,type:'code_name_conflict',compat,candidates:byCode,reason:`Mã SP khớp ${master.code} nhưng Tên thuốc hóa đơn không khớp Tên Master “${master.name}”.`};
-  return {master,type:'code',compat,candidates:byCode};
+  const masters=state.masterData.filter(m=>invoiceNameKey(m.name)===name);
+  const values=key=>[...new Set(rows.map(r=>String(r[key]||'').trim()).filter(Boolean))];
+  const master={name:rows[0].name,code:values('code').join(', '),unit:'',strength:'',packSpec:''};
+  for(const key of ['unit','strength','packSpec']){
+    const v=values(key);
+    if(v.length>1)return {master:null,type:'ambiguous_name',reason:`Nhiều dòng tồn cùng tên “${master.name}” nhưng khác ${key==='unit'?'đơn vị':key==='strength'?'hàm lượng':'quy cách'} (${v.join('; ')}). Cần xác nhận sản phẩm trước khi đối chiếu.`};
+    master[key]=v[0]||'';
+    if(!master[key]){const mv=[...new Set(masters.map(m=>m[key]).filter(Boolean))];if(mv.length===1)master[key]=mv[0]}
+  }
+  return {master,type:'name',reason:'Khớp tên thuốc trong dữ liệu tồn kho; không dùng mã hóa đơn để ghép.'};
 }
 function keyFor(code,lot,exp){return `${cleanCodeLocal(code||'')}|${normKey(lot||'')}|${toStandardDate(exp)||String(exp||'')}`}
 function processInventoryLogic(rawStockData,rawExportData){const today=new Date(),startDate=new Date(today.getFullYear(),today.getMonth(),1),endDate=new Date();startDate.setHours(0,0,0,0);endDate.setHours(23,59,59,999);const batchMap={};
   (rawStockData||[]).forEach(item=>{const key=keyFor(item.productCode,item.lotNumber,item.expiryDate);if(!batchMap[key])batchMap[key]={code:item.productCode||'',name:item.productName||'',unit:item.unit||'',strength:item.productStrength||item.strength||'',packSpec:item.packSpec||'',lot:item.lotNumber||'',exp:item.expiryDate||'',importDate:item.importDate?dateObj(item.importDate):null,currentQty:0,historyList:[]};batchMap[key].currentQty+=numberVal(item.quantity)});
   (rawExportData||[]).forEach(exp=>{const key=keyFor(exp.productCode,exp.lotNumber,exp.expiryDate);if(!batchMap[key])batchMap[key]={code:exp.productCode||'',name:exp.productName||'',unit:exp.unit||'',strength:exp.productStrength||'',packSpec:exp.packSpec||'',lot:exp.lotNumber||'',exp:exp.expiryDate||'',importDate:null,currentQty:0,historyList:[]};const d=dateObj(exp.exportDate);const stockQty=(exp.boxQuantity!==undefined&&exp.boxQuantity!==null&&exp.boxQuantity!=='')?numberVal(exp.boxQuantity):numberVal(exp.quantity);batchMap[key].historyList.push({date:d||new Date(0),qty:stockQty})});
   const out=Object.values(batchMap).map(batch=>{const totalLifetimeExport=batch.historyList.reduce((s,h)=>s+h.qty,0),originalImportQty=batch.currentQty+totalLifetimeExport;let open=0,input=0,output=0;output=batch.historyList.filter(h=>h.date>=startDate&&h.date<=endDate).reduce((s,h)=>s+h.qty,0);if(batch.importDate&&batch.importDate>=startDate&&batch.importDate<=endDate)input=originalImportQty;const exportsBeforeStart=batch.historyList.filter(h=>h.date<startDate).reduce((s,h)=>s+h.qty,0);const isImportedBeforeStart=!(batch.importDate&&batch.importDate>=startDate);if(isImportedBeforeStart)open=originalImportQty-exportsBeforeStart;const close=open+input-output;return {...batch,open,input,output,close}});out.sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'vi')||String(a.lot||'').localeCompare(String(b.lot||''),'vi'));return out}
-function stockRowsForMaster(master){if(!master)return [];const code=cleanCodeLocal(master.code||'');if(!code)return [];return state.stockData.filter(x=>cleanCodeLocal(x.code||'')===code)}
+function stockRowsForMaster(master){return master?state.stockData.filter(x=>invoiceNameKey(x.name)===invoiceNameKey(master.name)):[]}
 function auditItem(label,level,text){return {label,level,text}}
 function validateItems(items){
-  const dup=new Map();(items||[]).forEach(x=>{const k=`${cleanCodeLocal(x.productCode)}|${normKey(x.lotNumber)}|${toStandardDate(x.expiryDate)||''}`;dup.set(k,(dup.get(k)||0)+1)});
+  const dup=new Map();(items||[]).forEach(x=>{const k=`${invoiceNameKey(x.productName)}|${normalizeString(x.lotNumber)}|${toStandardDate(x.expiryDate)||''}`;dup.set(k,(dup.get(k)||0)+1)});
   return (items||[]).map(inv=>{
     const checks=[];let severity=0; // 0 ok, 1 warning, 2 error
     const mm=findMasterForInvoice(inv),master=mm.master;
-    if(!inv.productCode){checks.push(auditItem('Mã SP','error','Thiếu Mã SP trên hóa đơn/không đọc được. Mã SP là khóa bắt buộc để đối chiếu.'));severity=2}
-    else if(mm.type==='code_not_found'||mm.type==='duplicate_code'){checks.push(auditItem('Mã SP','error',mm.reason));severity=2}
-    else checks.push(auditItem('Mã SP','ok',master?`Khớp chính xác ${master.code}`:'Chưa xác định'));
-    if(!master)return {status:severity===2?'error':'warning',invoiceItem:inv,masterMatch:mm,checks,message:mm.reason||'Không xác định được Master bằng Mã SP.'};
-
-    const nameCmp=masterCompatibility(inv.productName,master.name);
-    if(!inv.productName){checks.push(auditItem('Tên thuốc','error','Thiếu tên thuốc trên hóa đơn'));severity=2}
-    else if(!nameCmp.accepted){checks.push(auditItem('Tên thuốc','error',`HĐ: ${inv.productName} ≠ Master: ${master.name}`));severity=2}
-    else checks.push(auditItem('Tên thuốc','ok',`Khớp Master: ${master.name}`));
+    if(!master){checks.push(auditItem('Tên thuốc','warn',mm.reason));return {status:'warning',invoiceItem:inv,masterMatch:mm,checks,message:mm.reason}}
+    checks.push(auditItem('Tên thuốc','ok',`Khớp tên tồn kho: ${master.name}`));
 
     if(inv.strength&&master.strength){const ok=strengthCanonical(inv.strength)===strengthCanonical(master.strength);checks.push(auditItem('Hàm lượng/NĐ',ok?'ok':'error',ok?`${master.strength}`:`HĐ ${inv.strength} ≠ Master ${master.strength}`));if(!ok)severity=2}
-    else if(master.strength)checks.push(auditItem('Hàm lượng/NĐ','warn',`Master: ${master.strength}; hóa đơn không thể hiện/không đọc được`));
+    else if(master.strength){checks.push(auditItem('Hàm lượng/NĐ','warn',`Dữ liệu: ${master.strength}; hóa đơn không thể hiện/không đọc được`));severity=Math.max(severity,1)}
 
     const pc=packCompatible(inv.packSpec,master.packSpec);
     if(inv.packSpec&&master.packSpec){checks.push(auditItem('Quy cách',pc.ok?'ok':'error',pc.ok?`Khớp ${master.packSpec}`:`HĐ ${inv.packSpec} ≠ Master ${master.packSpec}`));if(!pc.ok)severity=2}
-    else if(master.packSpec){checks.push(auditItem('Quy cách','warn',`Master: ${master.packSpec}; hóa đơn không thể hiện/không đọc được`));severity=Math.max(severity,1)}
+    else {checks.push(auditItem('Quy cách','warn',`Chưa đủ dữ liệu đối chiếu. HĐ: ${inv.packSpec||'chưa có'} · Dữ liệu kho: ${master.packSpec||'chưa có'}`));severity=Math.max(severity,1)}
 
     if(inv.unit&&master.unit){const ok=unitCanonical(inv.unit)===unitCanonical(master.unit)||unitCanonical(master.unit)==='hop'&&/hop|box/.test(normKey(inv.unit));checks.push(auditItem('ĐVT',ok?'ok':'warn',ok?`Khớp ${master.unit}`:`HĐ ${inv.unit} · Master ${master.unit}`));if(!ok)severity=Math.max(severity,1)}
 
     const productStock=stockRowsForMaster(master);
-    if(!productStock.length){checks.push(auditItem('Tồn kho','warn','Mã SP đúng Master nhưng hiện không có dòng tồn kho'));severity=Math.max(severity,1);return {status:'warning',invoiceItem:inv,matchedMaster:master,masterMatch:mm,checks,message:'Đã khớp Mã SP/Tên Master nhưng chưa có dòng tồn để soi Lô/HSD.'}}
+    if(!productStock.length){checks.push(auditItem('Tồn kho','warn','Tên thuốc đã khớp nhưng hiện không có dòng tồn kho'));severity=Math.max(severity,1);return {status:'warning',invoiceItem:inv,matchedMaster:master,masterMatch:mm,checks,message:'Đã khớp tên nhưng chưa có dòng tồn để soi Lô/HSD.'}}
     const invLot=normalizeString(inv.lotNumber);
     if(!invLot){checks.push(auditItem('Số lô','error','Hóa đơn thiếu Số lô'));severity=2;return {status:'error',invoiceItem:inv,matchedMaster:master,masterMatch:mm,checks,message:'Thiếu Số lô trên hóa đơn. Không đủ điều kiện xác nhận.'}}
     const lotRows=productStock.filter(s=>normalizeString(s.lot)===invLot);
-    if(!lotRows.length){const lots=[...new Set(productStock.map(s=>s.lot).filter(Boolean))].slice(0,8).join(', ');checks.push(auditItem('Số lô','error',`HĐ ${inv.lotNumber} · Kho: ${lots||'—'}`));severity=2;return {status:'error',invoiceItem:inv,matchedMaster:master,masterMatch:mm,matchedStockItem:productStock[0],checks,message:`Mã SP đúng nhưng Số lô không tồn tại trong kho. HĐ: ${inv.lotNumber||'—'} · Kho có: ${lots||'—'}`}}
+    if(!lotRows.length){const lots=[...new Set(productStock.map(s=>s.lot).filter(Boolean))].slice(0,8).join(', ');checks.push(auditItem('Số lô','error',`HĐ ${inv.lotNumber} · Kho: ${lots||'—'}`));severity=2;return {status:'error',invoiceItem:inv,matchedMaster:master,masterMatch:mm,matchedStockItem:productStock[0],checks,message:`Tên thuốc khớp nhưng Số lô không tồn tại trong kho. HĐ: ${inv.lotNumber||'—'} · Kho có: ${lots||'—'}`}}
     checks.push(auditItem('Số lô','ok',`Khớp lô ${inv.lotNumber}`));
-    const exactDate=lotRows.find(s=>areDatesEqual(inv.expiryDate,s.exp));
+    const dateRows=lotRows.filter(s=>areDatesEqual(inv.expiryDate,s.exp));
+    const exactDate=dateRows.length?{...dateRows[0],close:dateRows.reduce((sum,r)=>sum+numberVal(r.close),0)}:null;
     if(!inv.expiryDate){checks.push(auditItem('Hạn dùng','error','Hóa đơn thiếu HSD'));severity=2;return {status:'error',invoiceItem:inv,matchedMaster:master,masterMatch:mm,matchedStockItem:lotRows[0],checks,message:'Thiếu Hạn dùng trên hóa đơn. Không đủ điều kiện xác nhận.'}}
-    if(!exactDate){const hsds=[...new Set(lotRows.map(s=>displayDateVN(s.exp)).filter(Boolean))].slice(0,6).join(', ');checks.push(auditItem('Hạn dùng','error',`HĐ ${displayDateVN(inv.expiryDate)} · Kho ${hsds||'—'}`));severity=2;return {status:'error',invoiceItem:inv,matchedMaster:master,masterMatch:mm,matchedStockItem:lotRows[0],checks,message:`Mã SP + Lô đúng nhưng HSD sai. HĐ: ${displayDateVN(inv.expiryDate)} · Kho lô ${inv.lotNumber} có HSD: ${hsds||'—'}`}}
+    if(!exactDate){const hsds=[...new Set(lotRows.map(s=>displayDateVN(s.exp)).filter(Boolean))].slice(0,6).join(', ');checks.push(auditItem('Hạn dùng','error',`HĐ ${displayDateVN(inv.expiryDate)} · Kho ${hsds||'—'}`));severity=2;return {status:'error',invoiceItem:inv,matchedMaster:master,masterMatch:mm,matchedStockItem:lotRows[0],checks,message:`Tên thuốc + Lô khớp nhưng HSD khác dữ liệu kho. HĐ: ${displayDateVN(inv.expiryDate)} · Kho lô ${inv.lotNumber} có HSD: ${hsds||'—'}`}}
     checks.push(auditItem('Hạn dùng','ok',`Khớp ${displayDateVN(exactDate.exp)}`));
 
     const qcheck=invoiceQtyInStockUnit(inv,master);
+    const sameBatch=(items||[]).filter(x=>invoiceNameKey(x.productName)===invoiceNameKey(inv.productName)&&normalizeString(x.lotNumber)===invLot&&areDatesEqual(x.expiryDate,inv.expiryDate));
+    const quantities=sameBatch.map(x=>invoiceQtyInStockUnit(x,master));
+    if(sameBatch.length>1&&quantities.every(q=>q.known)){
+      const total=quantities.reduce((sum,q)=>sum+q.stockQty,0);
+      const over=total>numberVal(exactDate.close)+1e-9;
+      checks.push(auditItem('Tổng số lượng cùng lô',over?'error':'ok',`${sameBatch.length} dòng: ${total.toLocaleString('vi-VN')} ${master.unit} · Tồn lô ${numberVal(exactDate.close).toLocaleString('vi-VN')}`));if(over)severity=2;
+    }
     if(numberVal(inv.quantity)<=0){checks.push(auditItem('Số lượng','warn','Không đọc được số lượng > 0'));severity=Math.max(severity,1)}
     else if(!qcheck.known){checks.push(auditItem('Số lượng/ĐVT','warn',`${qcheck.note}. Tồn lô hiện ${numberVal(exactDate.close).toLocaleString('vi-VN')} ${master.unit||'đv kho'}.`));severity=Math.max(severity,1)}
     else if(qcheck.stockQty>numberVal(exactDate.close)+1e-9){checks.push(auditItem('Số lượng','error',`${qcheck.note} > tồn lô ${numberVal(exactDate.close).toLocaleString('vi-VN')} ${master.unit||'đv kho'}`));severity=2}
@@ -10350,22 +10180,22 @@ function validateItems(items){
 
     if(numberVal(inv.unitPrice)>0&&numberVal(inv.quantity)>0&&numberVal(inv.amount)>0){const expected=numberVal(inv.unitPrice)*numberVal(inv.quantity),diff=Math.abs(expected-numberVal(inv.amount)),tol=Math.max(2,Math.abs(expected)*0.002);const ok=diff<=tol;checks.push(auditItem('Thành tiền',ok?'ok':'warn',ok?'SL × đơn giá khớp':`SL × đơn giá = ${expected.toLocaleString('vi-VN')} nhưng thành tiền = ${numberVal(inv.amount).toLocaleString('vi-VN')}`));if(!ok)severity=Math.max(severity,1)}
 
-    const dk=`${cleanCodeLocal(inv.productCode)}|${normKey(inv.lotNumber)}|${toStandardDate(inv.expiryDate)||''}`;if((dup.get(dk)||0)>1){checks.push(auditItem('Dòng trùng','warn','Cùng Mã SP + Lô + HSD xuất hiện nhiều dòng; cần xác nhận chủ đích'));severity=Math.max(severity,1)}
+    const dk=`${invoiceNameKey(inv.productName)}|${normalizeString(inv.lotNumber)}|${toStandardDate(inv.expiryDate)||''}`;if((dup.get(dk)||0)>1){checks.push(auditItem('Dòng trùng','warn','Cùng Tên thuốc + Lô + HSD xuất hiện nhiều dòng; cần xác nhận chủ đích'));severity=Math.max(severity,1)}
     const status=severity===2?'error':severity===1?'warning':'ok';
-    return {status,invoiceItem:{...inv,canonicalProductCode:master.code||'',canonicalProductName:master.name||''},matchedMaster:master,masterMatch:mm,matchedStockItem:exactDate,checks,message:status==='ok'?'ĐỦ 4 KHÓA: Mã SP + Tên/Quy cách + Lô + HSD khớp dữ liệu kho.':status==='warning'?'Mã/Lô/HSD đã kiểm tra nhưng còn trường cảnh báo cần xác nhận.':'Có sai lệch dữ liệu bắt buộc; không nên xuất/ghi nhận hóa đơn trước khi sửa.'}
+    return {status,invoiceItem:{...inv,canonicalProductCode:master.code||'',canonicalProductName:master.name||''},matchedMaster:master,masterMatch:mm,matchedStockItem:exactDate,checks,message:status==='ok'?'Tên thuốc, quy cách, lô, hạn dùng và số lượng phù hợp dữ liệu tồn kho.':status==='warning'?'Tên thuốc/Lô/HSD đã kiểm tra nhưng còn trường cảnh báo cần xác nhận.':'Có sai lệch dữ liệu bắt buộc; không nên xuất/ghi nhận hóa đơn trước khi sửa.'}
   })
 }
 function formatNum(n){return Number(n)===0?'-':Number(n||0).toLocaleString('vi-VN')}
 function formatBytes(bytes){if(!bytes)return '0 Bytes';const k=1024,sizes=['Bytes','KB','MB','GB'],i=Math.floor(Math.log(bytes)/Math.log(k));return `${parseFloat((bytes/Math.pow(k,i)).toFixed(2))} ${sizes[i]}`}
 function parseJSON(text){let s=String(text||'').trim();const fence=s.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);if(fence)s=fence[1].trim();try{return JSON.parse(s)}catch{}const a=s.indexOf('['),b=s.lastIndexOf(']');if(a>=0&&b>a)return JSON.parse(s.slice(a,b+1));const c=s.indexOf('{'),d=s.lastIndexOf('}');if(c>=0&&d>c)return JSON.parse(s.slice(c,d+1));throw new Error('AI không trả JSON hợp lệ')}
 function normalizeInvoiceItems(x){let arr=Array.isArray(x)?x:(Array.isArray(x?.items)?x.items:[]);return arr.map((r,i)=>({stt:r.stt??i+1,productCode:String(r.productCode??r.maSP??r.maHang??'').trim(),productName:String(r.productName??r.tenHang??r.tenSP??'').trim(),strength:String(r.strength??r.hamLuong??r.nongDo??'').trim(),packSpec:String(r.packSpec??r.quyCach??r.packaging??'').trim(),lotNumber:String(r.lotNumber??r.soLo??'').trim(),expiryDate:String(r.expiryDate??r.hanDung??'').trim(),unit:String(r.unit??r.donVi??r.dvt??'').trim(),quantity:numberVal(r.quantity??r.soLuong),unitPrice:numberVal(r.unitPrice??r.donGia),amount:numberVal(r.amount??r.thanhTien),vatRate:String(r.vatRate??r.thueGTGT??'').trim(),vatAmount:numberVal(r.vatAmount??r.tienThue)})).filter(r=>r.productName||r.productCode||r.lotNumber||r.expiryDate)}
-const INVOICE_SCHEMA={type:'ARRAY',items:{type:'OBJECT',properties:{stt:{type:'STRING'},productCode:{type:'STRING'},productName:{type:'STRING'},strength:{type:'STRING'},packSpec:{type:'STRING'},lotNumber:{type:'STRING'},expiryDate:{type:'STRING'},unit:{type:'STRING'},quantity:{type:'NUMBER'},unitPrice:{type:'NUMBER'},amount:{type:'NUMBER'},vatRate:{type:'STRING'},vatAmount:{type:'NUMBER'}},required:['productCode','productName','lotNumber','expiryDate','quantity']}};
+const INVOICE_SCHEMA={type:'ARRAY',items:{type:'OBJECT',properties:{stt:{type:'STRING'},productCode:{type:'STRING'},productName:{type:'STRING'},strength:{type:'STRING'},packSpec:{type:'STRING'},lotNumber:{type:'STRING'},expiryDate:{type:'STRING'},unit:{type:'STRING'},quantity:{type:'NUMBER'},unitPrice:{type:'NUMBER'},amount:{type:'NUMBER'},vatRate:{type:'STRING'},vatAmount:{type:'NUMBER'}},required:['productName','lotNumber','expiryDate','quantity']}};
 function invoicePrompt(){return `Bạn đang đọc HÓA ĐƠN THUỐC để đối chiếu kho GDP. Hãy trích TOÀN BỘ dòng hàng thành JSON array.
 
 NGUYÊN TẮC BẮT BUỘC:
 1) Chỉ chép đúng dữ liệu NHÌN THẤY trên hóa đơn: stt, productCode (Mã SP/Mã hàng/SKU nếu có), productName, strength, packSpec/quy cách nếu có, lotNumber, expiryDate, unit, quantity, unitPrice, amount, vatRate, vatAmount.
 2) TUYỆT ĐỐI KHÔNG suy ra Mã SP từ tên thuốc, không lấy mã từ kiến thức bên ngoài, không tự sửa tên theo Master. Nếu hóa đơn không có Mã SP thì productCode="".
-3) Mã SP là khóa kiểm soát chính. Giữ nguyên số 0 đầu mã, ký tự gạch/chấm nếu xuất hiện; không ghép Mã SP với tên thuốc.
+3) Tên thuốc là căn cứ đối chiếu với tên trong tồn kho. Giữ đầy đủ tên thuốc, hàm lượng và dạng bào chế; không ghép mã vào tên. Mã SP chỉ là thông tin tùy chọn, thiếu mã không phải lỗi. Nếu quy cách nằm trong tên, chép thêm vào packSpec và giữ nguyên productName.
 4) Số lô và HSD phải chép chính xác từ hóa đơn. expiryDate chuẩn DD/MM/YYYY khi đọc được; không tự bịa ngày.
 5) Quy cách phải giữ đủ cấu trúc nếu có, ví dụ "Hộp 3 vỉ x 10 viên"; không tự đổi sang quy cách khác.
 6) Không bỏ sót dòng thuốc. Số Việt Nam 1.000 = 1000 khi là định dạng hàng nghìn.
@@ -10379,8 +10209,8 @@ async function fetchInventoryData(){if(!refs.stock||!refs.exports)throw new Erro
 async function fetchMasterData(){if(!refs.master)throw new Error('Master Firebase chưa sẵn sàng');const snap=await refs.master.once('value');return flattenMasterFiles(snap.val()||{})}
 let sharedRefreshTimer=null;
 function scheduleSharedRefresh(){clearTimeout(sharedRefreshTimer);sharedRefreshTimer=setTimeout(()=>refreshSharedData(false),180)}
-async function refreshSharedData(showBusy=true){if(showBusy)state.loadingStock=true;try{const [stock,master]=await Promise.all([fetchInventoryData(),fetchMasterData()]);state.stockData=stock;state.masterData=master;state.lastSyncAt=Date.now();state.connected=true;setFbStatus(`🟢 FIREBASE TEST CHUNG · Master ${master.length} SP · Kho ${stock.length} lô`,'ok')}catch(e){console.error('Invoice shared refresh',e);setFbStatus('🔴 Firebase TEST chung lỗi đồng bộ','bad');if(showBusy)notify('Không đồng bộ được Master/Tồn kho: '+e.message,'error')}finally{state.loadingStock=false;renderStock()}}
-async function runAnalysis(){if(!state.file||state.isAnalyzing)return;state.isAnalyzing=true;setStatus('Đang đồng bộ Master + Tồn kho mới nhất...',true);try{const syncPromise=refreshSharedData(false);const up=uploadInvoiceFile(state.file),timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error('Upload timed out')),10000));try{await Promise.race([up,timeout])}catch(e){console.warn('Upload skipped/failed',e);setStatus(e?.message==='Upload timed out'?'Storage chậm, bỏ qua lưu file...':'Storage chưa sẵn sàng, vẫn tiếp tục phân tích...',true)}await syncPromise;if(!state.masterData.length)throw new Error('Firebase TEST chưa có MASTER. Hãy nạp Dữ liệu Gốc trước khi soi hóa đơn.');setStatus('AI đang đọc hóa đơn...',true);const shared=window.IDECO_SHARED_AI;if(!shared||typeof shared.fileRequest!=='function')throw new Error('Module AI chung chưa sẵn sàng. Vui lòng kiểm tra Cài đặt AI.');const rr=await shared.fileRequest(state.file,invoicePrompt(),{jsonSchema:INVOICE_SCHEMA,purpose:'Kiểm tra hóa đơn thuốc'});const invoiceItems=normalizeInvoiceItems(parseJSON(rr.text));if(!invoiceItems.length)throw new Error('AI không đọc được dòng hàng nào trong hóa đơn.');setStatus('Đang soi MASTER → Lô → HSD trên Firebase TEST...',true);const results=validateItems(invoiceItems);state.analysisResults=results;renderResults();await saveInvoiceResult(state.file.name,results)}catch(e){console.error('Invoice analysis',e);notify('Lỗi khi phân tích hóa đơn: '+(e?.message||'Unknown Error'),'error')}finally{state.isAnalyzing=false;setStatus('',false)}}
+async function refreshSharedData(showBusy=true){if(showBusy)state.loadingStock=true;try{const [stock,master]=await Promise.all([fetchInventoryData(),fetchMasterData().catch(()=>[])]);state.stockData=stock;state.masterData=master;state.lastSyncAt=Date.now();state.connected=true;setFbStatus(`🟢 FIREBASE TEST CHUNG · Master ${master.length} SP · Kho ${stock.length} lô`,'ok')}catch(e){state.connected=false;console.error('Invoice shared refresh',e);setFbStatus('🔴 Firebase TEST chung lỗi đồng bộ','bad');if(showBusy)notify('Không đồng bộ được Master/Tồn kho: '+e.message,'error')}finally{state.loadingStock=false;renderStock()}}
+async function runAnalysis(){if(!state.file||state.isAnalyzing)return;state.isAnalyzing=true;setStatus('Đang đồng bộ Master + Tồn kho mới nhất...',true);try{const syncPromise=refreshSharedData(false);const up=uploadInvoiceFile(state.file),timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error('Upload timed out')),10000));try{await Promise.race([up,timeout])}catch(e){console.warn('Upload skipped/failed',e);setStatus(e?.message==='Upload timed out'?'Storage chậm, bỏ qua lưu file...':'Storage chưa sẵn sàng, vẫn tiếp tục phân tích...',true)}await syncPromise;if(!state.connected)throw new Error('Chưa đồng bộ được tồn kho mới nhất. Vui lòng thử lại.');if(!state.stockData.length)throw new Error('Chưa có dữ liệu tồn kho để đối chiếu tên thuốc.');setStatus('AI đang đọc hóa đơn...',true);const shared=window.IDECO_SHARED_AI;if(!shared||typeof shared.fileRequest!=='function')throw new Error('Module AI chung chưa sẵn sàng. Vui lòng kiểm tra Cài đặt AI.');const rr=await shared.fileRequest(state.file,invoicePrompt(),{jsonSchema:INVOICE_SCHEMA,purpose:'Kiểm tra hóa đơn thuốc'});const invoiceItems=normalizeInvoiceItems(parseJSON(rr.text));if(!invoiceItems.length)throw new Error('AI không đọc được dòng hàng nào trong hóa đơn.');setStatus('Đang đối chiếu Tên thuốc → Quy cách → Lô → HSD → Số lượng...',true);const results=validateItems(invoiceItems);state.analysisResults=results;renderResults();await saveInvoiceResult(state.file.name,results)}catch(e){console.error('Invoice analysis',e);notify('Lỗi khi phân tích hóa đơn: '+(e?.message||'Unknown Error'),'error')}finally{state.isAnalyzing=false;setStatus('',false)}}
 function showHistory(){state.analysisResults=null;$('ic-results-container').style.display='none';$('ic-history-container').style.display='flex'}
 function renderResults(){
   const results=state.analysisResults;if(!results){showHistory();return}
@@ -10391,7 +10221,7 @@ function renderResults(){
     const inv=r.invoiceItem||{},m=r.matchedMaster,s=r.matchedStockItem,checks=r.checks||[];
     const badge=r.status==='not_found'?'CHƯA CÓ MASTER':r.status==='warning'?'CẦN XÁC NHẬN':r.status==='error'?'LỖI KHÓA DỮ LIỆU':'HỢP LỆ';
     const audit=checks.length?`<div class="ic-audit-grid">${checks.map(c=>`<div class="ic-audit-item ${esc(c.level||'warn')}"><b>${esc(c.label||'Kiểm tra')}</b>${esc(c.text||'')}</div>`).join('')}</div>`:'';
-    return `<div class="ic-result ${esc(r.status)}"><div class="ic-result-top"><div class="ic-result-title">${esc(inv.productCode||'—')} · ${esc(inv.productName||'')}</div><span class="ic-status-badge">${esc(badge)}</span></div><div class="ic-compare"><div><small>1 · HÓA ĐƠN AI CHỈ TRÍCH XUẤT</small>Mã SP: <b>${esc(inv.productCode||'—')}</b><br>Tên: <b>${esc(inv.productName||'')}</b><br>${inv.strength?`Hàm lượng/NĐ: <b>${esc(inv.strength)}</b><br>`:''}${inv.packSpec?`Quy cách: <b>${esc(inv.packSpec)}</b><br>`:''}Lô: <b class="ic-lot">${esc(inv.lotNumber||'—')}</b><br>HSD: <b class="ic-lot">${esc(displayDateVN(inv.expiryDate)||'—')}</b><br>ĐVT/SL: <b>${esc(inv.unit||'—')} · ${formatNum(inv.quantity)}</b></div><div>${m?`<small>2 · MASTER + KHO CHÍNH THỨC</small>Mã: <b>${esc(m.code||'—')}</b><br>Tên chuẩn: <b>${esc(m.name||'')}</b><br>${m.strength?`Hàm lượng/NĐ: ${esc(m.strength)}<br>`:''}${m.packSpec?`Quy cách: ${esc(m.packSpec)}<br>`:''}${m.unit?`ĐVT Master: ${esc(m.unit)}<br>`:''}${s?`<small style="margin-top:6px">3 · LÔ TỒN KHO KHỚP</small>Lô: <b class="ic-lot">${esc(s.lot||'')}</b><br>HSD: <b class="ic-lot">${esc(displayDateVN(s.exp))}</b><br>Tồn theo lô: <b>${formatNum(s.close)}</b>`:'<span class="ic-muted">Chưa xác định được lô tồn khớp.</span>'}`:'<span class="ic-muted"><i>Chưa quy được về Master chính thức bằng Mã SP.</i></span>'}</div></div>${audit}<div class="ic-message" style="color:${r.status==='ok'?'#166534':r.status==='warning'?'#92400e':'#b91c1c'}">${r.status==='ok'?'✅':'⚠️'} ${esc(r.message||'')}</div><div class="ic-audit-rule"><b>Khóa kiểm soát:</b> Mã SP là khóa chính → đối tên/hàm lượng/quy cách → đối lô → đối HSD → đối số lượng/giá khi dữ liệu hóa đơn có đủ. Tên gần giống không được dùng để thay thế Mã SP.</div></div>`
+    return `<div class="ic-result ${esc(r.status)}"><div class="ic-result-top"><div class="ic-result-title">${esc(inv.productName||'')}</div><span class="ic-status-badge">${esc(badge)}</span></div><div class="ic-compare"><div><small>1 · HÓA ĐƠN AI CHỈ TRÍCH XUẤT</small>Mã trên HĐ (tham khảo): <b>${esc(inv.productCode||'không có — không bắt buộc')}</b><br>Tên: <b>${esc(inv.productName||'')}</b><br>${inv.strength?`Hàm lượng/NĐ: <b>${esc(inv.strength)}</b><br>`:''}${inv.packSpec?`Quy cách: <b>${esc(inv.packSpec)}</b><br>`:''}Lô: <b class="ic-lot">${esc(inv.lotNumber||'—')}</b><br>HSD: <b class="ic-lot">${esc(displayDateVN(inv.expiryDate)||'—')}</b><br>ĐVT/SL: <b>${esc(inv.unit||'—')} · ${formatNum(inv.quantity)}</b></div><div>${m?`<small>2 · DỮ LIỆU ĐỐI CHIẾU THEO TÊN</small>Mã: <b>${esc(m.code||'—')}</b><br>Tên chuẩn: <b>${esc(m.name||'')}</b><br>${m.strength?`Hàm lượng/NĐ: ${esc(m.strength)}<br>`:''}${m.packSpec?`Quy cách: ${esc(m.packSpec)}<br>`:''}${m.unit?`ĐVT Master: ${esc(m.unit)}<br>`:''}${s?`<small style="margin-top:6px">3 · LÔ TỒN KHO ĐỐI CHIẾU</small>Lô: <b class="ic-lot">${esc(s.lot||'')}</b><br>HSD: <b class="ic-lot">${esc(displayDateVN(s.exp))}</b><br>Tồn theo lô: <b>${formatNum(s.close)}</b>`:'<span class="ic-muted">Chưa xác định được lô tồn khớp.</span>'}`:'<span class="ic-muted"><i>Chưa xác định được thuốc theo tên trong dữ liệu tồn kho.</i></span>'}</div></div>${audit}<div class="ic-message" style="color:${r.status==='ok'?'#166534':r.status==='warning'?'#92400e':'#b91c1c'}">${r.status==='ok'?'✅':'⚠️'} ${esc(r.message||'')}</div><div class="ic-audit-rule"><b>Khóa kiểm soát:</b> Đối chiếu theo tên thuốc trong tồn kho → quy cách → số lô → hạn dùng → số lượng cùng đơn vị. Mã SP không bắt buộc và không dùng để ghép thuốc. Tên gần giống hoặc chưa rõ sản phẩm cần xác nhận.</div></div>`
   }).join(''):'<div class="ic-empty">Chưa có kết quả phân tích.</div>'
 }
 function renderHistory(){const list=state.historyList;$('ic-history-count').textContent=list.length;$('ic-history-list').innerHTML=list.length?list.map(x=>`<div class="ic-history-item"><div style="min-width:0;flex:1"><div class="ic-history-name" title="${esc(x.fileName)}">${esc(x.fileName)}</div><div class="ic-muted">${new Date(x.timestamp).toLocaleString('vi-VN')}</div><div class="ic-summary">${Number(x.summary?.error)>0?`<span class="ic-mini err">${Number(x.summary.error)} lỗi</span>`:''}${Number(x.summary?.warning)>0?`<span class="ic-mini warn">${Number(x.summary.warning)} cảnh báo</span>`:''}<span class="ic-mini ok">${Number(x.summary?.ok)||0} ok</span></div></div><div class="ic-actions"><button class="ic-btn primary" type="button" data-ic-history-view="${esc(x.id)}">Xem</button><button class="ic-btn danger" type="button" data-ic-history-delete="${esc(x.id)}">🗑</button></div></div>`).join(''):'<div class="ic-empty">Chưa có lịch sử kiểm tra.</div>'}

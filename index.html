@@ -1834,38 +1834,57 @@ async function runAI(settings, payload, onLog) {
   throw new Error(sanitizeAiText("Không thể kết nối dịch vụ AI.\n\n" + errors.slice(0, 6).join("\n")));
 }
 
-const ORDER_SCHEMA = {
-  type: "ARRAY",
-  items: {
-    type: "OBJECT",
-    properties: {
-      stt: { type: "STRING" },
-      code: { type: "STRING" },
-      name: { type: "STRING" },
-      unit: { type: "STRING" },
-      quantity: { type: "NUMBER" }
-    },
-    required: ["code", "name", "quantity"]
-  }
-};
-
-function parseOrderAIText(rawText) {
-  let arr = [];
-  try {
-    const parsed = JSON.parse(stripFence(rawText));
-    arr = Array.isArray(parsed) ? parsed : (parsed.items || parsed.data || parsed.products || []);
-  } catch (e) {
-    const m = stripFence(rawText).match(/\[[\s\S]*\]/);
-    if (m) { try { arr = JSON.parse(m[0]); } catch (e2) { arr = []; } }
-  }
-  return (arr || []).map((it, i) => ({
-    stt: it.stt || i + 1,
-    code: upper(it.code || it.maSP || ""),
-    name: String(it.name || it.tenSP || "").trim(),
-    unit: String(it.unit || it.dvt || "").trim(),
-    quantity: num(it.quantity != null ? it.quantity : it.soLuong)
-  })).filter((it) => (it.code || it.name) && it.quantity >= 0);
+const ORDER_TRACKING_PATH = 'ideco_forecast_customer_orders';
+const ORDER_PENDING_CACHE = 'IDECO_CUSTOMER_ORDERS_PENDING_V1';
+const ORDER_META_FIELDS = ['customerName','customerCode','orderCode','orderNumber','orderDate','contactName','phone','taxCode','customerAddress','deliveryAddress','salesPerson','customerNote','paymentTerms','sourcePages'];
+const ORDER_SCHEMA = {type:'OBJECT',properties:{orders:{type:'ARRAY',items:{type:'OBJECT',properties:{
+  ...Object.fromEntries(ORDER_META_FIELDS.map(k=>[k,{type:'STRING'}])),
+  totalAmount:{type:'STRING'},items:{type:'ARRAY',items:{type:'OBJECT',properties:{stt:{type:'STRING'},code:{type:'STRING'},name:{type:'STRING'},unit:{type:'STRING'},quantity:{type:'NUMBER'}},required:['name','quantity']}}
+},required:['customerName','orderCode','orderDate','items']}}},required:['orders']};
+function parseOrderAIText(rawText){
+  const data=JSON.parse(stripFence(rawText));
+  const docs=Array.isArray(data.orders)?data.orders:[{items:Array.isArray(data)?data:(data.items||data.data||data.products||[])}];
+  return docs.map(d=>{
+    const meta=Object.fromEntries(ORDER_META_FIELDS.map(k=>[k,String(d[k]??'').trim()]));
+    const items=(Array.isArray(d.items)?d.items:[]).map((it,i)=>({stt:it.stt||i+1,code:upper(it.code||it.maSP||''),name:String(it.name||it.tenSP||'').trim(),unit:String(it.unit||it.dvt||'').trim(),quantity:num(it.quantity!=null?it.quantity:it.soLuong)})).filter(it=>it.code||it.name);
+    const review=[];
+    if(!meta.customerName)review.push('Chưa đọc được tên khách hàng');
+    if(!meta.orderCode&&!meta.orderNumber)review.push('Chưa đọc được mã/số đơn');
+    if(!meta.orderDate)review.push('Chưa đọc được ngày lập đơn');
+    if(!items.length)review.push('Chưa đọc được dòng thuốc');
+    if(items.some(x=>x.quantity<=0))review.push('Có dòng số lượng bằng 0 hoặc chưa đọc được');
+    return {...meta,totalAmount:d.totalAmount==null||d.totalAmount===''?'':num(d.totalAmount),items,reviewNote:review.join('; ')};
+  });
 }
+function orderHeaderKey(d){return [normalizeString(d.customerCode||d.customerName),normalizeString(d.orderCode||d.orderNumber)].join('|')}
+function reconcileOrderDocuments(a,b,fileName){
+  const used=new Set();
+  const out=a.map(d=>{
+    let j=b.findIndex((x,i)=>!used.has(i)&&orderHeaderKey(x)===orderHeaderKey(d));
+    // A single unmatched document can be compared, but never silently move its lines.
+    if(j<0&&a.length===1&&b.length===1)j=0;
+    if(j<0)return {...d,reviewNote:[d.reviewNote,'Chỉ thấy đơn này ở lượt 1; cần đối chiếu PDF'].filter(Boolean).join('; ')};
+    used.add(j);const other=b[j],notes=[d.reviewNote,other.reviewNote].filter(Boolean);
+    const merged={...d};
+    for(const k of [...ORDER_META_FIELDS,'totalAmount']){
+      const av=String(d[k]??''),bv=String(other[k]??'');
+      if(av!==bv){notes.push(`Hai lượt khác nhau ở ${{customerName:'tên khách',customerCode:'mã khách',orderCode:'mã đơn',orderNumber:'số đơn',orderDate:'ngày lập',contactName:'người liên hệ',phone:'điện thoại',taxCode:'MST/định danh',customerAddress:'địa chỉ khách',deliveryAddress:'địa chỉ giao',salesPerson:'nhân viên',customerNote:'ghi chú đơn',paymentTerms:'thanh toán',sourcePages:'trang PDF',totalAmount:'tổng thanh toán'}[k]||k}: “${av||'chưa đọc được'}” / “${bv||'chưa đọc được'}”`);if(!av)merged[k]=other[k]}
+    }
+    merged.items=reconcileOrderPasses(d.items,other.items,fileName);
+    if(merged.items.some(x=>x.reviewLevel==='warn'))notes.push('Có dòng thuốc cần kiểm tra hai lượt');
+    return {...merged,reviewNote:[...new Set(notes)].join('; ')};
+  });
+  b.forEach((d,i)=>{if(!used.has(i))out.push({...d,reviewNote:[d.reviewNote,'Chỉ thấy đơn này ở lượt 2; cần đối chiếu PDF'].filter(Boolean).join('; ')})});
+  return out;
+}
+async function orderDocumentId(d){
+  const hasIdentity=(d.customerCode||d.customerName)&&(d.orderCode||d.orderNumber);
+  const identity=hasIdentity?orderHeaderKey(d):[d.sourceHash,d.sourcePages,d.sourceIndex].join('|');
+  const bytes=new TextEncoder().encode(identity);
+  const digest=await crypto.subtle.digest('SHA-256',bytes);
+  return 'order_'+Array.from(new Uint8Array(digest),x=>x.toString(16).padStart(2,'0')).join('');
+}
+function orderDateISO(v){const s=String(v||'').trim();let m=s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);if(m)return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;return /^\d{4}-\d{2}-\d{2}$/.test(s)?s:''}
 
 const orderIdentityKey = (it) => it && it.code ? `C:${upper(it.code)}` : `N:${normalizeString(it && it.name)}`;
 const orderNamesClose = (a,b) => {
@@ -1904,52 +1923,42 @@ function reconcileOrderPasses(pass1, pass2, fileName) {
   return result;
 }
 
-async function analyzeOrdersWithAI(files, settings, onLog) {
-  const prompt = [
-    "Bạn là chuyên gia bóc tách chứng từ ĐƠN ĐẶT HÀNG dược phẩm/mỹ phẩm.",
-    "Đọc TOÀN BỘ mọi trang, mọi dòng hàng; không bỏ sót sản phẩm.",
-    "Với mỗi sản phẩm lấy chính xác: code (Mã SP/Mã hàng), name (Tên hàng hóa đầy đủ, giữ cả hàm lượng nếu có), unit (ĐVT/quy cách in trên phiếu), quantity (Số lượng đặt, dạng SỐ).",
-    "Không tự suy đoán từ Master hay tồn kho. Chỉ chép dữ liệu thực sự nhìn thấy trên PDF/ảnh.",
-    "Không đổi Hộp thành viên/tuýp/chai; quantity phải đúng số lượng theo ĐVT trên chứng từ.",
-    "Bỏ dòng tổng cộng/thuế/chữ ký. Nếu thiếu mã để code chuỗi rỗng.",
-    "Trả DUY NHẤT mảng JSON: [{\"stt\":\"1\",\"code\":\"SP001\",\"name\":\"Paracetamol 500mg\",\"unit\":\"Hộp 10 vỉ x 10 viên\",\"quantity\":100}]"
-  ].join("\n");
-
-  const shared = getSharedAI();
-  if (shared && typeof shared.fileRequest === "function") {
-    let all=[];
-    for(let i=0;i<files.length;i++){
-      const file=files[i];
-      if(onLog)onLog(`${sharedAIRouteLabel()} đang đọc ${i+1}/${files.length}: ${file.name}…`);
-      const first=await shared.fileRequest(file,prompt,{jsonSchema:ORDER_SCHEMA,purpose:`Đơn đặt hàng · lượt 1 · ${file.name}`});
-      let items1=parseOrderAIText(first.text);
-      const isPdf=/pdf$/i.test(file.type)||/\.pdf$/i.test(file.name);
-      if(isPdf && settings.pdfDoubleCheck!==false){
-        if(onLog)onLog(`🔎 Đang kiểm tra PDF lượt 2: ${file.name}…`);
-        const prompt2=prompt+"\n\nĐÂY LÀ LƯỢT KIỂM TRA ĐỘC LẬP. Hãy đọc lại từ đầu, đặc biệt soi Mã SP, Tên thuốc, ĐVT/Quy cách và SỐ LƯỢNG. Không dựa vào kết quả lượt trước.";
-        const second=await shared.fileRequest(file,prompt2,{jsonSchema:ORDER_SCHEMA,purpose:`Đơn đặt hàng · kiểm tra lượt 2 · ${file.name}`});
-        const items2=parseOrderAIText(second.text);
-        items1=reconcileOrderPasses(items1,items2,file.name);
-      }else{
-        items1=items1.map(x=>({...x,reviewLevel:'ok',reviewNote:isPdf?`ℹ️ ${file.name}: kiểm tra 2 lượt đang tắt`:`✅ ${file.name}: ảnh đã đọc`}));
+async function analyzeOrdersWithAI(files,settings,onLog){
+  const prompt=[
+    'Bạn đọc ĐƠN ĐẶT HÀNG dược phẩm/mỹ phẩm. Đọc hết mọi trang. Một PDF có thể chứa NHIỀU ĐƠN CỦA NHIỀU KHÁCH.',
+    'Trả object {orders:[...]}. Mỗi phần tử là MỘT ĐƠN, giữ riêng các dòng thuốc của đơn đó; không gộp sản phẩm giữa khách/đơn. Đơn kéo dài nhiều trang chỉ tạo một phần tử, ghép đủ các dòng trang tiếp theo.',
+    'Đầu trang có thể là bên bán IDECO. customerName phải lấy từ Tên khách hàng/bên mua, KHÔNG lấy tên công ty ở tiêu đề làm khách. Trang mới có khách hoặc mã đơn khác phải tách đơn.',
+    'Mỗi đơn lấy: customerName, customerCode (Mã KH), orderCode (Mã đơn hàng, ví dụ DH2609_047), orderNumber (Số đơn hàng, ví dụ 202609/007), orderDate (ngày đặt/lập đơn DD/MM/YYYY; KHÔNG lấy ngày thanh toán), contactName, phone, taxCode, customerAddress, deliveryAddress, salesPerson, customerNote (gồm mã PO nếu có), paymentTerms, sourcePages (số trang thực trong PDF, ví dụ 1-2), totalAmount (tổng tiền thanh toán của ĐƠN, dạng chuỗi số không dấu phân cách).',
+    'items: [{stt,code,name,unit,quantity}]. Giữ tên thuốc đầy đủ, hàm lượng, đơn vị/quy cách. quantity lấy cột Số lượng đặt, không lấy Giá bán/Thành tiền/SL tặng/Tổng SL giao. Không đổi hộp thành viên. Bỏ dòng tổng/thuế/chữ ký. Không lặp tổng tiền khi lặp chân trang.',
+    'Chỉ chép thông tin nhìn thấy; trường không đọc được để chuỗi rỗng, số lượng không đọc được ghi 0 để cảnh báo. Không đoán khách hàng từ tên tệp, không suy đoán từ Master/tồn kho. Chỉ trả JSON đúng schema.'
+  ].join('\n');
+  const shared=getSharedAI();let provider='',model='',orders=[];
+  for(let i=0;i<files.length;i++){
+    const file=files[i],isPdf=/pdf$/i.test(file.type)||/\.pdf$/i.test(file.name);
+    if(onLog)onLog(`Đang đọc thông tin đơn và thuốc ${i+1}/${files.length}: ${file.name}…`);
+    let media=null;
+    const read=async(p,pass)=>{
+      if(shared&&typeof shared.fileRequest==='function'){
+        const r=await shared.fileRequest(file,p,{jsonSchema:ORDER_SCHEMA,purpose:`Đơn khách hàng · lượt ${pass} · ${file.name}`});provider=sharedAIRouteLabel();return r.text;
       }
-      all.push(...items1);
-    }
-    return {items:all,provider:sharedAIRouteLabel(),model:""};
+      if(!media){
+        if(isPdf&&!(settings.geminiApiKey||'').trim())media=await pdfToImages(file,settings.kpi.maxAiPages);
+        else media=[{mimeType:file.type||'application/octet-stream',data:await fileToBase64(file)}];
+      }
+      const r=await runAI(settings,{prompt:p,media,json:true,schema:ORDER_SCHEMA,purpose:'Đơn khách hàng'},onLog);provider=r.provider;model=r.model;return r.text;
+    };
+    let docs=parseOrderAIText(await read(prompt,1));
+    if(isPdf&&settings.pdfDoubleCheck!==false){
+      if(onLog)onLog(`Đối chiếu khách hàng, mã đơn và thuốc lượt 2: ${file.name}…`);
+      docs=reconcileOrderDocuments(docs,parseOrderAIText(await read(prompt+'\nĐỌC LẠI ĐỘC LẬP: kiểm tra ranh giới đơn/trang, khách, mã/số đơn, ngày và tất cả dòng thuốc.',2)),file.name);
+    }else docs=docs.map(d=>({...d,reviewNote:[d.reviewNote,'Chỉ đọc một lượt; cần kiểm tra theo chứng từ'].filter(Boolean).join('; ')}));
+    const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',await file.arrayBuffer())),x=>x.toString(16).padStart(2,'0')).join('');
+    orders.push(...docs.map((d,index)=>({...d,sourceFile:file.name,sourceHash:hash,sourceIndex:index,analyzedAt:Date.now(),provider,model})));
   }
-
-  // Fallback khi mở ứng dụng Dự báo độc lập ngoài hệ sinh thái.
-  const media = [];
-  for (const file of files) {
-    const isPdf = /pdf$/i.test(file.type) || /\.pdf$/i.test(file.name);
-    if (isPdf && !((settings.geminiApiKey || "").trim())) {
-      if (onLog) onLog(`Đang chuyển ${file.name} sang ảnh…`);
-      const imgs = await pdfToImages(file, settings.kpi.maxAiPages);
-      imgs.forEach((i) => media.push(i));
-    } else media.push({ mimeType: file.type || "application/octet-stream", data: await fileToBase64(file) });
-  }
-  const res = await runAI(settings, { prompt: prompt, media: media, json: true, schema: ORDER_SCHEMA, purpose:"Đơn đặt hàng" }, onLog);
-  return { items: parseOrderAIText(res.text), provider: res.provider, model: res.model };
+  const unique=new Map();
+  for(const d of orders){const id=await orderDocumentId(d);if(unique.has(id)){const kept=unique.get(id);kept.reviewNote=[kept.reviewNote,'Cùng khách và mã/số đơn xuất hiện nhiều lần trong đợt tải lên; đã giữ bản đầu để không cộng trùng nhu cầu. Cần kiểm tra các bản gốc.'].filter(Boolean).join('; ')}else unique.set(id,d)}
+  orders=Array.from(unique.values());
+  return {orders,items:orders.flatMap(d=>d.items.map(it=>({...it,sourceCustomer:d.customerName,sourceOrder:d.orderCode||d.orderNumber,reviewLevel:d.reviewNote?'warn':it.reviewLevel||'ok',reviewNote:[d.reviewNote,it.reviewNote].filter(Boolean).join('; ')}))),provider,model};
 }
 
 async function analyzeProductStrategy(item, extraContext, settings, onLog) {
@@ -2438,7 +2447,7 @@ const FileThumb = ({ file, onRemove }) => {
   );
 };
 
-const OrderAnalysisView = ({ settings, files, setFiles, analyzedOrders, setAnalyzedOrders, onAiStatus, toast }) => {
+const OrderAnalysisView = ({ settings, files, setFiles, analyzedOrders, setAnalyzedOrders, onAiStatus, onOrdersExtracted, onShowOrders, toast }) => {
   const [dragging, setDragging] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [log, setLog] = useState("");
@@ -2469,11 +2478,12 @@ const OrderAnalysisView = ({ settings, files, setFiles, analyzedOrders, setAnaly
     setAnalyzing(true); setLog("Đang chuẩn bị dữ liệu…");
     try {
       const res = await analyzeOrdersWithAI(files, settings, setLog);
+      const orderCount = await onOrdersExtracted(res.orders||[]);
       const aggregated = aggregateOrders(res.items);
       setAnalyzedOrders(aggregated);
       onAiStatus({ provider: res.provider, model: res.model });
       if (aggregated.length === 0) toast("AI không tìm thấy dòng sản phẩm nào trong tài liệu.", "warn");
-      else toast(`Đã bóc tách ${aggregated.length} mã sản phẩm từ ${files.length} tài liệu.`, "ok");
+      else toast(`Đã đọc ${orderCount} đơn khách hàng và ${aggregated.length} sản phẩm. Mở THÔNG TIN ĐƠN HÀNG để theo dõi trạng thái lưu.`, "ok");
     } catch (error) {
       toast("Phân tích thất bại.\n" + sanitizeAiText(String(error && error.message)).slice(0, 300), "error");
     } finally { setAnalyzing(false); setLog(""); }
@@ -2559,7 +2569,7 @@ const OrderAnalysisView = ({ settings, files, setFiles, analyzedOrders, setAnaly
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="p-5 border-b border-slate-100 bg-blue-50/30 flex justify-between items-center flex-wrap gap-2">
             <h3 className="font-bold text-slate-700 flex items-center gap-2">
-              <Ico n="fileText" size={20} cls="text-blue-600" /> KẾT QUẢ TRÍCH XUẤT AI
+              <Ico n="fileText" size={20} cls="text-blue-600" /> KẾT QUẢ TRÍCH XUẤT AI <button onClick={onShowOrders} className="ml-3 text-xs text-blue-700 underline">Xem thông tin từng đơn →</button>
             </h3>
             <div className="flex items-center gap-2">
               <button onClick={() => exportToExcel(analyzedOrders.map((i) => ({
@@ -3470,8 +3480,49 @@ const HistoryView = ({ historyList }) => {
 /* ============================================================
    12. ỨNG DỤNG CHÍNH
    ============================================================ */
+const ORDER_STATUSES=['Mới phân tích','Đang xử lý','Hoàn tất','Hủy'];
+const OrderInformationView=({orders,pendingIds,syncMessage,onRetry,onUpdate,onDelete,toast})=>{
+  const [query,setQuery]=useState(''),[from,setFrom]=useState(''),[to,setTo]=useState(''),[status,setStatus]=useState('');
+  const [selected,setSelected]=useState(''),[note,setNote]=useState(''),[nextStatus,setNextStatus]=useState('Mới phân tích'),[saving,setSaving]=useState(false);
+  const rows=useMemo(()=>orders.filter(d=>{
+    const q=normalizeString(query),date=orderDateISO(d.orderDate);
+    return (!q||normalizeString([d.customerName,d.customerCode,d.orderCode,d.orderNumber,d.sourceFile,d.customerNote].join(' ')).includes(q))&&(!status||(d.status||'Mới phân tích')===status)&&(!from||date&&date>=from)&&(!to||date&&date<=to);
+  }),[orders,query,from,to,status]);
+  const [deleting,setDeleting]=useState('');
+  const detail=orders.find(x=>x.id===selected);
+  const deleteOrder=async d=>{
+    if(deleting||saving||pendingIds.has(d.id))return;
+    if(!window.confirm(`Xóa đơn ${d.orderCode||d.orderNumber||'chưa có mã'} của ${d.customerName||'khách chưa xác định'}?\nToàn bộ thông tin, dòng thuốc và ghi chú theo dõi của đơn này sẽ bị xóa khỏi danh sách đã lưu trên Firebase. Không thể hoàn tác.`))return;
+    setDeleting(d.id);
+    try{await onDelete(d.id);if(selected===d.id)setSelected('');toast('Đã xóa đơn và chi tiết đã lưu trên Firebase.','ok')}
+    catch(e){toast('Chưa xóa được đơn: '+(e.message||e),'error')}
+    finally{setDeleting('')}
+  };
+
+  const open=d=>{setSelected(d.id);setNote(d.followupNote||'');setNextStatus(d.status||'Mới phân tích')};
+  const save=async()=>{setSaving(true);try{await onUpdate(detail.id,{status:nextStatus,followupNote:note,trackingUpdatedAt:Date.now()});toast('Đã lưu trạng thái và ghi chú.','ok')}catch(e){toast('Chưa lưu được: '+e.message,'error')}finally{setSaving(false)}};
+  const exportRows=()=>exportToExcel(rows.flatMap(d=>(d.items?.length?d.items:[{}]).map((it,i)=>({'Khách hàng':d.customerName,'Mã KH':d.customerCode,'Mã đơn':d.orderCode,'Số đơn':d.orderNumber,'Ngày lập':d.orderDate,'Trang PDF':d.sourcePages,'Tệp nguồn':d.sourceFile,'Trạng thái':d.status||'Mới phân tích','STT thuốc':i+1,'Mã SP':it.code||'','Tên thuốc':it.name||'','ĐVT':it.unit||'','Số lượng':it.quantity??'','Tổng thanh toán của đơn (chỉ dòng đầu)':i===0?d.totalAmount:'','Ghi chú theo dõi':d.followupNote||'','Cần kiểm tra':d.reviewNote||''}))), 'ThongTinDonHang','DonKhachHang');
+  return <div className="space-y-5">
+    <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+      <div className="flex flex-wrap justify-between gap-3"><div><h2 className="text-xl font-black text-slate-800">THÔNG TIN ĐƠN HÀNG</h2><p className="text-sm text-slate-500 mt-1">Theo dõi từng khách và từng đơn từ PDF/ảnh đã phân tích.</p></div><button disabled={!rows.length} onClick={exportRows} className="px-4 py-2 rounded-xl bg-emerald-600 text-white font-bold disabled:opacity-40">Xuất Excel chi tiết</button></div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-5">{[['Đơn đang hiển thị',rows.length],['Khách hàng',new Set(rows.map(x=>x.customerCode||x.customerName).filter(Boolean)).size],['Dòng thuốc',rows.reduce((n,x)=>n+(x.items?.length||0),0)],['Đơn cần kiểm tra',rows.filter(x=>x.reviewNote||x.items?.some(it=>it.reviewLevel==='warn')).length]].map(([label,value])=><div key={label} className="p-4 rounded-xl bg-slate-50 border"><div className="text-xs font-bold text-slate-500">{label}</div><div className="text-2xl font-black text-blue-700 mt-1">{value}</div></div>)}</div>
+      <div className="flex flex-wrap gap-3 mt-5 items-end"><label className="flex-1 min-w-[220px] text-xs font-bold">Tìm khách / mã đơn / số đơn<input className="w-full mt-1 border rounded-lg p-2.5 text-sm" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Pharmacity, Bạch Liên, DH2609…"/></label><label className="text-xs font-bold">Từ ngày lập<input type="date" className="block mt-1 border rounded-lg p-2" value={from} onChange={e=>setFrom(e.target.value)}/></label><label className="text-xs font-bold">Đến ngày lập<input type="date" className="block mt-1 border rounded-lg p-2" value={to} onChange={e=>setTo(e.target.value)}/></label><label className="text-xs font-bold">Trạng thái<select className="block mt-1 border rounded-lg p-2.5" value={status} onChange={e=>setStatus(e.target.value)}><option value="">Tất cả</option>{ORDER_STATUSES.map(v=><option key={v}>{v}</option>)}</select></label><button className="text-sm text-blue-700 p-2" onClick={()=>{setQuery('');setFrom('');setTo('');setStatus('')}}>Bỏ lọc</button></div>
+      <div className="mt-3 text-xs text-slate-500">{syncMessage} {pendingIds.size>0&&<span className="text-amber-700 font-bold"> · {pendingIds.size} đơn đang chờ lưu, chưa đồng bộ sang máy khác. <button onClick={onRetry} className="underline">Thử lưu lại</button></span>}</div>
+    </div>
+    <div className="bg-white border rounded-2xl overflow-hidden shadow-sm"><div className="overflow-x-auto"><table className="w-full text-sm text-left min-w-[1050px]"><thead className="bg-slate-100 text-xs uppercase text-slate-600"><tr>{['Khách hàng','Mã / Số đơn','Ngày lập','Thuốc','Tổng thanh toán','Theo dõi','Nguồn / Chi tiết'].map(v=><th key={v} className="p-4">{v}</th>)}</tr></thead><tbody>{rows.map(d=><tr key={d.id} className="border-t hover:bg-blue-50/40"><td className="p-4 max-w-[260px]"><b>{d.customerName||'Chưa đọc được khách'}</b><div className="text-xs text-slate-500 mt-1">{d.customerCode||'—'}</div></td><td className="p-4"><b className="text-blue-700">{d.orderCode||'Chưa có mã'}</b><div className="text-xs mt-1">Số: {d.orderNumber||'—'}</div></td><td className="p-4 whitespace-nowrap">{d.orderDate||'Chưa đọc được'}</td><td className="p-4">{d.items?.length||0} dòng</td><td className="p-4 whitespace-nowrap font-semibold">{d.totalAmount===''||d.totalAmount==null?'—':Number(d.totalAmount).toLocaleString('vi-VN')+' đ'}</td><td className="p-4"><span className="text-xs font-bold bg-blue-50 text-blue-800 rounded-full px-2 py-1">{d.status||'Mới phân tích'}</span>{d.reviewNote&&<div className="text-xs text-amber-700 mt-2">⚠ Cần kiểm tra</div>}{pendingIds.has(d.id)&&<div className="text-xs text-amber-700 mt-2">Chưa lưu xong</div>}</td><td className="p-4 max-w-[240px]"><div className="text-xs text-slate-500 break-words">{d.sourceFile} · trang {d.sourcePages||'—'}</div><button onClick={()=>open(d)} className="text-blue-700 font-bold mt-2">Xem chi tiết →</button><button onClick={()=>deleteOrder(d)} disabled={!!deleting||saving||pendingIds.has(d.id)} title={pendingIds.has(d.id)?"Chờ đơn lưu xong trước khi xóa":"Xóa đơn và chi tiết đã lưu"} className="block mt-2 px-3 py-1.5 rounded-lg border border-red-200 bg-red-50 text-red-700 text-xs font-bold disabled:opacity-40">{deleting===d.id?"Đang xóa…":"🗑 Xóa đơn"}</button></td></tr>)}</tbody></table></div>{!rows.length&&<div className="p-12 text-center text-slate-500">{orders.length?'Không có đơn phù hợp bộ lọc.':'Chưa có thông tin đơn. Vào “Phân tích Đơn”, tải PDF/ảnh và bấm phân tích. Các PDF đã phân tích bằng bản cũ cần được tải lại.'}</div>}</div>
+    <p className="text-xs text-slate-500">Danh sách này lưu từng đơn gốc AI trích xuất. Bảng thuốc tổng hợp ở “Phân tích Đơn” dùng cho lần dự báo hiện tại; chỉnh số lượng ở đó không sửa chứng từ đã lưu. Trạng thái theo dõi không tự cập nhật xuất kho hoặc thanh toán.</p>
+    {detail&&<div className="fixed inset-0 z-[150] bg-slate-900/60 p-3 md:p-6 flex items-center justify-center"><div role="dialog" aria-modal="true" aria-label="Chi tiết đơn hàng" className="bg-white rounded-2xl shadow-xl w-full max-w-6xl max-h-[92vh] flex flex-col"><div className="p-5 border-b flex justify-between gap-3"><div><h3 className="font-black text-lg">{detail.customerName||'Chưa đọc được khách hàng'}</h3><div className="text-sm text-blue-700 mt-1">Mã đơn: {detail.orderCode||'—'} · Số đơn: {detail.orderNumber||'—'} · Ngày: {detail.orderDate||'—'}</div></div><button className="font-bold p-2" onClick={()=>setSelected('')}>Đóng ✕</button></div><div className="p-5 overflow-auto space-y-5">
+      <div className="grid md:grid-cols-2 gap-3 text-sm">{[['Mã khách',detail.customerCode],['Người liên hệ',detail.contactName],['Điện thoại',detail.phone],['MST / thông tin định danh',detail.taxCode],['Nhân viên kinh doanh',detail.salesPerson],['Địa chỉ khách',detail.customerAddress],['Địa chỉ giao hàng',detail.deliveryAddress],['Ghi chú / PO trên đơn',detail.customerNote],['Thanh toán trên đơn',detail.paymentTerms],['Nguồn',`${detail.sourceFile} · trang ${detail.sourcePages||'—'}`]].map(([label,v])=><div key={label} className="p-3 bg-slate-50 rounded-lg break-words"><b className="block text-xs text-slate-500 mb-1">{label}</b>{v||'Chưa có thông tin'}</div>)}</div>
+      {detail.reviewNote&&<div className="p-3 bg-amber-50 text-amber-800 border border-amber-200 rounded-lg text-sm whitespace-pre-wrap">⚠ {detail.reviewNote}</div>}
+      <div className="overflow-x-auto border rounded-xl"><table className="w-full text-sm min-w-[650px]"><thead className="bg-slate-100 text-left"><tr>{['STT','Mã SP','Tên thuốc','ĐVT / Quy cách','Số lượng'].map(x=><th key={x} className="p-3">{x}</th>)}</tr></thead><tbody>{(detail.items||[]).map((it,i)=><tr key={i} className="border-t"><td className="p-3">{it.stt||i+1}</td><td className="p-3 text-blue-700">{it.code||'—'}</td><td className="p-3"><b>{it.name}</b>{it.reviewLevel==='warn'&&<div className="text-xs text-amber-700 mt-1">{it.reviewNote}</div>}</td><td className="p-3">{it.unit||'—'}</td><td className="p-3 font-bold">{Number(it.quantity||0).toLocaleString('vi-VN')}</td></tr>)}</tbody></table></div>
+      <div className="border-t pt-4 grid md:grid-cols-3 gap-3"><label className="text-sm font-bold">Trạng thái xử lý<select value={nextStatus} onChange={e=>setNextStatus(e.target.value)} className="block w-full border rounded-lg p-2.5 mt-2">{ORDER_STATUSES.map(v=><option key={v}>{v}</option>)}</select></label><label className="md:col-span-2 text-sm font-bold">Ghi chú theo dõi<textarea value={note} onChange={e=>setNote(e.target.value)} className="block w-full border rounded-lg p-2.5 mt-2 font-normal" rows={3} placeholder="Ví dụ: Chờ xác nhận tồn kho, dự kiến giao ngày…"/></label></div><div className="flex flex-wrap justify-between gap-3"><button onClick={()=>deleteOrder(detail)} disabled={!!deleting||saving||pendingIds.has(detail.id)} className="px-4 py-2.5 rounded-xl border border-red-200 bg-red-50 text-red-700 font-bold disabled:opacity-40">{deleting===detail.id?"Đang xóa…":"🗑 Xóa đơn này"}</button><button onClick={save} disabled={saving||!!deleting||pendingIds.has(detail.id)} className="px-5 py-2.5 rounded-xl bg-blue-600 text-white font-bold disabled:opacity-40">{saving?'Đang lưu…':pendingIds.has(detail.id)?'Chờ lưu đơn trước':'Lưu theo dõi'}</button></div>
+    </div></div></div>}
+  </div>;
+};
+
 const TABS = [
   { id: "ORDER_ANALYSIS", label: "Phân tích Đơn", icon: "uploadCloud" },
+  { id: "ORDER_INFORMATION", label: "THÔNG TIN ĐƠN HÀNG", icon: "fileText" },
   { id: "INVENTORY_REPORT", label: "Báo cáo Tồn Kho", icon: "dashboard" },
   { id: "SALES_DATA", label: "Sản Lượng BQ", icon: "sheet" },
   { id: "SHIPPED_ORDERS", label: "Thực Bán", icon: "truck" },
@@ -3498,6 +3549,62 @@ function App() {
   const [shippedOrders, setShippedOrders] = useState([]);
   const [historyList, setHistoryList] = useState([]);
   const [aiStatus, setAiStatus] = useState(null);
+  const [customerOrders,setCustomerOrders]=useState([]);
+  const [pendingOrders,setPendingOrders]=useState(()=>{try{return JSON.parse(localStorage.getItem(ORDER_PENDING_CACHE)||'{}')}catch{return {}}});
+  const [orderSyncMessage,setOrderSyncMessage]=useState('Đang tải danh sách đơn đã lưu…');
+  const orderSaves=useRef(new Set());
+  const orderDeletes=useRef(new Set());
+  useEffect(()=>{try{localStorage.setItem(ORDER_PENDING_CACHE,JSON.stringify(pendingOrders))}catch{setOrderSyncMessage('Không lưu được bản chờ trên máy này; hãy giữ trang mở cho đến khi đồng bộ xong.')}},[pendingOrders]);
+  useEffect(()=>{
+    const ref=DB.ref(ORDER_TRACKING_PATH);
+    const cb=ref.on('value',snap=>{const data=snap.val()||{};setCustomerOrders(Object.entries(data).map(([id,d])=>({...d,id})));setOrderSyncMessage('Đã tải danh sách đơn đã lưu. Thay đổi được đồng bộ tự động.');},err=>setOrderSyncMessage('Chưa tải được danh sách đơn: '+err.message));
+    return ()=>ref.off('value',cb);
+  },[]);
+  const persistCustomerOrders=async entries=>{
+    for(const d of entries){
+      if(orderSaves.current.has(d.id)||orderDeletes.current.has(d.id))continue;
+      orderSaves.current.add(d.id);
+      try{
+        const payload=JSON.parse(JSON.stringify(d));delete payload.id;
+        const result=await DB.ref(ORDER_TRACKING_PATH+'/'+d.id).transaction(old=>({...old,...payload,status:old?.status||'Mới phân tích',followupNote:old?.followupNote||'',createdAt:old?.createdAt||d.analyzedAt,updatedAt:Date.now()}));
+        if(!result.committed)throw new Error('Chưa xác nhận lưu đơn');
+        setCustomerOrders(prev=>[...prev.filter(x=>x.id!==d.id),{...result.snapshot.val(),id:d.id}]);
+        setPendingOrders(prev=>{const next={...prev};if(next[d.id]?.analyzedAt===d.analyzedAt)delete next[d.id];return next});
+      }catch(err){setOrderSyncMessage('Có đơn chưa lưu được: '+err.message)}finally{orderSaves.current.delete(d.id)}
+    }
+  };
+  const acceptCustomerOrders=async docs=>{
+    const entries=[];
+    for(const d of docs){const id=await orderDocumentId(d);entries.push({...d,id})}
+    // Do not silently overwrite two competing reads of the same order in one batch.
+    const grouped=new Map();
+    for(const d of entries){if(grouped.has(d.id)){const first=grouped.get(d.id);first.reviewNote=[first.reviewNote,'Đơn có cùng khách và mã/số xuất hiện nhiều lần trong đợt phân tích. Đã giữ bản đầu; kiểm tra tệp gốc.'].filter(Boolean).join('; ')}else grouped.set(d.id,d)}
+    const unique=Array.from(grouped.values());
+    setPendingOrders(prev=>({...prev,...Object.fromEntries(unique.map(d=>[d.id,d]))}));
+    persistCustomerOrders(unique);
+    return unique.length;
+  };
+  const displayedCustomerOrders=useMemo(()=>{
+    const map=new Map(customerOrders.map(x=>[x.id,x]));
+    Object.values(pendingOrders).forEach(x=>map.set(x.id,{...map.get(x.id),...x}));
+    return Array.from(map.values()).sort((a,b)=>(b.analyzedAt||0)-(a.analyzedAt||0));
+  },[customerOrders,pendingOrders]);
+  const updateCustomerOrder=(id,patch)=>{
+    if(orderDeletes.current.has(id))return Promise.reject(new Error('Đơn đang được xóa.'));
+    return DB.ref(ORDER_TRACKING_PATH+'/'+id).update(patch);
+  };
+  const deleteCustomerOrder=async id=>{
+    if(!id)throw new Error('Không xác định được đơn cần xóa.');
+    if(orderSaves.current.has(id)||pendingOrders[id])throw new Error('Đơn chưa lưu xong. Vui lòng chờ đồng bộ rồi xóa.');
+    if(orderDeletes.current.has(id))throw new Error('Đơn đang được xóa.');
+    orderDeletes.current.add(id);
+    try{
+      await DB.ref(ORDER_TRACKING_PATH+'/'+id).remove();
+      setCustomerOrders(prev=>prev.filter(d=>d.id!==id));
+      setPendingOrders(prev=>{const next={...prev};delete next[id];return next});
+    }finally{orderDeletes.current.delete(id)}
+  };
+
 
   const showToast = useCallback((msg, type) => {
     setToastState({ msg: msg, type: type || "ok" });
@@ -3623,8 +3730,9 @@ function App() {
           {activeTab === "ORDER_ANALYSIS" && (
             <OrderAnalysisView settings={settings} files={filesTab1} setFiles={setFilesTab1}
               analyzedOrders={analyzedOrders} setAnalyzedOrders={setAnalyzedOrders}
-              onAiStatus={setAiStatus} toast={showToast} />
+              onAiStatus={setAiStatus} onOrdersExtracted={acceptCustomerOrders} onShowOrders={()=>setActiveTab("ORDER_INFORMATION")} toast={showToast} />
           )}
+          {activeTab === "ORDER_INFORMATION" && <OrderInformationView orders={displayedCustomerOrders} pendingIds={new Set(Object.keys(pendingOrders))} syncMessage={orderSyncMessage} onRetry={()=>persistCustomerOrders(Object.values(pendingOrders))} onUpdate={updateCustomerOrder} onDelete={deleteCustomerOrder} toast={showToast} />}
           {activeTab === "INVENTORY_REPORT" && <InventoryReportTab />}
           {activeTab === "SALES_DATA" && <SalesView salesData={salesData} setSalesData={setSalesData} settings={settings} toast={showToast} />}
           {activeTab === "SHIPPED_ORDERS" && <ShippedOrdersView shippedOrders={shippedOrders} setShippedOrders={setShippedOrders} toast={showToast} />}
@@ -10101,9 +10209,32 @@ function flattenMasterFiles(raw){const out=[];Object.entries(raw||{}).forEach(([
 function masterCompatibility(sourceName,masterName){const shared=window.IDECO_SHARED_AI;if(shared&&typeof shared.masterNameCompatibility==='function'){try{return shared.masterNameCompatibility(sourceName,masterName)}catch{}}const a=normKey(sourceName),b=normKey(masterName);if(a&&b&&a===b)return {accepted:true,level:'exact',score:1,reason:'Tên trùng chuẩn hóa'};const at=a.split(' ').filter(x=>x.length>2),bt=b.split(' ').filter(x=>x.length>2),same=at.filter(x=>bt.includes(x)).length,score=Math.max(at.length,bt.length)?same/Math.max(at.length,bt.length):0;return {accepted:score>=.72,level:score>=.9?'safe':score>=.72?'near':'bad',score,reason:'So tên cục bộ'}}
 function unitCanonical(v){const s=normKey(v);if(!s)return '';const rules=[['hop',/\b(hop|box)\b/],['vien',/\b(vien|tablet|capsule)\b/],['tuyp',/\b(tuyp|tube)\b/],['chai',/\b(chai|bottle)\b/],['lo',/\b(lo|vial|jar)\b/],['ong',/\b(ong|ampoule|ampule)\b/],['goi',/\b(goi|sachet)\b/],['vi',/\b(vi|blister)\b/]];for(const [k,re] of rules)if(re.test(s))return k;return s}
 function strengthCanonical(v){return normKey(v).replace(/\s+/g,'').replace(/miligam|milligram/g,'mg').replace(/microgam|microgram/g,'mcg')}
-function packSignature(v){const s=normKey(v),nums=(s.match(/\d+(?:[.,]\d+)?/g)||[]).map(x=>x.replace(',','.'));const units=['hop','vi','vien','tuyp','chai','lo','ong','goi'].filter(u=>s.includes(u));return {raw:s,nums,units}}
-function packCompatible(a,b){if(!a||!b)return {known:false,ok:true,reason:'Thiếu quy cách trên một nguồn'};const x=packSignature(a),y=packSignature(b);if(x.raw===y.raw)return {known:true,ok:true,reason:'Quy cách trùng chuẩn hóa'};const numsOk=x.nums.length&&y.nums.length&&x.nums.join('x')===y.nums.join('x');const unitOverlap=!x.units.length||!y.units.length||x.units.some(u=>y.units.includes(u));const contain=x.raw.includes(y.raw)||y.raw.includes(x.raw);return {known:true,ok:!!((numsOk&&unitOverlap)||contain),reason:(numsOk&&unitOverlap)?'Cùng cấu trúc số lượng/đơn vị':contain?'Một mô tả bao hàm mô tả còn lại':'Quy cách khác Master'}}
-function invoicePackFactor(packSpec){const s=normKey(packSpec);if(!s)return {factor:null,smallUnit:''};let m=s.match(/(\d+(?:[.,]\d+)?)\s*vi\s*(?:x|\*)\s*(\d+(?:[.,]\d+)?)\s*vien/);if(m)return {factor:numberVal(m[1])*numberVal(m[2]),smallUnit:'vien'};for(const [u,re] of [['vien',/(\d+(?:[.,]\d+)?)\s*vien\b/],['tuyp',/(\d+(?:[.,]\d+)?)\s*tuyp\b/],['chai',/(\d+(?:[.,]\d+)?)\s*chai\b/],['lo',/(\d+(?:[.,]\d+)?)\s*lo\b/],['ong',/(\d+(?:[.,]\d+)?)\s*ong\b/],['goi',/(\d+(?:[.,]\d+)?)\s*goi\b/],['vi',/(\d+(?:[.,]\d+)?)\s*vi\b/]]){const x=s.match(re);if(x)return {factor:numberVal(x[1])||1,smallUnit:u}}return {factor:null,smallUnit:''}}
+// Preserve separators before interpreting packaging; never infer a pack from strength.
+function invoicePackText(v){return String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/đ/g,'d').replace(/[×✕*]/g,'x').replace(/(\d),(\d)/g,'$1.$2').replace(/\s+/g,' ').trim()}
+function invoicePackFactor(packSpec){
+  const s=invoicePackText(packSpec).replace(/[()[\]]/g,' ').trim();
+  const unknown={factor:null,smallUnit:''};
+  if(!s)return unknown;
+  // v/h and v/hop are invoice shorthand for tablets per box, not blisters.
+  let m=s.match(/^(?:hop\s*(?:1\s*x\s*)?)?(\d+)\s*(?:v|vien)\s*\/\s*(?:h|hop)\s*\.?$/);
+  if(m)return +m[1]>0?{factor:+m[1],smallUnit:'vien'}:unknown;
+  // A named blister hierarchy supplies the unit even when the final 'vien' is omitted.
+  m=s.match(/^(?:hop\s*(?:1\s*x\s*)?)?(\d+)\s*vi\s*x\s*(\d+)\s*(?:vien|v)?(?:\s*\/\s*(?:h|hop))?\s*\.?$/);
+  if(m)return +m[1]>0&&+m[2]>0?{factor:+m[1]*+m[2],smallUnit:'vien'}:unknown;
+  m=s.match(/^(?:hop\s*(?:1\s*x\s*)?)?(\d+)\s*(vien|tuyp|chai|lo|ong|goi|vi)(?:\s*\/\s*(?:h|hop))?\s*\.?$/);
+  if(m)return +m[1]>0?{factor:+m[1],smallUnit:m[2]}:unknown;
+  return unknown;
+}
+function packCompatible(a,b){
+  if(!a||!b)return {known:false,ok:false,reason:'Thiếu quy cách trên một nguồn'};
+  const x=invoicePackFactor(a),y=invoicePackFactor(b);
+  if(x.factor&&y.factor){
+    const ok=x.smallUnit===y.smallUnit&&x.factor===y.factor;
+    return {known:true,ok,reason:ok?`Tương đương ${x.factor} ${x.smallUnit==='vien'?'viên':x.smallUnit}/hộp (có thể khác cách chia vỉ)`:`Quy cách khác: HĐ ${x.factor} ${x.smallUnit}/hộp · Kho ${y.factor} ${y.smallUnit}/hộp`};
+  }
+  if(invoicePackText(a)===invoicePackText(b))return {known:true,ok:true,reason:'Quy cách trùng mô tả'};
+  return {known:false,ok:false,reason:'Chưa diễn giải chắc chắn hai quy cách; cần xác nhận, không tự suy đoán số viên/hộp'};
+}
 function invoiceQtyInStockUnit(inv,master){const qty=numberVal(inv.quantity),iu=unitCanonical(inv.unit),mu=unitCanonical(master?.unit);if(qty<=0)return {known:false,stockQty:0,note:'Không đọc được số lượng'};if(iu&&mu&&iu===mu)return {known:true,stockQty:qty,note:`${qty} ${master.unit||inv.unit}`};const pf=invoicePackFactor(master?.packSpec||'');if(mu==='hop'&&pf.factor&&iu===pf.smallUnit){const stockQty=qty/pf.factor,whole=Math.abs(stockQty-Math.round(stockQty))<1e-9;return {known:true,stockQty,note:`${qty} ${inv.unit} ÷ ${pf.factor} = ${stockQty.toLocaleString('vi-VN',{maximumFractionDigits:4})} hộp`,wholePack:whole}}return {known:false,stockQty:qty,note:`Không quy đổi chắc chắn ĐVT hóa đơn “${inv.unit||'—'}” về ĐVT kho “${master?.unit||'—'}”`}}
 // Match invoice names against inventory names only; invoice codes are informational.
 function invoiceNameKey(v){return String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/đ/g,'d').replace(/(\d),(\d)/g,'$1.$2').replace(/[^a-z0-9.%/+]+/g,' ').replace(/(\d)\s+(mg|mcg|ml|g|iu)\b/g,'$1$2').replace(/\s+/g,' ').trim()}
@@ -10121,7 +10252,7 @@ function findMasterForInvoice(inv){
   const master={name:rows[0].name,code:values('code').join(', '),unit:'',strength:'',packSpec:''};
   for(const key of ['unit','strength','packSpec']){
     const v=values(key);
-    if(v.length>1)return {master:null,type:'ambiguous_name',reason:`Nhiều dòng tồn cùng tên “${master.name}” nhưng khác ${key==='unit'?'đơn vị':key==='strength'?'hàm lượng':'quy cách'} (${v.join('; ')}). Cần xác nhận sản phẩm trước khi đối chiếu.`};
+    if(v.length>1&&!(key==='packSpec'&&v.every(p=>packCompatible(p,v[0]).ok)))return {master:null,type:'ambiguous_name',reason:`Nhiều dòng tồn cùng tên “${master.name}” nhưng khác ${key==='unit'?'đơn vị':key==='strength'?'hàm lượng':'quy cách'} (${v.join('; ')}). Cần xác nhận sản phẩm trước khi đối chiếu.`};
     master[key]=v[0]||'';
     if(!master[key]){const mv=[...new Set(masters.map(m=>m[key]).filter(Boolean))];if(mv.length===1)master[key]=mv[0]}
   }
@@ -10146,7 +10277,7 @@ function validateItems(items){
     else if(master.strength){checks.push(auditItem('Hàm lượng/NĐ','warn',`Dữ liệu: ${master.strength}; hóa đơn không thể hiện/không đọc được`));severity=Math.max(severity,1)}
 
     const pc=packCompatible(inv.packSpec,master.packSpec);
-    if(inv.packSpec&&master.packSpec){checks.push(auditItem('Quy cách',pc.ok?'ok':'error',pc.ok?`Khớp ${master.packSpec}`:`HĐ ${inv.packSpec} ≠ Master ${master.packSpec}`));if(!pc.ok)severity=2}
+    if(inv.packSpec&&master.packSpec){checks.push(auditItem('Quy cách',!pc.known?'warn':pc.ok?'ok':'error',`${pc.reason}. HĐ: ${inv.packSpec} · Kho: ${master.packSpec}`));if(!pc.known)severity=Math.max(severity,1);else if(!pc.ok)severity=2}
     else {checks.push(auditItem('Quy cách','warn',`Chưa đủ dữ liệu đối chiếu. HĐ: ${inv.packSpec||'chưa có'} · Dữ liệu kho: ${master.packSpec||'chưa có'}`));severity=Math.max(severity,1)}
 
     if(inv.unit&&master.unit){const ok=unitCanonical(inv.unit)===unitCanonical(master.unit)||unitCanonical(master.unit)==='hop'&&/hop|box/.test(normKey(inv.unit));checks.push(auditItem('ĐVT',ok?'ok':'warn',ok?`Khớp ${master.unit}`:`HĐ ${inv.unit} · Master ${master.unit}`));if(!ok)severity=Math.max(severity,1)}
@@ -10197,7 +10328,7 @@ NGUYÊN TẮC BẮT BUỘC:
 2) TUYỆT ĐỐI KHÔNG suy ra Mã SP từ tên thuốc, không lấy mã từ kiến thức bên ngoài, không tự sửa tên theo Master. Nếu hóa đơn không có Mã SP thì productCode="".
 3) Tên thuốc là căn cứ đối chiếu với tên trong tồn kho. Giữ đầy đủ tên thuốc, hàm lượng và dạng bào chế; không ghép mã vào tên. Mã SP chỉ là thông tin tùy chọn, thiếu mã không phải lỗi. Nếu quy cách nằm trong tên, chép thêm vào packSpec và giữ nguyên productName.
 4) Số lô và HSD phải chép chính xác từ hóa đơn. expiryDate chuẩn DD/MM/YYYY khi đọc được; không tự bịa ngày.
-5) Quy cách phải giữ đủ cấu trúc nếu có, ví dụ "Hộp 3 vỉ x 10 viên"; không tự đổi sang quy cách khác.
+5) Quy cách phải giữ nguyên mô tả nhìn thấy trong packSpec, kể cả viết tắt: "10v/h", "Hộp 2 vỉ x 5 viên", "1 vỉ x 10". Trong ngữ cảnh quy cách, "10v/h" nghĩa là 10 viên/hộp; "2 vỉ x 5 viên" và "1 vỉ x 10 viên" cùng tổng 10 viên/hộp. Không nhầm v (viên) với vỉ; không nhầm hàm lượng mg/ml với số viên. Không đoán cấu trúc vỉ khi hóa đơn chỉ ghi tổng viên; chương trình sẽ tính và đối chiếu quy cách. Nếu chỉ có "2 x 5" không rõ đơn vị, giữ nguyên để yêu cầu xác nhận.
 6) Không bỏ sót dòng thuốc. Số Việt Nam 1.000 = 1000 khi là định dạng hàng nghìn.
 7) Ô mờ/không chắc: để trống trường tương ứng thay vì đoán. Chỉ trả JSON hợp lệ, không giải thích.`}
 async function uploadInvoiceFile(file){if(!storage||!refs.archive)throw new Error('Firebase Storage chưa sẵn sàng');const timestamp=Date.now(),filePath=`archives/${timestamp}_${file.name}`,fileRef=storage.ref(filePath),snap=await fileRef.put(file),downloadUrl=await snap.ref.getDownloadURL(),newRef=refs.archive.push();await newRef.set({fileName:file.name,downloadUrl,storagePath:filePath,timestamp,size:file.size})}

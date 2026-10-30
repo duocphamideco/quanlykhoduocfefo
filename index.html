@@ -4740,7 +4740,18 @@ async function saveMappedMaster(){const req=['ma_sp','ma_erp','ten_sp','gia_ban'
 $('#saveMaster').onclick=async()=>{if(!selectedDataset)return alert('Chọn bảng dữ liệu trước.');if(!masterData.length&&!confirm('Bảng hiện không có dòng nào. Bạn có chắc muốn lưu bảng rỗng?'))return;const rows=masterData.map((r,i)=>({...r,stt:i+1}));toast($('#masterStatus'),'Đang lưu và kiểm tra thay đổi...','info');try{await writeAndVerifyMaster(selectedDataset,rows);masterData=rows;toast($('#masterStatus'),`✅ Đã lưu và xác nhận ${rows.length} dòng.`, 'ok')}catch(e){toast($('#masterStatus'),'❌ Lỗi lưu: '+e.message,'err')}};
 $('#masterDataManager').addEventListener('input',e=>{if(e.target.matches('.master-cell'))$('#masterStatus').textContent='⚠️ Có thay đổi chưa lưu.'});
 $('#masterDataManager').addEventListener('click',e=>{if(e.target.matches('#addMasterRow,.master-del'))setTimeout(()=>$('#masterStatus').textContent='⚠️ Có thay đổi chưa lưu.',0)});
-$('#exportMaster').onclick=()=>exportXlsx(masterData,`${selectedDataset||'MasterData'}.xlsx`,'MasterData');
+$('#exportMaster').onclick=()=>{
+ const table=$('#masterTable table');
+ if(!table||!table.tBodies[0]?.rows.length)return alert('Không có dữ liệu để xuất.');
+ // Chỉ xuất tám cột dữ liệu đang hiển thị; đọc giá trị ô để giữ cả sửa đổi chưa lưu.
+ const headers=Array.from(table.tHead.rows[0].cells).slice(0,8).map(cell=>cell.textContent.trim());
+ const rows=Array.from(table.tBodies[0].rows).map(row=>Array.from(row.cells).slice(0,8).map((cell,i)=>i===0?Number(cell.textContent.trim()):(cell.querySelector('input')?.value??cell.textContent.trim())));
+ const ws=XLSX.utils.aoa_to_sheet([headers,...rows]);
+ ws['!cols']=[{wch:7},{wch:18},{wch:25},{wch:55},{wch:20},{wch:16},{wch:20},{wch:14}];
+ const wb=XLSX.utils.book_new();
+ XLSX.utils.book_append_sheet(wb,ws,'MasterData');
+ XLSX.writeFile(wb,`${selectedDataset||'MasterData'}.xlsx`);
+};
 $('#deleteDataset').onclick=async()=>{if(!selectedDataset)return;let p=prompt(`Nhập mật khẩu để xóa vĩnh viễn bảng "${selectedDataset}":`);if(p===null)return;if(p!=='minhtriet1973')return alert('Mật khẩu không chính xác!');if(!confirm('Xác nhận xóa vĩnh viễn?'))return;await remove(ref(mainDb,`du_lieu_goc/${selectedDataset}`));selectedDataset='';masterData=[];renderMaster();$('#selectedDatasetLabel').textContent='...'};
 
 // ORDER VERIFICATION

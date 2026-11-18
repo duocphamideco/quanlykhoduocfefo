@@ -1439,8 +1439,9 @@ const aggregateOrders = (items) => {
   items.forEach((item) => {
     const key = item.code ? normalizeString(item.code) : normalizeString(item.name);
     if (!key) return;
-    if (!map.has(key)) map.set(key, Object.assign({}, item, { quantity: 0, reviewNotes: [] }));
+    if (!map.has(key)) map.set(key, Object.assign({}, item, { quantity: 0, reviewNotes: [], sourceOrders: [] }));
     const entry = map.get(key);
+    if (item.sourceOrder && !entry.sourceOrders.includes(String(item.sourceOrder))) entry.sourceOrders.push(String(item.sourceOrder));
     entry.quantity += num(item.quantity);
     if (item.name && String(item.name).length > String(entry.name || "").length) entry.name = item.name;
     if (item.unit && String(item.unit).length > String(entry.unit || "").length) entry.unit = item.unit;
@@ -1830,6 +1831,26 @@ async function runAI(settings, payload, onLog) {
 }
 
 const ORDER_TRACKING_PATH = 'ideco_forecast_customer_orders';
+// V63: SỔ ĐƠN ĐÃ ĐƯA VÀO DỰ BÁO — mỗi mã đơn hàng chỉ được tính 1 lần (theo ngày giờ máy tính), tránh cộng trùng số lượng dự báo
+const USED_ORDERS_PATH = 'ideco_forecast_used_orders';
+const vnDayKey = (ms) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' }).format(new Date(ms || Date.now()));
+const orderCodeKey = (c) => String(c || '').toUpperCase().replace(/\s+/g, '').replace(/[.#$\[\]\/]/g, '_');
+// V64: SỔ TỔNG mọi ngày — mỗi mã đơn 1 nút (giữ lần tính đầu tiên) → đơn đã tải lên NGÀY TRƯỚC cũng không tính lại
+const USED_ALL_PATH = 'ideco_forecast_used_orders_all';
+async function readUsedByCodes(codes) {
+  const out = new Map(), ks = Array.from(new Set((codes || []).map(orderCodeKey).filter(Boolean)));
+  await Promise.all(ks.map(async (k) => { const snap = await DB.ref(USED_ALL_PATH + '/' + k).once('value'); const v = snap.val(); if (v) out.set(k, { ...v, day: v.day || vnDayKey(v.at) }); }));
+  return out;
+}
+async function readUsedOrders(days) {
+  const out = new Map(); const n = Math.max(1, days || 3);
+  for (let i = 0; i < n; i++) {
+    const day = vnDayKey(Date.now() - i * 864e5);
+    const snap = await DB.ref(USED_ORDERS_PATH + '/' + day).once('value');
+    Object.entries(snap.val() || {}).forEach(([k, v]) => { if (!out.has(k)) out.set(k, { ...(v || {}), day }); });
+  }
+  return out;
+}
 const ORDER_PENDING_CACHE = 'IDECO_CUSTOMER_ORDERS_PENDING_V1';
 const ORDER_META_FIELDS = ['customerName','customerCode','orderCode','orderNumber','orderDate','contactName','phone','taxCode','customerAddress','deliveryAddress','salesPerson','customerNote','paymentTerms','sourcePages'];
 const ORDER_SCHEMA = {type:'OBJECT',properties:{orders:{type:'ARRAY',items:{type:'OBJECT',properties:{
@@ -2473,12 +2494,34 @@ const OrderAnalysisView = ({ settings, files, setFiles, analyzedOrders, setAnaly
     setAnalyzing(true); setLog("Đang chuẩn bị dữ liệu…");
     try {
       const res = await analyzeOrdersWithAI(files, settings, setLog);
+      // V63/V64: CHỈ 1 LẦN CHO 1 MÃ ĐƠN — bỏ đơn trùng mã trong đợt tải và đơn đã có trong dự báo đã lưu (hôm nay hoặc BẤT KỲ ngày trước nào)
+      let used = new Map(), usedErr = '';
+      try {
+        used = await readUsedOrders(3); // sổ theo ngày (bản cũ)
+        const all = await readUsedByCodes((res.orders || []).map((d) => d.orderCode || d.orderNumber)); // sổ tổng MỌI NGÀY
+        all.forEach((v, k) => { if (!used.has(k)) used.set(k, v); });
+      } catch (e) { usedErr = (e && e.message) || String(e); }
+      if (usedErr) throw new Error('Không đọc được sổ đơn đã đưa vào dự báo trên Firebase (' + usedErr + ') — dừng để không cộng trùng. Kiểm tra mạng rồi phân tích lại.');
+      const seenCodes = new Set(), dupBatch = [], dupUsed = [];
+      res.orders = (res.orders || []).filter((d) => {
+        const k = orderCodeKey(d.orderCode || d.orderNumber);
+        if (!k) return true;
+        if (used.has(k)) { const u = used.get(k); dupUsed.push(`${d.orderCode || d.orderNumber} (đã vào dự báo ${u.time || ''} ${u.day ? u.day.split('-').reverse().join('/') : ''})`.replace(/\s+\)/, ')')); return false; }
+        if (seenCodes.has(k)) { dupBatch.push(d.orderCode || d.orderNumber); return false; }
+        seenCodes.add(k); return true;
+      });
+      if (dupBatch.length || dupUsed.length) {
+        // dựng lại dòng hàng CHỈ từ các đơn được giữ (mỗi mã đơn đúng 1 lần)
+        res.items = res.orders.flatMap((d) => (d.items || []).map((it) => ({ ...it, sourceCustomer: d.customerName, sourceOrder: d.orderCode || d.orderNumber, reviewLevel: d.reviewNote ? 'warn' : it.reviewLevel || 'ok', reviewNote: [d.reviewNote, it.reviewNote].filter(Boolean).join('; ') })));
+      }
+      const dupNote = (dupBatch.length || dupUsed.length) ? `\n⚠️ Đã BỎ ${dupBatch.length + dupUsed.length} đơn trùng mã (mỗi mã đơn chỉ tính 1 lần):` + (dupBatch.length ? `\n• Trùng trong đợt tải: ${[...new Set(dupBatch)].join(', ')}` : '') + (dupUsed.length ? `\n• Đã đưa vào dự báo trước đó: ${dupUsed.join(', ')}` : '') : '';
       const orderCount = await onOrdersExtracted(res.orders||[]);
       const aggregated = aggregateOrders(res.items);
       setAnalyzedOrders(aggregated);
       onAiStatus({ provider: res.provider, model: res.model });
-      if (aggregated.length === 0) toast("AI không tìm thấy dòng sản phẩm nào trong tài liệu.", "warn");
-      else toast(`Đã đọc ${orderCount} đơn khách hàng và ${aggregated.length} sản phẩm. Mở THÔNG TIN ĐƠN HÀNG để theo dõi trạng thái lưu.`, "ok");
+      if (aggregated.length === 0 && dupNote) toast("Không còn đơn mới để dự báo (không tìm thấy dòng sản phẩm mới chưa tính)." + dupNote, "warn");
+      else if (aggregated.length === 0) toast("AI không tìm thấy dòng sản phẩm nào trong tài liệu.", "warn");
+      else toast(`Đã đọc ${orderCount} đơn khách hàng và ${aggregated.length} sản phẩm. Mở THÔNG TIN ĐƠN HÀNG để theo dõi trạng thái lưu.` + dupNote, dupNote ? "warn" : "ok");
     } catch (error) {
       toast("Phân tích thất bại.\n" + sanitizeAiText(String(error && error.message)).slice(0, 300), "error");
     } finally { setAnalyzing(false); setLog(""); }
@@ -3663,12 +3706,24 @@ function App() {
 
   const handleSaveToHistory = (results) => {
     const now = new Date();
+    const orderCodes = Array.from(new Set((analyzedOrders || []).flatMap((it) => it.sourceOrders || (it.sourceOrder ? [it.sourceOrder] : [])).map(String).filter(Boolean)));
     const newEntry = {
       title: `Dự báo ${now.toLocaleDateString("vi-VN")} ${now.toLocaleTimeString("vi-VN")}`,
       timestamp: now.getTime(),
+      orders: orderCodes,
       data: JSON.parse(JSON.stringify(results))
     };
-    DB.ref(HISTORY_PATH).push(newEntry)
+    const hisRef = DB.ref(HISTORY_PATH).push();
+    hisRef.set(newEntry)
+      .then(() => {
+        // V63: ghi SỔ ĐƠN ĐÃ ĐƯA VÀO DỰ BÁO theo ngày máy tính → lần tải sau tự bỏ mã đơn này
+        const day = vnDayKey(now.getTime()), time = now.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
+        // chỉ ghi mã CHƯA có trong sổ (giữ lần tính đầu tiên) + chỉ mục mã đơn theo bản lịch sử (extension kiểm trùng trước khi đặt Cao Mai)
+        const tasks = orderCodes.flatMap((c) => { const k = orderCodeKey(c); if (!k) return []; const rec = { code: c, at: now.getTime(), time, day, history: hisRef.key };
+          return [DB.ref(USED_ORDERS_PATH + "/" + day + "/" + k).transaction((old) => old || rec), DB.ref(USED_ALL_PATH + "/" + k).transaction((old) => old || rec)]; });
+        tasks.push(DB.ref("ideco_forecast_order_index/" + hisRef.key).set({ timestamp: now.getTime(), orders: orderCodes }));
+        return Promise.all(tasks);
+      })
       .then(() => showToast("Đã lưu lịch sử lên Firebase!", "ok"))
       .catch((err) => showToast("Lỗi lưu: " + err.message, "error"));
   };

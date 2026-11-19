@@ -1099,7 +1099,7 @@
                             </div>
                             <div class="full" id="ai-firebase-sync-status" style="font-size:.78rem;color:#475569;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:8px 10px">☁️ Đang kiểm tra cấu hình AI dùng chung trên Firebase Realtime...</div>
                             <div class="full" style="font-size:.78rem;color:#1e3a8a;background:#eef2ff;border:1px solid #c7d2fe;border-radius:8px;padding:9px 10px">
-                                <b>Thiết lập model chuẩn:</b> AI CHÍNH = Gemini 3.8 Flash (tuyến trả phí, ổn định) · AI PHỤ = Gemini 3.8 Flash (Google AI Studio, tự dự phòng khi AI CHÍNH lỗi). Tên model chỉ hiển thị bên trong Cài đặt đã khóa mật khẩu.
+                                <b>Thiết lập model chuẩn:</b> AI CHÍNH = Gemini 3.8 Flash (tuyến trả phí, ổn định) · AI PHỤ = Gemini 3.8 Flash (Google AI Studio, tự dự phòng khi AI CHÍNH lỗi). · <b>AI DỰ PHÒNG 3 = GPT-6.1 Terra</b> (dùng chung key AI CHÍNH, chỉ chạy khi cả 2 tuyến Gemini đều lỗi/quá tải). Tên model chỉ hiển thị bên trong Cài đặt đã khóa mật khẩu.
                             </div>
                             <div class="full app-password-settings">
                                 <h4>🔐 Bảo mật đăng nhập ứng dụng</h4>
@@ -1695,8 +1695,8 @@ function idecoParentAIRpc(action, args = {}, timeoutMs = 120000) {
 }
 const _idecoSharedAIProxy = {
   __rpcProxy: true,
-  textRequest: (prompt, opts) => idecoParentAIRpc("textRequest", { prompt, opts: opts || {} }, 150000),
-  fileRequest: (file, prompt, opts) => idecoParentAIRpc("fileRequest", { file, prompt, opts: opts || {} }, 240000),
+  textRequest: (prompt, opts) => idecoParentAIRpc("textRequest", { prompt, opts: opts || {} }, 360000),
+  fileRequest: (file, prompt, opts) => idecoParentAIRpc("fileRequest", { file, prompt, opts: opts || {} }, 480000),
   getRoute: () => _idecoAiRpcRoute,
   setRoute: (mode) => {
     _idecoAiRpcRoute = mode === "backup" ? "backup" : "main";
@@ -4082,7 +4082,7 @@ const exportXlsx=(rows,name,sheet='Data')=>{if(!rows?.length)return alert('Khôn
 const __IDECO_RPC_NS='IDECO_SHARED_AI_RPC_V1';let __idecoRpcSeq=0,__idecoRpcRoute='main',__idecoRpcState={ready:false,configuredMain:false,configuredBackup:false};const __idecoRpcPending=new Map();
 window.addEventListener('message',ev=>{const d=ev&&ev.data;if(!d||d.__idecoAiRpc!==__IDECO_RPC_NS||d.type!=='response')return;const p=__idecoRpcPending.get(d.id);if(!p)return;__idecoRpcPending.delete(d.id);clearTimeout(p.timer);if(d.result&&d.result.route)__idecoRpcRoute=d.result.route==='backup'?'backup':'main';if(d.result&&(Object.prototype.hasOwnProperty.call(d.result,'configuredMain')||Object.prototype.hasOwnProperty.call(d.result,'configuredBackup')))__idecoRpcState={ready:true,configuredMain:!!d.result.configuredMain,configuredBackup:!!d.result.configuredBackup};d.ok?p.resolve(d.result):p.reject(new Error(d.error||'Lỗi cầu nối AI chung'))});
 window.__IDECO_RPC_CALL_PARENT=function(action,args={},timeoutMs=120000){return new Promise((resolve,reject)=>{if(!window.parent||window.parent===window)return reject(new Error('Không có ứng dụng cha để dùng AI chung.'));const id='ai_rpc_'+Date.now()+'_'+(++__idecoRpcSeq),timer=setTimeout(()=>{__idecoRpcPending.delete(id);reject(new Error('AI chung không phản hồi kịp thời.'))},timeoutMs);__idecoRpcPending.set(id,{resolve,reject,timer});try{window.parent.postMessage({__idecoAiRpc:__IDECO_RPC_NS,type:'request',id,action,args},'*')}catch(e){clearTimeout(timer);__idecoRpcPending.delete(id);reject(e)}})};
-window.__IDECO_RPC_SHARED_AI_PROXY={__rpcProxy:true,textRequest:(prompt,opts)=>window.__IDECO_RPC_CALL_PARENT('textRequest',{prompt,opts:opts||{}},150000),fileRequest:(file,prompt,opts)=>window.__IDECO_RPC_CALL_PARENT('fileRequest',{file,prompt,opts:opts||{}},240000),getRoute:()=>__idecoRpcRoute,setRoute:(mode)=>{__idecoRpcRoute=mode==='backup'?'backup':'main';window.__IDECO_RPC_CALL_PARENT('setRoute',{mode:__idecoRpcRoute},15000).catch(()=>{});return true},getState:()=>({settings:{keys:__idecoRpcState.configuredMain?['shared-via-rpc']:[],kieKey:__idecoRpcState.configuredBackup?'shared-via-rpc':''},bridgeReady:__idecoRpcState.ready})};
+window.__IDECO_RPC_SHARED_AI_PROXY={__rpcProxy:true,textRequest:(prompt,opts)=>window.__IDECO_RPC_CALL_PARENT('textRequest',{prompt,opts:opts||{}},150000),fileRequest:(file,prompt,opts)=>window.__IDECO_RPC_CALL_PARENT('fileRequest',{file,prompt,opts:opts||{}},480000),getRoute:()=>__idecoRpcRoute,setRoute:(mode)=>{__idecoRpcRoute=mode==='backup'?'backup':'main';window.__IDECO_RPC_CALL_PARENT('setRoute',{mode:__idecoRpcRoute},15000).catch(()=>{});return true},getState:()=>({settings:{keys:__idecoRpcState.configuredMain?['shared-via-rpc']:[],kieKey:__idecoRpcState.configuredBackup?'shared-via-rpc':''},bridgeReady:__idecoRpcState.ready})};
 try{window.__IDECO_RPC_CALL_PARENT('hello',{},12000).then(r=>{if(r&&r.route)__idecoRpcRoute=r.route==='backup'?'backup':'main';if(r)__idecoRpcState={ready:true,configuredMain:!!r.configuredMain,configuredBackup:!!r.configuredBackup}}).catch(()=>{__idecoRpcState.ready=false})}catch(e){}
 
 // V57 giữ Firebase kho TEST; riêng bảng giá chuẩn dùng lại đúng Firebase của bảng gốc.
@@ -8283,6 +8283,9 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
         function currentAIKeys(){ return (aiState.settings.keys||[]).map((key,index)=>({key:String(key||'').trim(),index})).filter(x=>x.key); }
         function isBai(model){ return String(model||'').startsWith('bai:'); }
         function isKie(model){ return String(model||'').startsWith('kie:'); }
+        // V65 (19/11/2026): tuyến DỰ PHÒNG 3 = GPT-6.1 Terra (KIE, dùng chung API key AI CHÍNH) — chỉ chạy khi cả 2 tuyến Gemini 3.8 Flash đều lỗi/quá tải
+        const TERRA_MODEL='terra:gpt-6-1-terra', TERRA_ENDPOINT='https://api.kie.ai/codex/v1/responses';
+        function isTerra(model){ return String(model||'').startsWith('terra:'); }
         function hasKieAI(){ return !!String(aiState.settings.kieKey||'').trim(); }
         function hasAnyAI(){ return currentAIKeys().length>0 || hasKieAI(); }
         function activeAIRoute(){ return aiRouteModeState==='backup'?'backup':'main'; }
@@ -8383,6 +8386,7 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
                 // V62: AI CHÍNH = KIE Gemini 3.8 Flash trước; lỗi/hết credit → tự dự phòng AI PHỤ (Google AI Studio).
                 if(hasKieAI())list.push(isKie(fallback)?fallback:'kie:gemini-3-8-flash');
                 if(currentAIKeys().length && !isKie(primary) && !isBai(primary))list.push(primary);
+                if(hasKieAI())list.push(TERRA_MODEL); // V65: Gemini 3.8 Flash (KIE) → Gemini 3.8 Flash (Google) → Terra
                 return [...new Set(list.filter(Boolean))];
             }
             // AI PHỤ: Gemini trước. KIE trả phí tự động tiếp quản nếu Gemini lỗi/quota/model.
@@ -8390,6 +8394,7 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             if(currentAIKeys().length && !isKie(primary) && !isBai(primary))list.push(primary);
             if(hasKieAI())list.push('kie:gemini-3-8-flash');
             if(currentAIKeys().length && fallback && !isKie(fallback) && !isBai(fallback))list.push(fallback);
+            if(hasKieAI())list.push(TERRA_MODEL); // V65: dự phòng cuối khi cả 2 tuyến Gemini lỗi
             return [...new Set(list.filter(Boolean))];
         }
         function geminiEconomyModels(){
@@ -8616,6 +8621,56 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             }
             if(!chunks.length)throw new Error('AI CHÍNH: phản hồi không phải JSON/SSE hợp lệ. Kiểm tra kết nối API.');
             return {text:text.trim(),raw:chunks};
+        }
+        function terraOutputText(j){
+            const x=j&&j.data&&!j.output&&!j.output_text?j.data:j;
+            if(!x)return '';
+            if(x.error)throw Object.assign(new Error('AI DỰ PHÒNG 3: '+(x.error.message||JSON.stringify(x.error)).slice(0,300)),{status:Number(x.error.code)||0});
+            if(x.code!=null&&Number(x.code)!==200&&!x.output&&!x.output_text)throw Object.assign(new Error('AI DỰ PHÒNG 3: '+(x.msg||x.message||'Yêu cầu bị từ chối')),{status:Number(x.code)||0});
+            if(typeof x.output_text==='string'&&x.output_text.trim())return x.output_text;
+            let t='';
+            (Array.isArray(x.output)?x.output:[]).forEach(o=>(Array.isArray(o&&o.content)?o.content:[]).forEach(c=>{if(c&&(c.type==='output_text'||c.type==='text')&&c.text)t+=c.text;}));
+            if(!t&&x.status&&x.status!=='completed')throw new Error('AI DỰ PHÒNG 3 trả trạng thái '+x.status);
+            return t;
+        }
+        async function terraAI(parts,{jsonSchema=null,plainText=false,purpose='AI DỰ PHÒNG 3'}={}){
+            const key=String(aiState.settings.kieKey||'').trim();
+            if(!key)throw new Error('Chưa có API key AI CHÍNH (Terra dùng chung key này).');
+            const content=[];
+            for(const p of (parts||[])){
+                const inl=p&&(p.inlineData||p.inline_data);
+                if(inl){
+                    const mime=inl.mimeType||inl.mime_type||'application/octet-stream', url=`data:${mime};base64,${inl.data}`;
+                    if(/^image\//i.test(mime))content.push({type:'input_image',image_url:url});
+                    else content.push({type:'input_file',filename:/pdf/i.test(mime)?'tai_lieu.pdf':'tai_lieu',file_data:url});
+                }else if(p&&p.text)content.push({type:'input_text',text:p.text});
+            }
+            if(jsonSchema&&!plainText)content.push({type:'input_text',text:'CHỈ TRẢ VỀ JSON THUẦN hợp lệ (không giải thích, không dùng ```), đúng cấu trúc schema sau (kiểu OBJECT/ARRAY/STRING/NUMBER):\n'+JSON.stringify(jsonSchema)});
+            const body={model:TERRA_MODEL.slice(6),input:[{role:'user',content}],reasoning:{effort:'low'},stream:false};
+            let last=null;
+            for(let attempt=0;attempt<2;attempt++){
+                try{
+                    setAIProgress(attempt?'AI DỰ PHÒNG 3 đang thử lại...':'2 tuyến Gemini đang bận · AI DỰ PHÒNG 3 (Terra) tiếp quản phân tích...',true);
+                    const j=await fetchAI(TERRA_ENDPOINT,{method:'POST',headers:{Authorization:'Bearer '+key,'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(body)},
+                        Math.max(150000,Number(aiState.settings.timeoutMs)||150000),async res=>{
+                            const raw=await res.text(); let v=null; try{v=JSON.parse(raw)}catch{}
+                            if(!res.ok){const er=new Error('AI DỰ PHÒNG 3 HTTP '+res.status+' · '+String((v&&(v.msg||v.error?.message))||raw).slice(0,300));er.status=res.status;throw er;}
+                            if(v===null)throw new Error('AI DỰ PHÒNG 3: phản hồi không phải JSON.');
+                            return v;
+                        });
+                    const text=String(terraOutputText(j)||'').trim();
+                    if(!text)throw new Error('AI DỰ PHÒNG 3 trả nội dung rỗng.');
+                    aiState.lastRoute='AI DỰ PHÒNG 3'; aiState.lastError=''; updateAIRouteUI();
+                    return {text,provider:'terra',model:'gpt-6-1-terra',keyIndex:-1,raw:j};
+                }catch(e){
+                    last=e; const status=e?.status||0, msg=e?.name==='AbortError'?'Hết thời gian chờ AI DỰ PHÒNG 3':(e?.message||String(e));
+                    aiState.attempts.push(`AI DỰ PHÒNG 3/L${attempt+1}: ${msg}`);
+                    const transient=e?.name==='AbortError'||status===429||status>=500||/timeout|network|fetch|unavailable|overload|rate limit|server exception|high demand/i.test(msg);
+                    if(transient&&attempt<1){await sleepAI(3000+Math.floor(Math.random()*500));continue;}
+                    throw e;
+                }
+            }
+            throw last||new Error(`${purpose}: AI DỰ PHÒNG 3 chưa phản hồi.`);
         }
         async function kieAI(parts,{jsonSchema=null,plainText=false,purpose='AI CHÍNH'}={}){
             const key=String(aiState.settings.kieKey||'').trim();
@@ -8921,7 +8976,9 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
                 try{
                     const parts=(pdfInfo&&pdfInfo.chars>=120)?[{text:`${prompt}\n\nNỘI DUNG PDF ĐÃ TRÍCH XUẤT THEO DÒNG/CỘT:\n${pdfInfo.text}`}]:await geminiPartsForFile(file,prompt,purpose);
                     let r;
-                    if(isKie(model)){
+                    if(isTerra(model)){
+                        r=await terraAI(parts,{jsonSchema,plainText,purpose});
+                    }else if(isKie(model)){
                         r=await kieAI(parts,{jsonSchema,plainText,purpose});
                     }else{
                         if(!currentAIKeys().length)continue;
@@ -8940,8 +8997,8 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
                     aiResultCache.set(cacheKey,{text:r.text,sourceText:pdfInfo?.text||'',model:r.model,keyIndex:r.keyIndex});
                     return {...r,sourceText:pdfInfo?.text||''};
                 }catch(e){
-                    last=e; const msg=publicAIText(e?.message||String(e)); aiState.lastError=msg; failures.push(`${model}: ${msg}`); aiState.attempts.push(`${model}: ${msg}`);
-                    setAIProgress(isKie(model)?'AI CHÍNH chưa thành công · đang tự chuyển AI PHỤ...':'AI PHỤ chưa thành công · đang kiểm tra tuyến còn lại...',true);
+                    last=e; const msg=publicAIText(e?.message||String(e)); aiState.lastError=msg; failures.push(`${isTerra(model)?'terra':model}: ${msg}`); aiState.attempts.push(`${model}: ${msg}`);
+                    setAIProgress(isTerra(model)?'AI DỰ PHÒNG 3 chưa thành công.':isKie(model)?'AI CHÍNH chưa thành công · đang tự chuyển AI PHỤ...':'AI PHỤ chưa thành công · đang kiểm tra tuyến còn lại...',true);
                 }
             }
             const detail=failures.slice(-4).join(' | ');
@@ -8951,6 +9008,7 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             let last=null;
             for(const model of configuredAIModels()){
                 try{
+                    if(isTerra(model))return await terraAI([{text:prompt}],{jsonSchema,plainText,purpose});
                     if(isKie(model))return await kieAI([{text:prompt}],{jsonSchema,plainText,purpose});
                     if(currentAIKeys().length)return await geminiAI([{text:prompt}],{
                         jsonSchema,

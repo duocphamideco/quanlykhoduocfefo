@@ -1099,7 +1099,7 @@
                             </div>
                             <div class="full" id="ai-firebase-sync-status" style="font-size:.78rem;color:#475569;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:8px 10px">☁️ Đang kiểm tra cấu hình AI dùng chung trên Firebase Realtime...</div>
                             <div class="full" style="font-size:.78rem;color:#1e3a8a;background:#eef2ff;border:1px solid #c7d2fe;border-radius:8px;padding:9px 10px">
-                                <b>Thiết lập model chuẩn:</b> AI CHÍNH = Gemini 3.8 Flash (tuyến trả phí, ổn định) · AI PHỤ = Gemini 3.8 Flash (Google AI Studio, tự dự phòng khi AI CHÍNH lỗi). · <b>AI DỰ PHÒNG 3 = GPT-6.1 Terra</b> (dùng chung key AI CHÍNH, chỉ chạy khi cả 2 tuyến Gemini đều lỗi/quá tải). Tên model chỉ hiển thị bên trong Cài đặt đã khóa mật khẩu.
+                                <b>Thiết lập model chuẩn:</b> AI CHÍNH = GPT-6.1 Terra (KIE) → lỗi thì Gemini 3.8 Flash (KIE) · AI PHỤ = Gemini 3.8 Flash (Google AI Studio, tự dự phòng khi AI CHÍNH lỗi). Tên model chỉ hiển thị bên trong Cài đặt đã khóa mật khẩu.
                             </div>
                             <div class="full app-password-settings">
                                 <h4>🔐 Bảo mật đăng nhập ứng dụng</h4>
@@ -1695,8 +1695,8 @@ function idecoParentAIRpc(action, args = {}, timeoutMs = 120000) {
 }
 const _idecoSharedAIProxy = {
   __rpcProxy: true,
-  textRequest: (prompt, opts) => idecoParentAIRpc("textRequest", { prompt, opts: opts || {} }, 360000),
-  fileRequest: (file, prompt, opts) => idecoParentAIRpc("fileRequest", { file, prompt, opts: opts || {} }, 480000),
+  textRequest: (prompt, opts) => idecoParentAIRpc("textRequest", { prompt, opts: opts || {} }, 150000),
+  fileRequest: (file, prompt, opts) => idecoParentAIRpc("fileRequest", { file, prompt, opts: opts || {} }, 240000),
   getRoute: () => _idecoAiRpcRoute,
   setRoute: (mode) => {
     _idecoAiRpcRoute = mode === "backup" ? "backup" : "main";
@@ -1842,6 +1842,79 @@ async function readUsedByCodes(codes) {
   await Promise.all(ks.map(async (k) => { const snap = await DB.ref(USED_ALL_PATH + '/' + k).once('value'); const v = snap.val(); if (v) out.set(k, { ...v, day: v.day || vnDayKey(v.at) }); }));
   return out;
 }
+// V65 (extension 1.22.0): ĐÚNG KHÁCH THEO MÃ ĐƠN ERP + XÓA ĐỂ LẤY LẠI
+const RELEASED_PATH = 'ideco_forecast_released';
+const ORDER_INDEX_PATH = 'ideco_forecast_order_index';
+function erpTruthMap() { try { const t = window.__IDECO_ERP_ORDERS; if (!t || !Array.isArray(t.orders)) return null; const m = new Map(); t.orders.forEach((o) => { const k = orderCodeKey(o && o.code); if (k) m.set(k, o); }); return m.size ? m : null; } catch (_) { return null; } }
+function fileOrderKey(name) { const m = String(name || '').match(/^DH_(.+)\.pdf$/i); return m ? orderCodeKey(m[1]) : ''; }
+// Extension gửi kèm danh sách ERP {mã đơn → tên khách}: tên khách LẤY THEO ERP, không theo AI. Tệp riêng từng đơn (DH_<mã>.pdf) → mã đơn theo tệp.
+function applyErpTruth(orders) {
+  const truth = erpTruthMap(), rep = { active: !!truth, fixed: [], unknown: [], missing: [], forcedCode: [] };
+  if (!truth) { window.__IDECO_ERP_CHECK = rep; return orders; }
+  // 1 tệp DH_<mã>.pdf = đúng 1 đơn (extension đã kiểm). AI tách thành nhiều phần → GỘP lại thành 1 đơn, giữ đủ dòng thuốc.
+  { const groups = new Map(), rest = [];
+    orders.forEach((d) => { const fk = fileOrderKey(d.sourceFile); if (fk && truth.has(fk)) { if (!groups.has(fk)) groups.set(fk, []); groups.get(fk).push(d); } else rest.push(d); });
+    const merged = [];
+    groups.forEach((list, fk) => {
+      if (list.length === 1) { merged.push(list[0]); return; }
+      const base = list.find((d) => orderCodeKey(d.orderCode || d.orderNumber) === fk) || list[0];
+      const items = list.flatMap((d) => d.items || []).map((it, i) => ({ ...it, stt: i + 1 }));
+      rep.forcedCode.push(`gộp ${list.length} phần AI tách của ${truth.get(fk).code}`);
+      merged.push({ ...base, items, reviewNote: [base.reviewNote, `AI tách tệp đơn thành ${list.length} phần — đã gộp lại theo mã đơn ERP`].filter(Boolean).join('; ') });
+    });
+    orders = merged.concat(rest); }
+  const perFile = new Map(); orders.forEach((d) => { const fk = fileOrderKey(d.sourceFile); if (fk) perFile.set(fk, (perFile.get(fk) || 0) + 1); });
+  const out = orders.map((d0) => {
+    let d = d0, k = orderCodeKey(d.orderCode || d.orderNumber); const notes = []; const fk = fileOrderKey(d.sourceFile);
+    if (fk && truth.has(fk) && perFile.get(fk) === 1 && k !== fk) { const c = truth.get(fk).code; rep.forcedCode.push((d.orderCode || d.orderNumber || '(trống)') + ' → ' + c); notes.push('Mã đơn theo tệp ERP ' + c + ' (AI đọc: ' + (d.orderCode || d.orderNumber || 'trống') + ')'); d = { ...d, orderCode: c }; k = fk; }
+    const t = truth.get(k);
+    if (!t) { rep.unknown.push(d.orderCode || d.orderNumber || '(không mã)'); return { ...d, reviewNote: [d.reviewNote, '⛔ Mã đơn không có trong danh sách ERP của lượt này — kiểm tra lại'].filter(Boolean).join('; ') }; }
+    const name = String(t.customer || '').trim(), nd = { ...d, erpVerified: true };
+    if (name && normalizeString(name) !== normalizeString(d.customerName)) { rep.fixed.push(t.code + ': "' + (d.customerName || 'trống') + '" → "' + name + '"'); notes.push('Tên khách theo ERP (AI đọc: ' + (d.customerName || 'trống') + ')'); nd.customerName = name; }
+    if (t.customerCode && String(t.customerCode).trim() && normalizeString(t.customerCode) !== normalizeString(d.customerCode)) nd.customerCode = String(t.customerCode).trim();
+    if (notes.length) nd.reviewNote = [d.reviewNote, ...notes].filter(Boolean).join('; ');
+    return nd;
+  });
+  const seen = new Set(out.map((d) => orderCodeKey(d.orderCode || d.orderNumber)));
+  truth.forEach((t, k) => { if (!seen.has(k)) rep.missing.push(t.code); });
+  window.__IDECO_ERP_CHECK = rep; return out;
+}
+// Gỡ mã đơn khỏi SỔ "đã đưa vào dự báo" + xóa hồ sơ đơn → lượt chạy tự động kế tiếp LẤY LẠI các đơn này.
+async function releaseForecastOrders(historyId, codes, why) {
+  const list = (codes || []).map(String), ks = Array.from(new Set(list.map(orderCodeKey).filter(Boolean))), at = Date.now();
+  const one = async (k) => {
+    const all = (await DB.ref(USED_ALL_PATH + '/' + k).once('value')).val();
+    if (all && (!historyId || !all.history || all.history === historyId)) await DB.ref(USED_ALL_PATH + '/' + k).remove();
+    for (let i = 0; i < 7; i++) { const day = vnDayKey(at - i * 864e5); const v = (await DB.ref(USED_ORDERS_PATH + '/' + day + '/' + k).once('value')).val(); if (v && (!historyId || !v.history || v.history === historyId)) await DB.ref(USED_ORDERS_PATH + '/' + day + '/' + k).remove(); }
+    await DB.ref(RELEASED_PATH + '/' + k).set({ code: list.find((c) => orderCodeKey(c) === k) || k, at, history: historyId || '', why: why || '' });
+  };
+  for (let i = 0; i < ks.length; i += 8) await Promise.all(ks.slice(i, i + 8).map(one)); // song song từng nhóm 8 mã
+  // giữ chỉ mục, đánh dấu deleted → extension biết bản đã xóa từng được đặt Cao Mai hay chưa (chống đặt trùng)
+  if (historyId) { const ix = (await DB.ref(ORDER_INDEX_PATH + '/' + historyId).once('value')).val(); if (ix) await DB.ref(ORDER_INDEX_PATH + '/' + historyId).update({ deleted: at, why: why || '' }); }
+  const snap = (await DB.ref(ORDER_TRACKING_PATH).once('value')).val() || {};
+  const ids = Object.entries(snap).filter(([, v]) => v && ks.includes(orderCodeKey(v.orderCode || v.orderNumber))).map(([id]) => id);
+  await Promise.all(ids.map((id) => DB.ref(ORDER_TRACKING_PATH + '/' + id).remove()));
+  return { codes: ks.length, orders: ids.length };
+}
+// LÀM LẠI DỰ BÁO TRONG NGÀY (extension gọi): xóa các bản lưu của ngày (chỉ bản lưu SAU mốc `after` — bản đã đặt Cao Mai được GIỮ)
+// + gỡ mã đơn khỏi sổ + xóa hồ sơ đơn → lượt chạy kế tiếp lấy lại đúng khách. dry=true: chỉ liệt kê.
+window.__IDECO_FC_RESET_DAY = async function (opt) {
+  opt = opt || {};
+  const day = opt.day || vnDayKey(), start = Date.parse(day + 'T00:00:00+07:00'), end = start + 864e5, after = Number(opt.after) || 0;
+  const all = (await DB.ref(HISTORY_PATH).once('value')).val() || {};
+  const inDay = Object.entries(all).map(([id, v]) => ({ id, ...(v || {}) })).filter((e) => +e.timestamp >= start && +e.timestamp < end);
+  const del = inDay.filter((e) => +e.timestamp > after), kept = inDay.filter((e) => +e.timestamp <= after);
+  const pick = (e) => ({ id: e.id, title: e.title || '', timestamp: +e.timestamp, orders: Array.isArray(e.orders) ? e.orders : [] });
+  if (opt.dry) return { day, deleted: 0, entries: del.map(pick), kept: kept.map(pick) };
+  let codes = 0, orders = 0; const done = [];
+  for (const e of del) {
+    await DB.ref(HISTORY_PATH + '/' + e.id).remove();
+    const list = Array.isArray(e.orders) ? e.orders : [];
+    if (list.length) { const r = await releaseForecastOrders(e.id, list, opt.why || 'Làm lại dự báo'); codes += r.codes; orders += r.orders; }
+    done.push(pick(e));
+  }
+  return { day, deleted: done.length, codes, orders, entries: done, kept: kept.map(pick) };
+};
 async function readUsedOrders(days) {
   const out = new Map(); const n = Math.max(1, days || 3);
   for (let i = 0; i < n; i++) {
@@ -2493,7 +2566,11 @@ const OrderAnalysisView = ({ settings, files, setFiles, analyzedOrders, setAnaly
     if (files.length === 0) return;
     setAnalyzing(true); setLog("Đang chuẩn bị dữ liệu…");
     try {
+      window.__IDECO_ERP_CHECK = null;
       const res = await analyzeOrdersWithAI(files, settings, setLog);
+      // V65: tên khách / mã đơn theo ERP (khi extension gửi danh sách ERP) — mỗi mã đơn đúng 1 khách
+      res.orders = applyErpTruth(res.orders || []);
+      res.items = res.orders.flatMap((d) => (d.items || []).map((it) => ({ ...it, sourceCustomer: d.customerName, sourceOrder: d.orderCode || d.orderNumber, reviewLevel: d.reviewNote ? 'warn' : it.reviewLevel || 'ok', reviewNote: [d.reviewNote, it.reviewNote].filter(Boolean).join('; ') })));
       // V63/V64: CHỈ 1 LẦN CHO 1 MÃ ĐƠN — bỏ đơn trùng mã trong đợt tải và đơn đã có trong dự báo đã lưu (hôm nay hoặc BẤT KỲ ngày trước nào)
       let used = new Map(), usedErr = '';
       try {
@@ -3392,10 +3469,11 @@ const HistoryView = ({ historyList }) => {
   const handleDelete = async (e, id, title) => {
     e.preventDefault(); e.stopPropagation();
     if (!id) { alert("Lỗi hệ thống: Bản ghi không có ID hợp lệ."); return; }
-    const confirmMessage = `⚠️ XÁC NHẬN XÓA VĨNH VIỄN\n\nBạn có chắc chắn muốn xóa bản lưu:\n"${title}"?\n\nDữ liệu sau khi xóa sẽ không thể khôi phục lại được.`;
+    const entry = (historyList || []).find((h) => h.id === id), codes = (entry && Array.isArray(entry.orders)) ? entry.orders : [];
+    const confirmMessage = `⚠️ XÁC NHẬN XÓA VĨNH VIỄN\n\nBạn có chắc chắn muốn xóa bản lưu:\n"${title}"?\n\nDữ liệu sau khi xóa sẽ không thể khôi phục lại được.` + (codes.length ? `\n\n${codes.length} mã đơn của bản lưu này sẽ được GỠ khỏi sổ "đã đưa vào dự báo" và xóa khỏi THÔNG TIN ĐƠN HÀNG → bấm chạy Dự báo tự động để LẤY LẠI (đơn còn Chưa xử lý trên ERP, lập hôm nay).` : '');
     if (window.confirm(confirmMessage)) {
       setIsDeletingId(id);
-      try { await DB.ref(`${HISTORY_PATH}/${id}`).remove(); }
+      try { await DB.ref(`${HISTORY_PATH}/${id}`).remove(); if (codes.length) { const r = await releaseForecastOrders(id, codes, 'Xóa bản lưu ' + title); alert(`Đã xóa bản lưu, gỡ ${r.codes} mã đơn khỏi sổ và xóa ${r.orders} hồ sơ đơn.\nBấm chạy Dự báo tự động để lấy lại đúng khách hàng.`); } }
       catch (error) { alert(`Không thể thực hiện lệnh xóa.\nChi tiết: ${(error && error.message) || "Lỗi kết nối Firebase"}`); }
       finally { setIsDeletingId(null); }
     }
@@ -3530,9 +3608,20 @@ const OrderInformationView=({orders,pendingIds,syncMessage,onRetry,onUpdate,onDe
   const detail=orders.find(x=>x.id===selected);
   const deleteOrder=async d=>{
     if(deleting||saving||pendingIds.has(d.id))return;
+    const code=d.orderCode||d.orderNumber||'',k=orderCodeKey(code);let used=null,his=null;
+    try{if(k){used=(await DB.ref(USED_ALL_PATH+'/'+k).once('value')).val();if(used&&used.history)his=(await DB.ref(HISTORY_PATH+'/'+used.history).once('value')).val()}}catch(e){toast('Không đọc được sổ dự báo: '+(e.message||e),'error');return}
+    if(his){
+      const codes=Array.isArray(his.orders)?his.orders:[code];
+      if(!window.confirm(`Đơn ${code} đã nằm trong bản dự báo đã lưu "${his.title||''}" (${codes.length} đơn).\nĐể LẤY LẠI đúng mà KHÔNG cộng trùng số lượng, phải xóa CẢ bản dự báo đó: gỡ ${codes.length} mã đơn khỏi sổ và xóa thông tin các đơn này.\nSau đó bấm chạy Dự báo tự động để lấy lại.\n\nĐồng ý xóa?`))return;
+      setDeleting(d.id);
+      try{await DB.ref(HISTORY_PATH+'/'+used.history).remove();const r=await releaseForecastOrders(used.history,codes,'Xóa đơn '+code);if(selected===d.id)setSelected('');toast(`Đã xóa bản dự báo và gỡ ${r.codes} mã đơn (${r.orders} hồ sơ). Bấm chạy Dự báo tự động để lấy lại.`,'ok')}
+      catch(e){toast('Chưa xóa được: '+(e.message||e),'error')}
+      finally{setDeleting('')}
+      return;
+    }
     if(!window.confirm(`Xóa đơn ${d.orderCode||d.orderNumber||'chưa có mã'} của ${d.customerName||'khách chưa xác định'}?\nToàn bộ thông tin, dòng thuốc và ghi chú theo dõi của đơn này sẽ bị xóa khỏi danh sách đã lưu trên Firebase. Không thể hoàn tác.`))return;
     setDeleting(d.id);
-    try{await onDelete(d.id);if(selected===d.id)setSelected('');toast('Đã xóa đơn và chi tiết đã lưu trên Firebase.','ok')}
+    try{await onDelete(d.id);if(used&&k)await releaseForecastOrders('',[code],'Xóa đơn '+code);if(selected===d.id)setSelected('');toast(used?'Đã xóa đơn và gỡ mã khỏi sổ dự báo — bấm chạy Dự báo tự động để lấy lại.':'Đã xóa đơn và chi tiết đã lưu trên Firebase.','ok')}
     catch(e){toast('Chưa xóa được đơn: '+(e.message||e),'error')}
     finally{setDeleting('')}
   };
@@ -3618,6 +3707,10 @@ function App() {
     const grouped=new Map();
     for(const d of entries){if(grouped.has(d.id)){const first=grouped.get(d.id);first.reviewNote=[first.reviewNote,'Đơn có cùng khách và mã/số xuất hiện nhiều lần trong đợt phân tích. Đã giữ bản đầu; kiểm tra tệp gốc.'].filter(Boolean).join('; ')}else grouped.set(d.id,d)}
     const unique=Array.from(grouped.values());
+    // V65: 1 mã đơn = 1 hồ sơ — xóa hồ sơ cũ cùng mã đơn nhưng khác khách (bản AI đọc sai trước đây) để không trùng
+    try{const keys=new Map(unique.map(d=>[orderCodeKey(d.orderCode||d.orderNumber),d.id]).filter(([k])=>k));
+      const stale=(customerOrders||[]).filter(x=>{const k=orderCodeKey(x.orderCode||x.orderNumber);return k&&keys.has(k)&&keys.get(k)!==x.id});
+      await Promise.all(stale.map(x=>DB.ref(ORDER_TRACKING_PATH+'/'+x.id).remove()));}catch(e){console.warn('Không dọn được hồ sơ đơn cũ',e)}
     setPendingOrders(prev=>({...prev,...Object.fromEntries(unique.map(d=>[d.id,d]))}));
     persistCustomerOrders(unique);
     return unique.length;
@@ -4082,7 +4175,7 @@ const exportXlsx=(rows,name,sheet='Data')=>{if(!rows?.length)return alert('Khôn
 const __IDECO_RPC_NS='IDECO_SHARED_AI_RPC_V1';let __idecoRpcSeq=0,__idecoRpcRoute='main',__idecoRpcState={ready:false,configuredMain:false,configuredBackup:false};const __idecoRpcPending=new Map();
 window.addEventListener('message',ev=>{const d=ev&&ev.data;if(!d||d.__idecoAiRpc!==__IDECO_RPC_NS||d.type!=='response')return;const p=__idecoRpcPending.get(d.id);if(!p)return;__idecoRpcPending.delete(d.id);clearTimeout(p.timer);if(d.result&&d.result.route)__idecoRpcRoute=d.result.route==='backup'?'backup':'main';if(d.result&&(Object.prototype.hasOwnProperty.call(d.result,'configuredMain')||Object.prototype.hasOwnProperty.call(d.result,'configuredBackup')))__idecoRpcState={ready:true,configuredMain:!!d.result.configuredMain,configuredBackup:!!d.result.configuredBackup};d.ok?p.resolve(d.result):p.reject(new Error(d.error||'Lỗi cầu nối AI chung'))});
 window.__IDECO_RPC_CALL_PARENT=function(action,args={},timeoutMs=120000){return new Promise((resolve,reject)=>{if(!window.parent||window.parent===window)return reject(new Error('Không có ứng dụng cha để dùng AI chung.'));const id='ai_rpc_'+Date.now()+'_'+(++__idecoRpcSeq),timer=setTimeout(()=>{__idecoRpcPending.delete(id);reject(new Error('AI chung không phản hồi kịp thời.'))},timeoutMs);__idecoRpcPending.set(id,{resolve,reject,timer});try{window.parent.postMessage({__idecoAiRpc:__IDECO_RPC_NS,type:'request',id,action,args},'*')}catch(e){clearTimeout(timer);__idecoRpcPending.delete(id);reject(e)}})};
-window.__IDECO_RPC_SHARED_AI_PROXY={__rpcProxy:true,textRequest:(prompt,opts)=>window.__IDECO_RPC_CALL_PARENT('textRequest',{prompt,opts:opts||{}},150000),fileRequest:(file,prompt,opts)=>window.__IDECO_RPC_CALL_PARENT('fileRequest',{file,prompt,opts:opts||{}},480000),getRoute:()=>__idecoRpcRoute,setRoute:(mode)=>{__idecoRpcRoute=mode==='backup'?'backup':'main';window.__IDECO_RPC_CALL_PARENT('setRoute',{mode:__idecoRpcRoute},15000).catch(()=>{});return true},getState:()=>({settings:{keys:__idecoRpcState.configuredMain?['shared-via-rpc']:[],kieKey:__idecoRpcState.configuredBackup?'shared-via-rpc':''},bridgeReady:__idecoRpcState.ready})};
+window.__IDECO_RPC_SHARED_AI_PROXY={__rpcProxy:true,textRequest:(prompt,opts)=>window.__IDECO_RPC_CALL_PARENT('textRequest',{prompt,opts:opts||{}},150000),fileRequest:(file,prompt,opts)=>window.__IDECO_RPC_CALL_PARENT('fileRequest',{file,prompt,opts:opts||{}},240000),getRoute:()=>__idecoRpcRoute,setRoute:(mode)=>{__idecoRpcRoute=mode==='backup'?'backup':'main';window.__IDECO_RPC_CALL_PARENT('setRoute',{mode:__idecoRpcRoute},15000).catch(()=>{});return true},getState:()=>({settings:{keys:__idecoRpcState.configuredMain?['shared-via-rpc']:[],kieKey:__idecoRpcState.configuredBackup?'shared-via-rpc':''},bridgeReady:__idecoRpcState.ready})};
 try{window.__IDECO_RPC_CALL_PARENT('hello',{},12000).then(r=>{if(r&&r.route)__idecoRpcRoute=r.route==='backup'?'backup':'main';if(r)__idecoRpcState={ready:true,configuredMain:!!r.configuredMain,configuredBackup:!!r.configuredBackup}}).catch(()=>{__idecoRpcState.ready=false})}catch(e){}
 
 // V57 giữ Firebase kho TEST; riêng bảng giá chuẩn dùng lại đúng Firebase của bảng gốc.
@@ -8283,9 +8376,6 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
         function currentAIKeys(){ return (aiState.settings.keys||[]).map((key,index)=>({key:String(key||'').trim(),index})).filter(x=>x.key); }
         function isBai(model){ return String(model||'').startsWith('bai:'); }
         function isKie(model){ return String(model||'').startsWith('kie:'); }
-        // V65 (19/11/2026): tuyến DỰ PHÒNG 3 = GPT-6.1 Terra (KIE, dùng chung API key AI CHÍNH) — chỉ chạy khi cả 2 tuyến Gemini 3.8 Flash đều lỗi/quá tải
-        const TERRA_MODEL='terra:gpt-6-1-terra', TERRA_ENDPOINT='https://api.kie.ai/codex/v1/responses';
-        function isTerra(model){ return String(model||'').startsWith('terra:'); }
         function hasKieAI(){ return !!String(aiState.settings.kieKey||'').trim(); }
         function hasAnyAI(){ return currentAIKeys().length>0 || hasKieAI(); }
         function activeAIRoute(){ return aiRouteModeState==='backup'?'backup':'main'; }
@@ -8383,10 +8473,10 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             const fallback=aiState.settings.fallbackModel||AI_DEFAULT.fallbackModel;
             if(activeAIRoute()==='backup'){
                 const list=[];
-                // V62: AI CHÍNH = KIE Gemini 3.8 Flash trước; lỗi/hết credit → tự dự phòng AI PHỤ (Google AI Studio).
+                // V65: AI CHÍNH = KIE GPT-6.1 Terra → lỗi: KIE Gemini 3.8 Flash → AI PHỤ (Google AI Studio).
+                if(hasKieAI())list.push('kie:gpt-6-1-terra');
                 if(hasKieAI())list.push(isKie(fallback)?fallback:'kie:gemini-3-8-flash');
                 if(currentAIKeys().length && !isKie(primary) && !isBai(primary))list.push(primary);
-                if(hasKieAI())list.push(TERRA_MODEL); // V65: Gemini 3.8 Flash (KIE) → Gemini 3.8 Flash (Google) → Terra
                 return [...new Set(list.filter(Boolean))];
             }
             // AI PHỤ: Gemini trước. KIE trả phí tự động tiếp quản nếu Gemini lỗi/quota/model.
@@ -8394,7 +8484,6 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             if(currentAIKeys().length && !isKie(primary) && !isBai(primary))list.push(primary);
             if(hasKieAI())list.push('kie:gemini-3-8-flash');
             if(currentAIKeys().length && fallback && !isKie(fallback) && !isBai(fallback))list.push(fallback);
-            if(hasKieAI())list.push(TERRA_MODEL); // V65: dự phòng cuối khi cả 2 tuyến Gemini lỗi
             return [...new Set(list.filter(Boolean))];
         }
         function geminiEconomyModels(){
@@ -8622,57 +8711,62 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             if(!chunks.length)throw new Error('AI CHÍNH: phản hồi không phải JSON/SSE hợp lệ. Kiểm tra kết nối API.');
             return {text:text.trim(),raw:chunks};
         }
-        function terraOutputText(j){
-            const x=j&&j.data&&!j.output&&!j.output_text?j.data:j;
+        /* V65: GPT-6.1 Terra trên KIE — OpenAI Responses API: POST https://api.kie.ai/codex/v1/responses, model gpt-6-1-terra.
+           Chữ → input_text · ảnh → input_image (data URL) · PDF scan → input_file (file_data). JSON: schema ghép vào lời nhắc rồi lọc JSON. */
+        const KIE_TERRA_URL='https://api.kie.ai/codex/v1/responses';
+        function terraTextFromPayload(j){
+            const x=j&&j.data&&!j.output?j.data:j;
             if(!x)return '';
-            if(x.error)throw Object.assign(new Error('AI DỰ PHÒNG 3: '+(x.error.message||JSON.stringify(x.error)).slice(0,300)),{status:Number(x.error.code)||0});
-            if(x.code!=null&&Number(x.code)!==200&&!x.output&&!x.output_text)throw Object.assign(new Error('AI DỰ PHÒNG 3: '+(x.msg||x.message||'Yêu cầu bị từ chối')),{status:Number(x.code)||0});
+            if(x.error||(x.code!=null&&Number(x.code)!==200&&!x.output)){const er=new Error('GPT-6.1 Terra: '+String(x.error?.message||x.msg||x.message||JSON.stringify(x.error||x)).slice(0,300));er.status=Number(x.error?.code||x.code)||0;throw er;}
             if(typeof x.output_text==='string'&&x.output_text.trim())return x.output_text;
-            let t='';
-            (Array.isArray(x.output)?x.output:[]).forEach(o=>(Array.isArray(o&&o.content)?o.content:[]).forEach(c=>{if(c&&(c.type==='output_text'||c.type==='text')&&c.text)t+=c.text;}));
-            if(!t&&x.status&&x.status!=='completed')throw new Error('AI DỰ PHÒNG 3 trả trạng thái '+x.status);
+            let t='';(Array.isArray(x.output)?x.output:[]).forEach(o=>(Array.isArray(o?.content)?o.content:[]).forEach(c=>{if(c&&(c.type==='output_text'||c.type==='text')&&c.text)t+=c.text;}));
+            if(!t&&x.status&&x.status!=='completed'){const er=new Error('GPT-6.1 Terra trả trạng thái '+x.status+(x.incomplete_details?.reason?(' ('+x.incomplete_details.reason+')'):''));throw er;}
             return t;
         }
-        async function terraAI(parts,{jsonSchema=null,plainText=false,purpose='AI DỰ PHÒNG 3'}={}){
+        function terraCleanJson(t){
+            let x=String(t||'').trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'').trim();
+            const a=Math.min(...['{','['].map(c=>{const i=x.indexOf(c);return i<0?Infinity:i;})), b=Math.max(x.lastIndexOf('}'),x.lastIndexOf(']'));
+            if(Number.isFinite(a)&&b>a)x=x.slice(a,b+1);
+            JSON.parse(x); return x;
+        }
+        async function terraAI(parts,{jsonSchema=null,plainText=false,purpose='AI CHÍNH'}={}){
             const key=String(aiState.settings.kieKey||'').trim();
-            if(!key)throw new Error('Chưa có API key AI CHÍNH (Terra dùng chung key này).');
+            if(!key)throw new Error('Chưa có API key AI CHÍNH.');
             const content=[];
             for(const p of (parts||[])){
-                const inl=p&&(p.inlineData||p.inline_data);
-                if(inl){
-                    const mime=inl.mimeType||inl.mime_type||'application/octet-stream', url=`data:${mime};base64,${inl.data}`;
-                    if(/^image\//i.test(mime))content.push({type:'input_image',image_url:url});
-                    else content.push({type:'input_file',filename:/pdf/i.test(mime)?'tai_lieu.pdf':'tai_lieu',file_data:url});
-                }else if(p&&p.text)content.push({type:'input_text',text:p.text});
+                if(p&&p.text!=null)content.push({type:'input_text',text:String(p.text)});
+                else if(p&&p.inlineData){const mt=String(p.inlineData.mimeType||'');const du='data:'+mt+';base64,'+p.inlineData.data;
+                    if(/^image\//.test(mt))content.push({type:'input_image',image_url:du});
+                    else content.push({type:'input_file',filename:/pdf/.test(mt)?'tai-lieu.pdf':'tai-lieu',file_data:du});}
             }
-            if(jsonSchema&&!plainText)content.push({type:'input_text',text:'CHỈ TRẢ VỀ JSON THUẦN hợp lệ (không giải thích, không dùng ```), đúng cấu trúc schema sau (kiểu OBJECT/ARRAY/STRING/NUMBER):\n'+JSON.stringify(jsonSchema)});
-            const body={model:TERRA_MODEL.slice(6),input:[{role:'user',content}],reasoning:{effort:'low'},stream:false};
+            if(jsonSchema)content.push({type:'input_text',text:'YÊU CẦU ĐẦU RA: CHỈ trả về JSON hợp lệ (không Markdown, không giải thích), đúng cấu trúc schema sau:\n'+JSON.stringify(jsonSchema)});
+            const body={model:'gpt-6-1-terra',input:[{role:'user',content}],reasoning:{effort:'low'},stream:false,max_output_tokens:plainText?14000:16384};
             let last=null;
             for(let attempt=0;attempt<2;attempt++){
                 try{
-                    setAIProgress(attempt?'AI DỰ PHÒNG 3 đang thử lại...':'2 tuyến Gemini đang bận · AI DỰ PHÒNG 3 (Terra) tiếp quản phân tích...',true);
-                    const j=await fetchAI(TERRA_ENDPOINT,{method:'POST',headers:{Authorization:'Bearer '+key,'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(body)},
-                        Math.max(150000,Number(aiState.settings.timeoutMs)||150000),async res=>{
-                            const raw=await res.text(); let v=null; try{v=JSON.parse(raw)}catch{}
-                            if(!res.ok){const er=new Error('AI DỰ PHÒNG 3 HTTP '+res.status+' · '+String((v&&(v.msg||v.error?.message))||raw).slice(0,300));er.status=res.status;throw er;}
-                            if(v===null)throw new Error('AI DỰ PHÒNG 3: phản hồi không phải JSON.');
-                            return v;
-                        });
-                    const text=String(terraOutputText(j)||'').trim();
-                    if(!text)throw new Error('AI DỰ PHÒNG 3 trả nội dung rỗng.');
-                    aiState.lastRoute='AI DỰ PHÒNG 3'; aiState.lastError=''; updateAIRouteUI();
-                    return {text,provider:'terra',model:'gpt-6-1-terra',keyIndex:-1,raw:j};
+                    setAIProgress(attempt?'AI CHÍNH (GPT-6.1 Terra) đang thử lại...':'AI CHÍNH (GPT-6.1 Terra) đang phân tích...',true);
+                    const out=await fetchAI(KIE_TERRA_URL,{method:'POST',headers:{Authorization:'Bearer '+key,'Content-Type':'application/json'},body:JSON.stringify(body)},Math.max(120000,Number(aiState.settings.timeoutMs)||120000),async res=>{
+                        const raw=await res.text();let j=null;try{j=JSON.parse(raw)}catch{}
+                        if(!res.ok){const er=new Error('GPT-6.1 Terra HTTP '+res.status+' · '+String((j&&(j.error?.message||j.msg))||raw).slice(0,400));er.status=res.status;throw er;}
+                        if(!j)throw new Error('GPT-6.1 Terra: phản hồi không phải JSON.');
+                        return {text:terraTextFromPayload(j).trim(),raw:j};
+                    });
+                    if(!out.text)throw new Error('GPT-6.1 Terra trả nội dung rỗng.');
+                    const text=jsonSchema?terraCleanJson(out.text):out.text;
+                    aiState.lastRoute='AI CHÍNH · GPT-6.1 Terra';aiState.lastError='';updateAIRouteUI();refreshKieCredit(true).catch(()=>{});
+                    return {text,provider:'kie',model:'gpt-6-1-terra',keyIndex:-1,raw:out.raw};
                 }catch(e){
-                    last=e; const status=e?.status||0, msg=e?.name==='AbortError'?'Hết thời gian chờ AI DỰ PHÒNG 3':(e?.message||String(e));
-                    aiState.attempts.push(`AI DỰ PHÒNG 3/L${attempt+1}: ${msg}`);
-                    const transient=e?.name==='AbortError'||status===429||status>=500||/timeout|network|fetch|unavailable|overload|rate limit|server exception|high demand/i.test(msg);
-                    if(transient&&attempt<1){await sleepAI(3000+Math.floor(Math.random()*500));continue;}
+                    last=e;const status=e?.status||0;const msg=e?.name==='AbortError'?'Hết thời gian chờ GPT-6.1 Terra':(e?.message||String(e));
+                    aiState.attempts.push(`AI CHÍNH/Terra/L${attempt+1}: ${msg}`);
+                    const transient=e?.name==='AbortError'||status===429||status>=500||/timeout|network|fetch|unavailable|overload|rate limit/i.test(msg);
+                    if(transient&&attempt<1){await sleepAI(1500+Math.floor(Math.random()*300));continue;}
                     throw e;
                 }
             }
-            throw last||new Error(`${purpose}: AI DỰ PHÒNG 3 chưa phản hồi.`);
+            throw last||new Error(purpose+': GPT-6.1 Terra chưa phản hồi.');
         }
-        async function kieAI(parts,{jsonSchema=null,plainText=false,purpose='AI CHÍNH'}={}){
+        async function kieAI(parts,{jsonSchema=null,plainText=false,purpose='AI CHÍNH',model=''}={}){
+            if(/gpt-6-1-terra/.test(String(model||'')))return await terraAI(parts,{jsonSchema,plainText,purpose});
             const key=String(aiState.settings.kieKey||'').trim();
             if(!key)throw new Error('Chưa có API key AI CHÍNH.');
 
@@ -8976,10 +9070,8 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
                 try{
                     const parts=(pdfInfo&&pdfInfo.chars>=120)?[{text:`${prompt}\n\nNỘI DUNG PDF ĐÃ TRÍCH XUẤT THEO DÒNG/CỘT:\n${pdfInfo.text}`}]:await geminiPartsForFile(file,prompt,purpose);
                     let r;
-                    if(isTerra(model)){
-                        r=await terraAI(parts,{jsonSchema,plainText,purpose});
-                    }else if(isKie(model)){
-                        r=await kieAI(parts,{jsonSchema,plainText,purpose});
+                    if(isKie(model)){
+                        r=await kieAI(parts,{jsonSchema,plainText,purpose,model});
                     }else{
                         if(!currentAIKeys().length)continue;
                         r=await geminiAI(parts,{
@@ -8997,8 +9089,8 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
                     aiResultCache.set(cacheKey,{text:r.text,sourceText:pdfInfo?.text||'',model:r.model,keyIndex:r.keyIndex});
                     return {...r,sourceText:pdfInfo?.text||''};
                 }catch(e){
-                    last=e; const msg=publicAIText(e?.message||String(e)); aiState.lastError=msg; failures.push(`${isTerra(model)?'terra':model}: ${msg}`); aiState.attempts.push(`${model}: ${msg}`);
-                    setAIProgress(isTerra(model)?'AI DỰ PHÒNG 3 chưa thành công.':isKie(model)?'AI CHÍNH chưa thành công · đang tự chuyển AI PHỤ...':'AI PHỤ chưa thành công · đang kiểm tra tuyến còn lại...',true);
+                    last=e; const msg=publicAIText(e?.message||String(e)); aiState.lastError=msg; failures.push(`${model}: ${msg}`); aiState.attempts.push(`${model}: ${msg}`);
+                    setAIProgress(/gpt-6-1-terra/.test(model)?'GPT-6.1 Terra chưa thành công · đang chuyển Gemini 3.8 Flash...':isKie(model)?'AI CHÍNH chưa thành công · đang tự chuyển AI PHỤ...':'AI PHỤ chưa thành công · đang kiểm tra tuyến còn lại...',true);
                 }
             }
             const detail=failures.slice(-4).join(' | ');
@@ -9008,8 +9100,7 @@ Chỉ xóa khi đã kiểm tra không còn dùng làm dữ liệu chuẩn.`); if
             let last=null;
             for(const model of configuredAIModels()){
                 try{
-                    if(isTerra(model))return await terraAI([{text:prompt}],{jsonSchema,plainText,purpose});
-                    if(isKie(model))return await kieAI([{text:prompt}],{jsonSchema,plainText,purpose});
+                    if(isKie(model))return await kieAI([{text:prompt}],{jsonSchema,plainText,purpose,model});
                     if(currentAIKeys().length)return await geminiAI([{text:prompt}],{
                         jsonSchema,
                         plainText,
@@ -9765,10 +9856,14 @@ YÊU CẦU BẮT BUỘC:
             }else results.push('⚠️ AI PHỤ: chưa có API key');
             if(hasKieAI()){
                 try{
+                    await kieAI([{text:'Trả lời đúng một từ: OK'}],{plainText:true,purpose:'Kiểm tra AI CHÍNH',model:'kie:gpt-6-1-terra'});
+                    results.push('✅ AI CHÍNH · GPT-6.1 Terra hoạt động');
+                }catch(e){results.push(`❌ AI CHÍNH · GPT-6.1 Terra: ${e.message} (sẽ tự chuyển Gemini 3.8 Flash)`)}
+                try{
                     const r=await kieAI([{text:'Trả lời đúng một từ: OK'}],{plainText:true,purpose:'Kiểm tra AI CHÍNH'});
                     const credit=await refreshKieCredit(true);
-                    results.push(`✅ AI CHÍNH hoạt động${credit!==null?` · Credit ${Number(credit).toLocaleString('vi-VN')}`:''}`);
-                }catch(e){results.push(`❌ AI CHÍNH: ${e.message}`)}
+                    results.push(`✅ AI CHÍNH · Gemini 3.8 Flash (dự phòng) hoạt động${credit!==null?` · Credit ${Number(credit).toLocaleString('vi-VN')}`:''}`);
+                }catch(e){results.push(`❌ AI CHÍNH · Gemini 3.8 Flash: ${e.message}`)}
             }else results.push('⚠️ AI CHÍNH: chưa có API key');
             if(el)el.innerHTML=results.map(x=>`<div style="margin:3px 0;${x.startsWith('✅')?'color:#15803d':x.startsWith('❌')?'color:#b91c1c':'color:#b45309'}">${escAI(x)}</div>`).join('');
         }
